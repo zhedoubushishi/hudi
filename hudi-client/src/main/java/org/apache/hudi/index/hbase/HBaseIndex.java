@@ -348,7 +348,7 @@ public class HBaseIndex<T extends HoodieRecordPayload> extends HoodieIndex<T> {
     if (deletes.size() > 0) {
       hTable.delete(deletes);
     }
-    hTable.flushCommits();
+    // hTable.flushCommits();
     puts.clear();
     deletes.clear();
     sleepForTime(SLEEP_TIME_MILLISECONDS);
