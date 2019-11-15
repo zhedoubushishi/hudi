@@ -73,19 +73,19 @@
 
     <fasterxml.version>2.6.7</fasterxml.version>
     <glassfish.version>2.17</glassfish.version>
-    <parquet.version>1.8.1</parquet.version>
+    <parquet.version>1.10.1</parquet.version>
     <junit.version>4.11</junit.version>
     <junit-dep.version>4.10</junit-dep.version>
     <mockito.version>1.10.19</mockito.version>
     <log4j.version>1.2.17</log4j.version>
     <slf4j.version>1.7.5</slf4j.version>
     <joda.version>2.9.9</joda.version>
-    <hadoop.version>2.7.3</hadoop.version>
+    <hadoop.version>3.2.1</hadoop.version>
     <hive.groupid>org.apache.hive</hive.groupid>
-    <hive.version>2.3.1</hive.version>
+    <hive.version>3.1.2</hive.version>
     <metrics.version>4.0.2</metrics.version>
     <spark.version>2.1.0</spark.version>
-    <avro.version>1.7.7</avro.version>
+    <avro.version>1.8.2</avro.version>
     <scala.version>2.11.8</scala.version>
     <scala.libversion>2.11</scala.libversion>
     <apache-rat-plugin.version>0.12</apache-rat-plugin.version>
@@ -94,7 +94,7 @@
     <surefire-log4j.file>file://${project.basedir}/src/test/resources/log4j-surefire.properties</surefire-log4j.file>
     <thrift.version>0.12.0</thrift.version>
     <jetty.version>7.6.0.v20120127</jetty.version>
-    <hbase.version>1.2.3</hbase.version>
+    <hbase.version>2.2.2</hbase.version>
     <codehaus-jackson.version>1.9.13</codehaus-jackson.version>
     <skipTests>false</skipTests>
     <skipITs>${skipTests}</skipITs>
