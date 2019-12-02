@@ -22,8 +22,8 @@ import java.nio.ByteBuffer
 import java.sql.{Date, Timestamp}
 import java.util
 
-import com.databricks.spark.avro.SchemaConverters
-import com.databricks.spark.avro.SchemaConverters.IncompatibleSchemaException
+import _root_.com.databricks.spark.avro.SchemaConverters
+import _root_.com.databricks.spark.avro.SchemaConverters.IncompatibleSchemaException
 import org.apache.avro.{Schema, SchemaBuilder}
 import org.apache.avro.Schema.Type._
 import org.apache.avro.generic.GenericData.{Fixed, Record}

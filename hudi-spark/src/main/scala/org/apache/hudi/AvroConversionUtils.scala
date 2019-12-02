@@ -17,7 +17,7 @@
 
 package org.apache.hudi
 
-import com.databricks.spark.avro.SchemaConverters
+import _root_.com.databricks.spark.avro.SchemaConverters
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.{Schema, SchemaBuilder}
 import org.apache.spark.rdd.RDD

@@ -84,7 +84,7 @@
     <hive.groupid>org.apache.hive</hive.groupid>
     <hive.version>3.1.2</hive.version>
     <metrics.version>4.0.2</metrics.version>
-    <spark.version>2.1.0</spark.version>
+    <spark.version>2.4.4</spark.version>
     <avro.version>1.8.2</avro.version>
     <scala.version>2.11.8</scala.version>
     <scala.libversion>2.11</scala.libversion>
@@ -240,6 +240,7 @@
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <skip>${skipUTs}</skip>
+          <trimStackTrace>false</trimStackTrace>
           <systemPropertyVariables>
             <log4j.configuration>
               ${surefire-log4j.file}
