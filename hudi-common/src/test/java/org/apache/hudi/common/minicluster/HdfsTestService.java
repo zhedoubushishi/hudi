@@ -26,6 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.http.HttpServer2;
 import org.apache.hudi.common.model.HoodieTestUtils;
 import org.apache.hudi.common.util.FileIOUtils;
 import org.apache.log4j.LogManager;
@@ -135,6 +136,9 @@ public class HdfsTestService {
     config.set(DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY, bindIP + ":" + datanodePort);
     config.set(DFSConfigKeys.DFS_DATANODE_IPC_ADDRESS_KEY, bindIP + ":" + datanodeIpcPort);
     config.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY, bindIP + ":" + datanodeHttpPort);
+
+    config.setInt(HttpServer2.HTTP_MAX_THREADS_KEY, 10);
+
     // When a datanode registers with the namenode, the Namenode do a hostname
     // check of the datanode which will fail on OpenShift due to reverse DNS
     // issues with the internal IP addresses. This config disables that check,

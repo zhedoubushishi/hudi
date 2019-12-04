@@ -71,19 +71,19 @@
   <dependencies>
 
     <!-- Jetty -->
-    <dependency>
-      <!-- Needs to be at the top to ensure we get the correct dependency versions for jetty-server -->
-      <groupId>org.eclipse.jetty.aggregate</groupId>
-      <artifactId>jetty-all</artifactId>
-      <scope>test</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      &lt;!&ndash; Needs to be at the top to ensure we get the correct dependency versions for jetty-server &ndash;&gt;-->
+<!--      <groupId>org.eclipse.jetty.aggregate</groupId>-->
+<!--      <artifactId>jetty-all</artifactId>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>${jetty.version}</version>
-      <scope>test</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.eclipse.jetty</groupId>-->
+<!--      <artifactId>jetty-server</artifactId>-->
+<!--      <version>${jetty.version}</version>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
 
     <!-- Hoodie -->
     <dependency>

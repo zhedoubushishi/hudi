@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.metastore.RetryingHMSHandler;
 import org.apache.hadoop.hive.metastore.TSetIpAddressProcessor;
 import org.apache.hadoop.hive.metastore.TUGIBasedProcessor;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.thrift.TUGIContainingTransport;
 import org.apache.hive.service.server.HiveServer2;
 import org.apache.hudi.common.model.HoodieTestUtils;
@@ -136,8 +137,10 @@ public class HiveTestService {
   }
 
   private HiveConf configureHive(Configuration conf, String localHiveLocation) throws IOException {
-    conf.set("hive.metastore.local", "false");
-    conf.set(HiveConf.ConfVars.METASTOREURIS.varname, "thrift://" + bindIP + ":" + metastorePort);
+    // conf.set("hive.metastore.local", "false"); ???
+    conf.set("hive.metastore.local", "true");
+    conf.set(MetastoreConf.ConfVars.THRIFT_URIS.getVarname(), "thrift://" + bindIP + ":" + metastorePort);
+    conf.setInt(MetastoreConf.ConfVars.SERVER_PORT.getVarname(), metastorePort);
     conf.set(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_BIND_HOST.varname, bindIP);
     conf.setInt(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT.varname, serverPort);
     // The following line to turn of SASL has no effect since HiveAuthFactory calls
@@ -148,14 +151,19 @@ public class HiveTestService {
     File localHiveDir = new File(localHiveLocation);
     localHiveDir.mkdirs();
     File metastoreDbDir = new File(localHiveDir, "metastore_db");
-    conf.set(HiveConf.ConfVars.METASTORECONNECTURLKEY.varname,
+    LOG.info("WENNINGD => " + metastoreDbDir.getPath());
+    conf.set(MetastoreConf.ConfVars.CONNECT_URL_KEY.getVarname(),
         "jdbc:derby:" + metastoreDbDir.getPath() + ";create=true");
+    // conf.set(MetastoreConf.ConfVars.CONNECTION_DRIVER.getVarname(), "org.apache.derby.jdbc.ClientDriver");
     File derbyLogFile = new File(localHiveDir, "derby.log");
     derbyLogFile.createNewFile();
     setSystemProperty("derby.stream.error.file", derbyLogFile.getPath());
-    conf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, Files.createTempDir().getAbsolutePath());
-    conf.set("datanucleus.schema.autoCreateTables", "true");
-    conf.set("hive.metastore.schema.verification", "false");
+    conf.set(MetastoreConf.ConfVars.WAREHOUSE.getVarname(), Files.createTempDir().getAbsolutePath());
+    // conf.set("datanucleus.schema.autoCreateTables", "true");
+    conf.setBoolean("hive.metastore.schema.verification", false);
+    conf.setBoolean("hive.metastore.event.db.notification.api.auth", false);
+    conf.setBoolean("datanucleus.schema.autoCreateTables", true);
+    conf.setBoolean("datanucleus.autoCreateSchema", true);
     setSystemProperty("derby.stream.error.file", derbyLogFile.getPath());
 
     return new HiveConf(conf, this.getClass());
@@ -266,10 +274,10 @@ public class HiveTestService {
       // Server will create new threads up to max as necessary. After an idle
       // period, it will destory threads to keep the number of threads in the
       // pool to min.
-      int minWorkerThreads = conf.getIntVar(HiveConf.ConfVars.METASTORESERVERMINTHREADS);
-      int maxWorkerThreads = conf.getIntVar(HiveConf.ConfVars.METASTORESERVERMAXTHREADS);
-      boolean tcpKeepAlive = conf.getBoolVar(HiveConf.ConfVars.METASTORE_TCP_KEEP_ALIVE);
-      boolean useFramedTransport = conf.getBoolVar(HiveConf.ConfVars.METASTORE_USE_THRIFT_FRAMED_TRANSPORT);
+      int minWorkerThreads = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.SERVER_MIN_THREADS);
+      int maxWorkerThreads = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.SERVER_MAX_THREADS);
+      boolean tcpKeepAlive = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.TCP_KEEP_ALIVE);
+      boolean useFramedTransport = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.USE_THRIFT_FRAMED_TRANSPORT);
 
       // don't support SASL yet
       // boolean useSasl = conf.getBoolVar(HiveConf.ConfVars.METASTORE_USE_THRIFT_SASL);
@@ -287,9 +295,9 @@ public class HiveTestService {
       TTransportFactory transFactory;
 
       HMSHandler baseHandler = new HiveMetaStore.HMSHandler("new db based metaserver", conf, false);
-      IHMSHandler handler = (IHMSHandler) RetryingHMSHandler.getProxy(conf, baseHandler, true);
+      IHMSHandler handler = RetryingHMSHandler.getProxy(conf, baseHandler, true);
 
-      if (conf.getBoolVar(HiveConf.ConfVars.METASTORE_EXECUTE_SET_UGI)) {
+      if (MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.EXECUTE_SET_UGI)) {
         transFactory = useFramedTransport
             ? new ChainedTTransportFactory(new TFramedTransport.Factory(), new TUGIContainingTransport.Factory())
             : new TUGIContainingTransport.Factory();
@@ -317,5 +325,10 @@ public class HiveTestService {
     } catch (Throwable x) {
       throw new IOException(x);
     }
+  }
+
+  public static void main(String[] args) throws Exception {
+    InetSocketAddress address = new InetSocketAddress("127.0.0.1", 9083);
+    TServerTransport serverTransport = new TServerSocketKeepAlive(address);
   }
 }
