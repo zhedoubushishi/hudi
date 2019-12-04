@@ -163,6 +163,7 @@ public class HiveTestService {
     conf.setBoolean("hive.metastore.schema.verification", false);
     conf.setBoolean("hive.metastore.event.db.notification.api.auth", false);
     conf.setBoolean("datanucleus.schema.autoCreateTables", true);
+    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
     conf.setBoolean("datanucleus.autoCreateSchema", true);
     setSystemProperty("derby.stream.error.file", derbyLogFile.getPath());
 
