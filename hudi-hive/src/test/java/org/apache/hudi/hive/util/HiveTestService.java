@@ -40,7 +40,8 @@ import org.apache.hadoop.hive.metastore.TSetIpAddressProcessor;
 import org.apache.hadoop.hive.metastore.TUGIBasedProcessor;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.thrift.TUGIContainingTransport;
+//import org.apache.hadoop.hive.thrift.TUGIContainingTransport;
+import org.apache.hadoop.hive.metastore.security.TUGIContainingTransport;
 import org.apache.hive.service.server.HiveServer2;
 import org.apache.hudi.common.model.HoodieTestUtils;
 import org.apache.hudi.common.util.FileIOUtils;
@@ -102,6 +103,7 @@ public class HiveTestService {
     }
 
     HiveConf serverConf = configureHive(hadoopConf, localHiveLocation);
+    LOG.info("WENNINGD => print hive conf: " + serverConf.toString());
 
     executorService = Executors.newSingleThreadExecutor();
     tServer = startMetaStore(bindIP, metastorePort, serverConf);
@@ -138,7 +140,7 @@ public class HiveTestService {
 
   private HiveConf configureHive(Configuration conf, String localHiveLocation) throws IOException {
     // conf.set("hive.metastore.local", "false"); ???
-    conf.set("hive.metastore.local", "true");
+    conf.set("hive.metastore.local", "false");
     conf.set(MetastoreConf.ConfVars.THRIFT_URIS.getVarname(), "thrift://" + bindIP + ":" + metastorePort);
     conf.setInt(MetastoreConf.ConfVars.SERVER_PORT.getVarname(), metastorePort);
     conf.set(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_BIND_HOST.varname, bindIP);
@@ -151,9 +153,9 @@ public class HiveTestService {
     File localHiveDir = new File(localHiveLocation);
     localHiveDir.mkdirs();
     File metastoreDbDir = new File(localHiveDir, "metastore_db");
-    LOG.info("WENNINGD => " + metastoreDbDir.getPath());
+    LOG.info("WENNINGD => metastore db path is: " + metastoreDbDir.getPath());
     conf.set(MetastoreConf.ConfVars.CONNECT_URL_KEY.getVarname(),
-        "jdbc:derby:" + metastoreDbDir.getPath() + ";create=true");
+        "jdbc:derby:" + metastoreDbDir.getPath() + ";databaseName=metastore_db;create=true");
     // conf.set(MetastoreConf.ConfVars.CONNECTION_DRIVER.getVarname(), "org.apache.derby.jdbc.ClientDriver");
     File derbyLogFile = new File(localHiveDir, "derby.log");
     derbyLogFile.createNewFile();
@@ -165,6 +167,7 @@ public class HiveTestService {
     conf.setBoolean("datanucleus.schema.autoCreateTables", true);
     conf.setBoolean("datanucleus.schema.autoCreateAll", true);
     conf.setBoolean("datanucleus.autoCreateSchema", true);
+    conf.setBoolean("hive.metastore.event.db.notification.api.auth", false);
     setSystemProperty("derby.stream.error.file", derbyLogFile.getPath());
 
     return new HiveConf(conf, this.getClass());
