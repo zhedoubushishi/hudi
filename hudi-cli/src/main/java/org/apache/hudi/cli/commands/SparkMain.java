@@ -281,6 +281,21 @@ public class SparkMain {
     return 0;
   }
 
+  private static int doBootstrap(JavaSparkContext jsc, String tableName, String basePath, String sourcePath, String recordKeyCols, int parallelism, String selectorClass, String schema) {
+    HoodieWriteConfig config = HoodieWriteConfig.newBuilder()
+        .forTable(tableName)
+        .withPath(basePath)
+        .withAutoCommit(true)
+        .withSchema(schema)
+        .withBootstrapSourceBasePath(sourcePath)
+        .withBootstrapKeyGenClass(recordKeyCols)
+        .withBootstrapParallelism(parallelism)
+        .withBootstrapModeSelector(selectorClass).build();
+    HoodieWriteClient client = new HoodieWriteClient(jsc, config, false);
+    client.bootstrap(org.apache.hudi.common.util.Option.empty());
+    return 0;
+  }
+
   private static int rollback(JavaSparkContext jsc, String instantTime, String basePath) throws Exception {
     HoodieWriteClient client = createHoodieClient(jsc, basePath);
     if (client.rollback(instantTime)) {

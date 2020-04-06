@@ -20,6 +20,8 @@ package org.apache.hudi.config;
 
 import org.apache.hudi.client.HoodieWriteClient;
 import org.apache.hudi.client.WriteStatus;
+import org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelector;
+import org.apache.hudi.client.bootstrap.translator.IdentityBootstrapPathTranslator;
 import org.apache.hudi.common.config.DefaultHoodieConfig;
 import org.apache.hudi.common.fs.ConsistencyGuardConfig;
 import org.apache.hudi.common.model.HoodieCleaningPolicy;
@@ -118,14 +120,29 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
       "_.hoodie.allow.multi.write.on.same.instant";
   private static final String DEFAULT_ALLOW_MULTI_WRITE_ON_SAME_INSTANT = "false";
 
+  public static final String EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION = AVRO_SCHEMA + ".externalTransformation";
+  public static final String DEFAULT_EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION = "false";
+
   private ConsistencyGuardConfig consistencyGuardConfig;
+
+  private static final String SOURCE_BASE_PATH_PROP = "hoodie.bootstrap.source.base.path";
+  private static final String BOOTSTRAP_MODE_SELECTOR = "hoodie.bootstrap.mode.selector";
+  private static final String FULL_BOOTRAP_INPUT_PROVIDER = "hoodie.bootstrap.full.input.provider";
+  private static final String BOOTSTRAP_KEYGEN_CLASS = "hoodie.bootstrap.keygen.class";
+  private static final String BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS =
+      "hoodie.bootstrap.partitionpath.translator.class";
+  private static final String DEFAULT_BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS =
+      IdentityBootstrapPathTranslator.class.getName();
+
+  private static final String BOOTSTRAP_PARALLELISM = "hoodie.bootstrap.parallelism";
+  private static final String DEFAULT_BOOTSTRAP_PARALLELISM = "1500";
 
   // Hoodie Write Client transparently rewrites File System View config when embedded mode is enabled
   // We keep track of original config and rewritten config
   private final FileSystemViewStorageConfig clientSpecifiedViewStorageConfig;
   private FileSystemViewStorageConfig viewStorageConfig;
 
-  private HoodieWriteConfig(Properties props) {
+  protected HoodieWriteConfig(Properties props) {
     super(props);
     Properties newProps = new Properties();
     newProps.putAll(props);
@@ -167,6 +184,10 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
 
   public Boolean shouldAssumeDatePartitioning() {
     return Boolean.parseBoolean(props.getProperty(HOODIE_ASSUME_DATE_PARTITIONING_PROP));
+  }
+
+  public boolean shouldUseExternalSchemaTransformation() {
+    return Boolean.parseBoolean(props.getProperty(EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION));
   }
 
   public Integer getTimelineLayoutVersion() {
@@ -624,9 +645,33 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
     return clientSpecifiedViewStorageConfig;
   }
 
+  public String getBootstrapSourceBasePath() {
+    return props.getProperty(SOURCE_BASE_PATH_PROP);
+  }
+
+  public String getBootstrapModeSelectorClass() {
+    return props.getProperty(BOOTSTRAP_MODE_SELECTOR);
+  }
+
+  public String getFullBootstrapInputProvider() {
+    return props.getProperty(FULL_BOOTRAP_INPUT_PROVIDER);
+  }
+
+  public String getBootstrapKeyGeneratorClass() {
+    return props.getProperty(BOOTSTRAP_KEYGEN_CLASS);
+  }
+
+  public String getBootstrapPartitionPathTranslatorClass() {
+    return props.getProperty(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
+  }
+
+  public int getBootstrapParallelism() {
+    return Integer.parseInt(props.getProperty(BOOTSTRAP_PARALLELISM));
+  }
+
   public static class Builder {
 
-    private final Properties props = new Properties();
+    protected final Properties props = new Properties();
     private boolean isIndexConfigSet = false;
     private boolean isStorageConfigSet = false;
     private boolean isCompactionConfigSet = false;
@@ -790,7 +835,47 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
       return this;
     }
 
-    public HoodieWriteConfig build() {
+    public Builder withExternalSchemaTrasformation(boolean enabled) {
+      props.setProperty(EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION, String.valueOf(enabled));
+      return this;
+    }
+
+    public Builder withBootstrapSourceBasePath(String basePath) {
+      props.setProperty(SOURCE_BASE_PATH_PROP, basePath);
+      return this;
+    }
+
+    public Builder withBootstrapModeSelector(String partitionSelectorClass) {
+      props.setProperty(BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
+      return this;
+    }
+
+    public Builder withFullBootstrapInputProvider(String partitionSelectorClass) {
+      props.setProperty(FULL_BOOTRAP_INPUT_PROVIDER, partitionSelectorClass);
+      return this;
+    }
+
+    public Builder withBootstrapKeyGenClass(String keyGenClass) {
+      props.setProperty(BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
+      return this;
+    }
+
+    public Builder withBootstrapPartitionPathTranslatorClass(String partitionPathTranslatorClass) {
+      props.setProperty(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, partitionPathTranslatorClass);
+      return this;
+    }
+
+    public Builder withBootstrapParallelism(int parallelism) {
+      props.setProperty(BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
+      return this;
+    }
+
+    public Builder withProperties(Properties properties) {
+      this.props.putAll(properties);
+      return this;
+    }
+
+    protected void setDefaults() {
       // Check for mandatory properties
       setDefaultOnCondition(props, !props.containsKey(INSERT_PARALLELISM), INSERT_PARALLELISM, DEFAULT_PARALLELISM);
       setDefaultOnCondition(props, !props.containsKey(BULKINSERT_PARALLELISM), BULKINSERT_PARALLELISM,
@@ -840,13 +925,23 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
           FileSystemViewStorageConfig.newBuilder().fromProperties(props).build());
       setDefaultOnCondition(props, !isConsistencyGuardSet,
           ConsistencyGuardConfig.newBuilder().fromProperties(props).build());
-
+      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_PARALLELISM), BOOTSTRAP_PARALLELISM,
+          DEFAULT_BOOTSTRAP_PARALLELISM);
+      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS),
+          BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, DEFAULT_BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
+      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_MODE_SELECTOR), BOOTSTRAP_MODE_SELECTOR,
+          MetadataOnlyBootstrapModeSelector.class.getCanonicalName());
+      setDefaultOnCondition(props, !props.containsKey(EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION),
+          EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION, DEFAULT_EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION);
       setDefaultOnCondition(props, !props.containsKey(TIMELINE_LAYOUT_VERSION), TIMELINE_LAYOUT_VERSION,
           String.valueOf(TimelineLayoutVersion.CURR_VERSION));
       String layoutVersion = props.getProperty(TIMELINE_LAYOUT_VERSION);
       // Ensure Layout Version is good
       new TimelineLayoutVersion(Integer.parseInt(layoutVersion));
+    }
 
+    public HoodieWriteConfig build() {
+      setDefaults();
       // Build WriteConfig at the end
       HoodieWriteConfig config = new HoodieWriteConfig(props);
       Objects.requireNonNull(config.getBasePath());
