@@ -18,6 +18,7 @@
 
 package org.apache.hudi.common.bootstrap;
 
+
 import org.apache.hudi.avro.model.HoodieFSPermission;
 import org.apache.hudi.avro.model.HoodieFileStatus;
 import org.apache.hudi.avro.model.HoodiePath;

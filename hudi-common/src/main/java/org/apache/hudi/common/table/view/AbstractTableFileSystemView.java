@@ -19,7 +19,6 @@
 package org.apache.hudi.common.table.view;
 
 import org.apache.hudi.common.bootstrap.index.BootstrapIndex;
-import org.apache.hudi.common.bootstrap.index.HFileBasedBootstrapIndex;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.model.BootstrapSourceFileMapping;
 import org.apache.hudi.common.model.CompactionOperation;
@@ -86,7 +85,7 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
   private final ReadLock readLock = globalLock.readLock();
   private final WriteLock writeLock = globalLock.writeLock();
 
-  private BootstrapIndex bootstrapIndex;
+  private BootstrapIndex.IndexReader bootstrapIndex;
 
   private String getPartitionPathFromFilePath(String fullPath) {
     return FSUtils.getRelativePartitionPath(new Path(metaClient.getBasePath()), new Path(fullPath).getParent());
@@ -98,8 +97,8 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
   protected void init(HoodieTableMetaClient metaClient, HoodieTimeline visibleActiveTimeline) {
     this.metaClient = metaClient;
     refreshTimeline(visibleActiveTimeline);
-    bootstrapIndex = new HFileBasedBootstrapIndex(metaClient);
 
+    this.bootstrapIndex =  BootstrapIndex.getBootstrapIndex(metaClient).createReader();
     // Load Pending Compaction Operations
     resetPendingCompactionOperations(CompactionUtils.getAllPendingCompactionOperations(metaClient).values().stream()
         .map(e -> Pair.of(e.getKey(), CompactionOperation.convertFromAvroRecordInstance(e.getValue()))));
@@ -126,9 +125,9 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
     // Group by partition for efficient updates for both InMemory and DiskBased stuctures.
     fileGroups.stream().collect(Collectors.groupingBy(HoodieFileGroup::getPartitionPath)).forEach((partition, value) -> {
       if (!isPartitionAvailableInStore(partition)) {
-        try (BootstrapIndex.IndexReader reader = bootstrapIndex.createReader()) {
+        if (bootstrapIndex.isIndexAvailable()) {
           List<BootstrapSourceFileMapping> sourceFileMappings =
-              reader.getSourceFileMappingForPartition(partition);
+              bootstrapIndex.getSourceFileMappingForPartition(partition);
           addExternalBaseFileMapping(sourceFileMappings.stream()
               .map(s -> new ExternalBaseFileMapping(new HoodieFileGroupId(s.getHudiPartitionPath(), s.getHudiFileId()),
                   s.getSourceFileStatus())));

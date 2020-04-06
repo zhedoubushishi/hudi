@@ -57,8 +57,8 @@ import java.util.Map;
 
 import scala.Tuple2;
 
-public abstract class BaseCommitActionExecutor<T extends HoodieRecordPayload<T>>
-    extends BaseActionExecutor<HoodieWriteMetadata> {
+public abstract class BaseCommitActionExecutor<T extends HoodieRecordPayload<T>, R>
+    extends BaseActionExecutor<R> {
 
   private static final Logger LOG = LogManager.getLogger(BaseCommitActionExecutor.class);
 
@@ -178,7 +178,12 @@ public abstract class BaseCommitActionExecutor<T extends HoodieRecordPayload<T>>
     }
   }
 
-  private void commit(Option<Map<String, String>> extraMetadata, HoodieWriteMetadata result) {
+  protected void commit(Option<Map<String, String>> extraMetadata, HoodieWriteMetadata result) {
+    commit(extraMetadata, result, result.getWriteStatuses().map(WriteStatus::getStat).collect());
+  }
+
+  protected void commit(Option<Map<String, String>> extraMetadata, HoodieWriteMetadata result,
+      List<HoodieWriteStat> stats) {
     String actionType = table.getMetaClient().getCommitActionType();
     LOG.info("Committing " + instantTime + ", action Type " + actionType);
     // Create a Hoodie table which encapsulated the commits and files visible
@@ -186,9 +191,7 @@ public abstract class BaseCommitActionExecutor<T extends HoodieRecordPayload<T>>
 
     HoodieActiveTimeline activeTimeline = table.getActiveTimeline();
     HoodieCommitMetadata metadata = new HoodieCommitMetadata();
-
     result.setCommitted(true);
-    List<HoodieWriteStat> stats = result.getWriteStatuses().map(WriteStatus::getStat).collect();
     result.setWriteStats(stats);
 
     updateMetadataAndRollingStats(metadata, stats);

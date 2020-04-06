@@ -82,6 +82,7 @@ public interface HoodieTimeline extends Serializable {
   String INVALID_INSTANT_TS = "0";
 
   String METADATA_BOOTSTRAP_INSTANT_TS = "00000000000000";
+  String FULL_BOOTSTRAP_INSTANT_TS = "00000000000001";
 
   /**
    * Filter this timeline to just include the in-flights.

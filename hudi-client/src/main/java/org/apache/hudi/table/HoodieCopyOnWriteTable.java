@@ -46,6 +46,8 @@ import org.apache.hudi.exception.HoodieUpsertException;
 import org.apache.hudi.execution.SparkBoundedInMemoryExecutor;
 import org.apache.hudi.io.HoodieCreateHandle;
 import org.apache.hudi.io.HoodieMergeHandle;
+import org.apache.hudi.table.action.bootstrap.BootstrapActionExecutor;
+import org.apache.hudi.table.action.bootstrap.HoodieBootstrapWriteMetadata;
 import org.apache.hudi.table.action.clean.CleanActionExecutor;
 import org.apache.hudi.table.action.HoodieWriteMetadata;
 import org.apache.hudi.table.action.commit.BulkInsertCommitActionExecutor;
@@ -143,6 +145,15 @@ public class HoodieCopyOnWriteTable<T extends HoodieRecordPayload> extends Hoodi
   @Override
   public HoodieWriteMetadata compact(JavaSparkContext jsc, String compactionInstantTime) {
     throw new HoodieNotSupportedException("Compaction is not supported on a CopyOnWrite table");
+  }
+
+  @Override
+  public HoodieBootstrapWriteMetadata bootstrap(JavaSparkContext jsc) {
+    return new BootstrapActionExecutor(jsc, config, this).execute();
+  }
+
+  public void rollbackBootstrap(JavaSparkContext jsc) {
+    throw new IllegalStateException("Not Implemented Yet");
   }
 
   public Iterator<List<WriteStatus>> handleUpdate(String instantTime, String partitionPath, String fileId,

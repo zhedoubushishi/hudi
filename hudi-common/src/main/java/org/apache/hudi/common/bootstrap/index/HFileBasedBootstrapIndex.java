@@ -179,6 +179,11 @@ public class HFileBasedBootstrapIndex extends BootstrapIndex {
     }
 
     @Override
+    protected boolean checkIndex() {
+      return isBootstrapped;
+    }
+
+    @Override
     public BootstrapIndexInfo getIndexInfo() {
       if (null == bootstrapIndexInfo) {
         synchronized (this) {
