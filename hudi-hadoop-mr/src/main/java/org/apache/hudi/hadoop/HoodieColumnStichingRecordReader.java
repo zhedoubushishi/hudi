@@ -24,7 +24,6 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.RecordReader;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.hudi.common.util.ValidationUtils;
@@ -69,9 +68,6 @@ public class HoodieColumnStichingRecordReader implements RecordReader<NullWritab
     for (int j = 0; j < right.get().length; j++) {
       value.get()[i++] = right.get()[j];
     }
-    System.out.println("Left Record :" + Arrays.asList(left.get()));
-    System.out.println("Right Record :" + Arrays.asList(right.get()));
-    System.out.println("Stiched Record :" + Arrays.asList(value.get()));
     return hasMoreOnLeft;
   }
 

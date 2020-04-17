@@ -85,7 +85,7 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
   private final ReadLock readLock = globalLock.readLock();
   private final WriteLock writeLock = globalLock.writeLock();
 
-  private BootstrapIndex.IndexReader bootstrapIndex;
+  private BootstrapIndex bootstrapIndex;
 
   private String getPartitionPathFromFilePath(String fullPath) {
     return FSUtils.getRelativePartitionPath(new Path(metaClient.getBasePath()), new Path(fullPath).getParent());
@@ -97,8 +97,7 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
   protected void init(HoodieTableMetaClient metaClient, HoodieTimeline visibleActiveTimeline) {
     this.metaClient = metaClient;
     refreshTimeline(visibleActiveTimeline);
-
-    this.bootstrapIndex =  BootstrapIndex.getBootstrapIndex(metaClient).createReader();
+    this.bootstrapIndex =  BootstrapIndex.getBootstrapIndex(metaClient);
     // Load Pending Compaction Operations
     resetPendingCompactionOperations(CompactionUtils.getAllPendingCompactionOperations(metaClient).values().stream()
         .map(e -> Pair.of(e.getKey(), CompactionOperation.convertFromAvroRecordInstance(e.getValue()))));
@@ -126,11 +125,14 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
     fileGroups.stream().collect(Collectors.groupingBy(HoodieFileGroup::getPartitionPath)).forEach((partition, value) -> {
       if (!isPartitionAvailableInStore(partition)) {
         if (bootstrapIndex.isIndexAvailable()) {
-          List<BootstrapSourceFileMapping> sourceFileMappings =
-              bootstrapIndex.getSourceFileMappingForPartition(partition);
-          addExternalBaseFileMapping(sourceFileMappings.stream()
-              .map(s -> new ExternalBaseFileMapping(new HoodieFileGroupId(s.getHudiPartitionPath(), s.getHudiFileId()),
-                  s.getSourceFileStatus())));
+          try (BootstrapIndex.IndexReader reader = bootstrapIndex.createReader()) {
+            LOG.info("Boostrap Index available for partition " + partition);
+            List<BootstrapSourceFileMapping> sourceFileMappings =
+                reader.getSourceFileMappingForPartition(partition);
+            addExternalBaseFileMapping(sourceFileMappings.stream()
+                .map(s -> new ExternalBaseFileMapping(new HoodieFileGroupId(s.getHudiPartitionPath(),
+                    s.getHudiFileId()), s.getSourceFileStatus())));
+          }
         }
         storePartitionView(partition, value);
       }
@@ -203,6 +205,8 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
 
       addedPartitions.clear();
       resetViewState();
+
+      bootstrapIndex = null;
 
       // Initialize with new Hoodie timeline.
       init(metaClient, getTimeline());

@@ -18,7 +18,6 @@
 
 package org.apache.hudi.common.bootstrap;
 
-
 import org.apache.hudi.avro.model.HoodieFSPermission;
 import org.apache.hudi.avro.model.HoodieFileStatus;
 import org.apache.hudi.avro.model.HoodiePath;
@@ -72,9 +71,7 @@ public class TestBootstrapIndex extends HoodieCommonTestHarness {
     testBootstrapIndexOneRound(10);
 
     HFileBasedBootstrapIndex index = new HFileBasedBootstrapIndex(metaClient);
-    try (IndexWriter w = index.createWriter(SOURCE_BASE_PATH)) {
-      w.dropIndex();
-    }
+    index.dropIndex();
 
     // Run again this time recreating bootstrap index
     testBootstrapIndexOneRound(5);

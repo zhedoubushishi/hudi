@@ -18,12 +18,31 @@
 
 package org.apache.hudi.client.bootstrap.selector;
 
+import org.apache.hudi.avro.model.HoodieFileStatus;
 import org.apache.hudi.client.bootstrap.BootstrapMode;
+import org.apache.hudi.common.util.collection.Pair;
 import org.apache.hudi.config.HoodieWriteConfig;
 
-public class FullBootstrapSelector extends UniformBootstrapSelector {
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-  public FullBootstrapSelector(HoodieWriteConfig bootstrapConfig) {
-    super(bootstrapConfig, BootstrapMode.FULL_BOOTSTRAP);
+/**
+ * A bootstrap selector which employs same bootstrap mode for all partitions.
+ */
+public abstract class UniBootstrapModeSelector extends BootstrapModeSelector {
+
+  private final BootstrapMode bootstrapMode;
+
+  public UniBootstrapModeSelector(HoodieWriteConfig bootstrapConfig, BootstrapMode bootstrapMode) {
+    super(bootstrapConfig);
+    this.bootstrapMode = bootstrapMode;
+  }
+
+  @Override
+  public Map<BootstrapMode, List<String>> select(List<Pair<String, List<HoodieFileStatus>>> partitions) {
+    return partitions.stream().map(p -> Pair.of(bootstrapMode, p))
+        .collect(Collectors.groupingBy(Pair::getKey, Collectors.mapping(x -> x.getValue().getKey(),
+            Collectors.toList())));
   }
 }

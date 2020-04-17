@@ -341,7 +341,7 @@ public abstract class HoodieTable<T extends HoodieRecordPayload> implements Seri
    * Perform rollback of bootstrap of a Hudi table.
    * @param jsc JavaSparkContext
    */
-  public abstract void rollbackBootstrap(JavaSparkContext jsc);
+  public abstract void rollbackBootstrap(JavaSparkContext jsc, String instantTime);
 
   /**
    * Executes a new clean action.

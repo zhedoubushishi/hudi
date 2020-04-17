@@ -146,14 +146,20 @@ public class HoodieWriteClient<T extends HoodieRecordPayload> extends AbstractHo
     return recordsWithLocation.filter(v1 -> !v1.isCurrentLocationKnown());
   }
 
+  /**
+   * Main API to run bootstrap to hudi.
+   */
   public void bootstrap() {
     HoodieTable<T> table = getTableAndInitCtx(WriteOperationType.UPSERT);
     table.bootstrap(jsc);
   }
 
+  /**
+   * Main API to rollback bootstrap to hudi.
+   */
   public void rollBackBootstrap() {
     HoodieTable<T> table = getTableAndInitCtx(WriteOperationType.UPSERT);
-    table.rollbackBootstrap(jsc);
+    table.rollbackBootstrap(jsc, HoodieActiveTimeline.createNewInstantTime());
   }
 
   /**
@@ -649,7 +655,13 @@ public class HoodieWriteClient<T extends HoodieRecordPayload> extends AbstractHo
     List<String> commits = inflightTimeline.getReverseOrderedInstants().map(HoodieInstant::getTimestamp)
         .collect(Collectors.toList());
     for (String commit : commits) {
-      rollback(commit);
+      if (HoodieTimeline.compareTimestamps(commit, HoodieTimeline.LESSER_THAN_OR_EQUALS,
+          HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS)) {
+        rollBackBootstrap();
+        break;
+      } else {
+        rollback(commit);
+      }
     }
   }
 

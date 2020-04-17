@@ -23,8 +23,6 @@ import org.apache.hudi.common.model.BootstrapSourceFileMapping;
 import org.apache.hudi.common.model.HoodieWriteStat;
 import org.apache.hudi.common.util.collection.Pair;
 
-import java.io.Serializable;
-
 /**
  * WriteStatus for Bootstrap.
  */
@@ -46,29 +44,5 @@ public class BootstrapWriteStatus extends WriteStatus {
 
   public void setBootstrapSourceFileMapping(BootstrapSourceFileMapping sourceFileMapping) {
     this.sourceFileMapping = sourceFileMapping;
-  }
-
-  public static final class BootstrapSourceFileInfo implements Serializable {
-    private final String bootstrapBasePath;
-    private final String bootstrapPartitionPath;
-    private final String fileName;
-
-    public BootstrapSourceFileInfo(String bootstrapBasePath, String bootstrapPartitionPath, String fileName) {
-      this.bootstrapBasePath = bootstrapBasePath;
-      this.bootstrapPartitionPath = bootstrapPartitionPath;
-      this.fileName = fileName;
-    }
-
-    public String getBootstrapBasePath() {
-      return bootstrapBasePath;
-    }
-
-    public String getBootstrapPartitionPath() {
-      return bootstrapPartitionPath;
-    }
-
-    public String getFileName() {
-      return fileName;
-    }
   }
 }

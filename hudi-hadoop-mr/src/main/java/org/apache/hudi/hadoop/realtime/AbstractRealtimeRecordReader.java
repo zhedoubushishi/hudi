@@ -18,6 +18,7 @@
 
 package org.apache.hudi.hadoop.realtime;
 
+import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hudi.avro.HoodieAvroUtils;
 import org.apache.hudi.common.model.HoodieAvroPayload;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
@@ -45,9 +46,9 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hudi.hadoop.InputSplitUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.parquet.avro.AvroSchemaConverter;
 import org.apache.parquet.hadoop.ParquetFileReader;
 import org.apache.parquet.schema.MessageType;
 
@@ -332,7 +333,7 @@ public abstract class AbstractRealtimeRecordReader {
     Schema schemaFromLogFile =
         LogReaderUtils.readLatestSchemaFromLogFiles(split.getBasePath(), split.getDeltaLogPaths(), jobConf);
     if (schemaFromLogFile == null) {
-      writerSchema = new AvroSchemaConverter().convert(baseFileSchema);
+      writerSchema = InputSplitUtils.getBaseFileSchema((FileSplit)split, jobConf);
       LOG.debug("Writer Schema From Parquet => " + writerSchema.getFields());
     } else {
       writerSchema = schemaFromLogFile;

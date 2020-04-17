@@ -18,7 +18,7 @@
 
 package org.apache.hudi.table.action.bootstrap;
 
-import org.apache.hudi.table.action.commit.HoodieWriteMetadata;
+import org.apache.hudi.table.action.HoodieWriteMetadata;
 
 public class HoodieBootstrapWriteMetadata {
 

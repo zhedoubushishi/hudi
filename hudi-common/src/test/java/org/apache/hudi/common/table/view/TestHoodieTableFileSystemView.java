@@ -22,7 +22,6 @@ import org.apache.hudi.avro.model.HoodieCompactionPlan;
 import org.apache.hudi.avro.model.HoodieFSPermission;
 import org.apache.hudi.avro.model.HoodieFileStatus;
 import org.apache.hudi.avro.model.HoodiePath;
-import org.apache.hudi.common.HoodieCommonTestHarness;
 import org.apache.hudi.common.bootstrap.FileStatusUtils;
 import org.apache.hudi.common.bootstrap.index.BootstrapIndex.IndexWriter;
 import org.apache.hudi.common.bootstrap.index.HFileBasedBootstrapIndex;

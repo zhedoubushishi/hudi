@@ -580,10 +580,8 @@ public class FSUtils {
     final Path basePath = new Path(basePathStr);
     final Map<Integer, List<String>> levelToPartitions = new HashMap<>();
     final Map<String, List<HoodieFileStatus>> partitionToFiles = new HashMap<>();
-    System.out.print("BASE PAth is " + basePathStr);
     processFiles(fs, basePathStr, (status) -> {
       if (status.isFile() && filePathFilter.accept(status.getPath())) {
-        System.out.print("Processing File :" + status.getPath());
         String relativePath = FSUtils.getRelativePartitionPath(basePath, status.getPath().getParent());
         List<HoodieFileStatus> statusList = partitionToFiles.get(relativePath);
         if (null == statusList) {

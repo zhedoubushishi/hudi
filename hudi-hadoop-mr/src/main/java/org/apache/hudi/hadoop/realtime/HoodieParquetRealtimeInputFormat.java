@@ -143,10 +143,10 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
                   .map(logFile -> logFile.getPath().toString()).collect(Collectors.toList());
               if (split instanceof ExternalBaseFileSplit) {
                 ExternalBaseFileSplit eSplit = (ExternalBaseFileSplit)split;
-                String[] hosts = Arrays.stream(split.getLocationInfo()).filter(x -> !x.isInMemory())
-                    .toArray(String[]::new);
-                String[] inMemoryHosts = Arrays.stream(split.getLocationInfo()).filter(SplitLocationInfo::isInMemory)
-                    .toArray(String[]::new);
+                String[] hosts = split.getLocationInfo() != null ? Arrays.stream(split.getLocationInfo())
+                    .filter(x -> !x.isInMemory()).toArray(String[]::new) : new String[0];
+                String[] inMemoryHosts = split.getLocationInfo() != null ? Arrays.stream(split.getLocationInfo())
+                    .filter(SplitLocationInfo::isInMemory).toArray(String[]::new) : new String[0];
                 FileSplit baseSplit = new FileSplit(eSplit.getPath(), eSplit.getStart(), eSplit.getLength(),
                     hosts, inMemoryHosts);
                 rtSplits.add(new RealtimeExternalBaseFileSplit(baseSplit,metaClient.getBasePath(),
@@ -270,7 +270,7 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
         "HoodieRealtimeRecordReader can only work on RealtimeSplit and not with " + split);
 
     return new HoodieRealtimeRecordReader((RealtimeSplit)split, jobConf,
-          super.getRecordReader(split, jobConf, reporter));
+        super.getRecordReader(split, jobConf, reporter));
   }
 
   @Override

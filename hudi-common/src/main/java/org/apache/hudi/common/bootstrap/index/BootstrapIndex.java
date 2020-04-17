@@ -40,9 +40,38 @@ public abstract class BootstrapIndex implements Serializable {
     this.metaClient = metaClient;
   }
 
+  /**
+   * Create Bootstrap Index Reader.
+   * @return Index Reader
+   */
   public abstract IndexReader createReader();
 
+  /**
+   * Create Bootstrap Index Writer.
+   * @param sourceBasePath Source Base Path
+   * @return Index Writer
+   */
   public abstract IndexWriter createWriter(String sourceBasePath);
+
+  /**
+   * Drop bootstrap index.
+   */
+  public abstract void dropIndex();
+
+  /**
+   * Returns true if valid metadata bootstrap is present.
+   * @return
+   */
+  public final boolean isIndexAvailable() {
+    return metaClient.getActiveTimeline().getCommitsTimeline().filterCompletedInstants().lastInstant()
+        .map(i -> HoodieTimeline.compareTimestamps(i.getTimestamp(), HoodieTimeline.GREATER_THAN_OR_EQUALS,
+            HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS)).orElse(false) && checkIndex();
+  }
+
+  /**
+   * Check if bootstrap Index is present and ensures readable.
+   */
+  protected abstract boolean checkIndex();
 
   /**
    * Bootstrap Index Reader Interface.
@@ -54,21 +83,6 @@ public abstract class BootstrapIndex implements Serializable {
     public IndexReader(HoodieTableMetaClient metaClient) {
       this.metaClient = metaClient;
     }
-
-    /**
-     * Returns true if valid metadata bootstrap is present.
-     * @return
-     */
-    public final boolean isIndexAvailable() {
-      return metaClient.getActiveTimeline().getCommitTimeline().lastInstant()
-          .map(i -> HoodieTimeline.compareTimestamps(i.getTimestamp(), HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS,
-              HoodieTimeline.GREATER_OR_EQUAL)).orElse(false) && checkIndex();
-    }
-
-    /**
-     * Check if bootstrap Index is present and ensures readable.
-     */
-    protected abstract boolean checkIndex();
 
     /**
      * Return bootstrap index info.
@@ -140,11 +154,6 @@ public abstract class BootstrapIndex implements Serializable {
      * Writer calls this method after appending all partitions to be indexed.
      */
     public abstract void finish();
-
-    /**
-     * Drop bootstrap index.
-     */
-    public abstract void dropIndex();
 
     public abstract void close();
   }

@@ -20,7 +20,7 @@ package org.apache.hudi.config;
 
 import org.apache.hudi.client.HoodieWriteClient;
 import org.apache.hudi.client.WriteStatus;
-import org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapSelector;
+import org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelector;
 import org.apache.hudi.common.config.DefaultHoodieConfig;
 import org.apache.hudi.common.fs.ConsistencyGuardConfig;
 import org.apache.hudi.common.model.HoodieCleaningPolicy;
@@ -103,17 +103,12 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   private ConsistencyGuardConfig consistencyGuardConfig;
 
   private static final String SOURCE_BASE_PATH_PROP = "hoodie.bootstrap.source.base.path";
-  private static final String BOOTSTRAP_PARTITION_SELECTOR = "hoodie.bootstrap.partition.selector";
+  private static final String BOOTSTRAP_MODE_SELECTOR = "hoodie.bootstrap.mode.selector";
   private static final String FULL_BOOTRAP_INPUT_PROVIDER = "hoodie.bootstrap.full.input.provider";
   // Expect configurations of format col1,col2,col3 ....
   private static final String BOOTSTRAP_RECORDKEY_COLUMNS = "hoodie.bootstrap.recordkey.columns";
   private static final String BOOTSTRAP_PARALLELISM = "hoodie.bootstrap.parallelism";
   private static final String DEFAULT_BOOTSTRAP_PARALLELISM = "1500";
-  private static final String BOOTSTRAP_METADATA_WRITER_PARALLELISM  = "hoodie.bootstrap.metadata.writer.parallelism";
-  private static final String DEFAULT_BOOTSTRAP_METADATA_WRITER_PARALLELISM = "1500";
-  private static final String BOOTSTRAP_METADATA_WRITER_MAX_SIZE_PER_FILE  =
-      "hoodie.bootstrap.metadata.writer.maxSizeInBytes";
-  private static final String DEFAULT_METADATA_WRITER_MAX_SIZE_PER_FILE = String.valueOf(1024L * 1024L * 1024L);
 
   // Hoodie Write Client transparently rewrites File System View config when embedded mode is enabled
   // We keep track of original config and rewritten config
@@ -564,8 +559,8 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
     return props.getProperty(SOURCE_BASE_PATH_PROP);
   }
 
-  public String getBootstrapPartitionSelectorClass() {
-    return props.getProperty(BOOTSTRAP_PARTITION_SELECTOR);
+  public String getBootstrapModeSelectorClass() {
+    return props.getProperty(BOOTSTRAP_MODE_SELECTOR);
   }
 
   public String getFullBootstrapInputProvider() {
@@ -578,14 +573,6 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
 
   public int getBootstrapParallelism() {
     return Integer.parseInt(props.getProperty(BOOTSTRAP_PARALLELISM));
-  }
-
-  public int getBootstrapMetadataWriterParallelism() {
-    return Integer.parseInt(props.getProperty(BOOTSTRAP_METADATA_WRITER_PARALLELISM));
-  }
-
-  public long getBootstrapMetadataWriterMaxFileSizeInBytes() {
-    return Long.parseLong(props.getProperty(BOOTSTRAP_METADATA_WRITER_MAX_SIZE_PER_FILE));
   }
 
   public static class Builder {
@@ -754,8 +741,8 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
       return this;
     }
 
-    public Builder withBootstrapPartitionSelector(String partitionSelectorClass) {
-      props.setProperty(BOOTSTRAP_PARTITION_SELECTOR, partitionSelectorClass);
+    public Builder withBootstrapModeSelector(String partitionSelectorClass) {
+      props.setProperty(BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
       return this;
     }
 
@@ -771,16 +758,6 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
 
     public Builder withBootstrapParallelism(int parallelism) {
       props.setProperty(BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
-      return this;
-    }
-
-    public Builder withBootstrapMetadataWriterParallelism(int parallelism) {
-      props.setProperty(BOOTSTRAP_METADATA_WRITER_PARALLELISM, String.valueOf(parallelism));
-      return this;
-    }
-
-    public Builder withBootstrapMetadataWriterMaxFileSizeInBytes(long maxFileSizeInBytes) {
-      props.setProperty(BOOTSTRAP_METADATA_WRITER_MAX_SIZE_PER_FILE, String.valueOf(maxFileSizeInBytes));
       return this;
     }
 
@@ -839,13 +816,8 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
           ConsistencyGuardConfig.newBuilder().fromProperties(props).build());
       setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_PARALLELISM), BOOTSTRAP_PARALLELISM,
           DEFAULT_BOOTSTRAP_PARALLELISM);
-      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_METADATA_WRITER_PARALLELISM),
-          BOOTSTRAP_METADATA_WRITER_PARALLELISM, DEFAULT_BOOTSTRAP_METADATA_WRITER_PARALLELISM);
-      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_METADATA_WRITER_MAX_SIZE_PER_FILE),
-          BOOTSTRAP_METADATA_WRITER_MAX_SIZE_PER_FILE, DEFAULT_METADATA_WRITER_MAX_SIZE_PER_FILE);
-      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_PARTITION_SELECTOR), BOOTSTRAP_PARTITION_SELECTOR,
-          MetadataOnlyBootstrapSelector.class.getCanonicalName());
-
+      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_MODE_SELECTOR), BOOTSTRAP_MODE_SELECTOR,
+          MetadataOnlyBootstrapModeSelector.class.getCanonicalName());
       setDefaultOnCondition(props, !props.containsKey(TIMELINE_LAYOUT_VERSION), TIMELINE_LAYOUT_VERSION,
           String.valueOf(TimelineLayoutVersion.CURR_VERSION));
       String layoutVersion = props.getProperty(TIMELINE_LAYOUT_VERSION);

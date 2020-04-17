@@ -358,7 +358,6 @@ public class HoodieParquetInputFormat extends MapredParquetInputFormat implement
     // }
     if (split instanceof ExternalBaseFileSplit) {
       ExternalBaseFileSplit eSplit = (ExternalBaseFileSplit)split;
-      LOG.debug("ExternalDataFileSplit is " + eSplit);
       String[] rawColNames = HoodieColumnProjectionUtils.getReadColumnNames(job);
       List<Integer> rawColIds = HoodieColumnProjectionUtils.getReadColumnIDs(job);
       List<Pair<Integer, String>> colsWithIndex =
@@ -425,7 +424,9 @@ public class HoodieParquetInputFormat extends MapredParquetInputFormat implement
             super.getRecordReader(rightSplit, jobConf2, reporter));
       }
     }
-    System.out.println("EMPLOYING DEFAULT RECORD READER - " + split);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("EMPLOYING DEFAULT RECORD READER - " + split);
+    }
     return super.getRecordReader(split, job, reporter);
   }
 
@@ -473,7 +474,7 @@ public class HoodieParquetInputFormat extends MapredParquetInputFormat implement
 
   private ExternalBaseFileSplit makeExternalFileSplit(HoodiePathWithExternalFileStatus file, FileSplit split) {
     try {
-      System.out.println("Making external data split for " + file);
+      LOG.info("Making external data split for " + file);
       FileStatus externalFileStatus = file.getExternalFileStatus();
       FileSplit externalFileSplit = makeSplit(externalFileStatus.getPath(), 0, externalFileStatus.getLen(),
           new String[0], new String[0]);

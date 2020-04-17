@@ -23,12 +23,16 @@ import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.util.collection.Pair;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import java.util.List;
 
 public abstract class FullBootstrapInputProvider {
+
+  protected static final Logger LOG = LogManager.getLogger(FullBootstrapInputProvider.class);
 
   protected final TypedProperties props;
   protected final JavaSparkContext jsc;
@@ -40,9 +44,11 @@ public abstract class FullBootstrapInputProvider {
 
   /**
    * Generates a list of input partition and files and returns a RDD representing source.
+   * @param tableName Hudi Table Name
+   * @param sourceBasePath Source Base Path
    * @param partitionPaths Partition Paths
    * @return JavaRDD of input records
    */
   public abstract JavaRDD<HoodieRecord> generateInputRecordRDD(String tableName,
-      List<Pair<String, List<HoodieFileStatus>>> partitionPaths);
+      String sourceBasePath, List<Pair<String, List<HoodieFileStatus>>> partitionPaths);
 }

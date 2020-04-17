@@ -160,8 +160,8 @@ public class HoodieBootstrapClient extends AbstractHoodieClient {
               }
             });
 
-    BootstrapSelector selector =
-        (BootstrapSelector) ReflectionUtils.loadClass(writeConfig.getPartitionSelectorClass(),
+    BootstrapModeSelector selector =
+        (BootstrapModeSelector) ReflectionUtils.loadClass(writeConfig.getPartitionSelectorClass(),
             writeConfig);
     return selector.select(folders);
   }

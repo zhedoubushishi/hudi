@@ -104,7 +104,8 @@
     <surefire-log4j.file>file://${project.basedir}/src/test/resources/log4j-surefire.properties</surefire-log4j.file>
     <thrift.version>0.12.0</thrift.version>
     <jetty.version>7.6.0.v20120127</jetty.version>
-    <hbase.version>1.2.3</hbase.version>
+    <htrace.version>3.1.0-incubating</htrace.version>
+    <hbase.version>1.4.13</hbase.version>
     <codehaus-jackson.version>1.9.13</codehaus-jackson.version>
     <h2.version>1.4.199</h2.version>
     <skipTests>false</skipTests>

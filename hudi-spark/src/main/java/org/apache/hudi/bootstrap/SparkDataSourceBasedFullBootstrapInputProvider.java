@@ -51,7 +51,7 @@ public class SparkDataSourceBasedFullBootstrapInputProvider extends FullBootstra
   }
 
   @Override
-  public JavaRDD<HoodieRecord> generateInputRecordRDD(String tableName,
+  public JavaRDD<HoodieRecord> generateInputRecordRDD(String tableName, String sourceBasePath,
       List<Pair<String, List<HoodieFileStatus>>> partitionPathsWithFiles) {
     String[] filePaths = partitionPathsWithFiles.stream().map(Pair::getValue)
         .flatMap(f -> f.stream().map(fs -> FileStatusUtils.toPath(fs.getPath()).toUri().getPath()))
