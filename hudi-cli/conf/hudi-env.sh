@@ -19,4 +19,5 @@
 # Set the necessary environment variables
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/etc/hadoop/conf"}
 export SPARK_CONF_DIR=${SPARK_CONF_DIR:-"/etc/spark/conf"}
+export SPARK_HOME=${SPARK_HOME:-"/usr/lib/spark"}
 export CLIENT_JAR=${CLIENT_JAR}

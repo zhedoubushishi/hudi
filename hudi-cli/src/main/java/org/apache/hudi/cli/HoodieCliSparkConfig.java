@@ -25,7 +25,8 @@ public class HoodieCliSparkConfig {
   /**
    * Configs to start spark application.
    */
-  public static final String CLI_SPARK_MASTER = "SPARK_MASTER";
+  public static final String CLI_ENV_SPARK_MASTER = "SPARK_MASTER";
+  public static final String CLI_SPARK_MASTER = "spark.master";
   public static final String CLI_SERIALIZER = "spark.serializer";
   public static final String CLI_DRIVER_MAX_RESULT_SIZE = "spark.driver.maxResultSize";
   public static final String CLI_EVENT_LOG_OVERWRITE = "spark.eventLog.overwrite";

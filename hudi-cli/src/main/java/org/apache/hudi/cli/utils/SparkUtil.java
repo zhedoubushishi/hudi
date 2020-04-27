@@ -29,6 +29,7 @@ import org.apache.hudi.common.util.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.launcher.SparkLauncher;
+import org.apache.spark.util.Utils;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -69,16 +70,19 @@ public class SparkUtil {
   public static JavaSparkContext initJavaSparkConf(String name, Option<String> master,
       Option<String> executorMemory) {
     SparkConf sparkConf = new SparkConf().setAppName(name);
+    Utils.loadDefaultSparkProperties(sparkConf, null);
 
-    String defMaster = master.orElse(sparkConf.getenv(HoodieCliSparkConfig.CLI_SPARK_MASTER));
-    if ((null == defMaster) || (defMaster.isEmpty())) {
-      sparkConf.setMaster(DEFAULT_SPARK_MASTER);
-    } else {
-      sparkConf.setMaster(defMaster);
+    if (!sparkConf.contains(HoodieCliSparkConfig.CLI_SPARK_MASTER)) {
+      String defMaster = master.orElse(sparkConf.getenv(HoodieCliSparkConfig.CLI_ENV_SPARK_MASTER));
+      if (StringUtils.isNullOrEmpty(defMaster)) {
+        sparkConf.setMaster(DEFAULT_SPARK_MASTER);
+      } else {
+        sparkConf.setMaster(defMaster);
+      }
     }
 
     sparkConf.set(HoodieCliSparkConfig.CLI_SERIALIZER, "org.apache.spark.serializer.KryoSerializer");
-    sparkConf.set(HoodieCliSparkConfig.CLI_DRIVER_MAX_RESULT_SIZE, "2g");
+    sparkConf.setIfMissing(HoodieCliSparkConfig.CLI_DRIVER_MAX_RESULT_SIZE, "2g");
     sparkConf.set(HoodieCliSparkConfig.CLI_EVENT_LOG_OVERWRITE, "true");
     sparkConf.set(HoodieCliSparkConfig.CLI_EVENT_LOG_ENABLED, "true");
     if (executorMemory.isPresent()) {
