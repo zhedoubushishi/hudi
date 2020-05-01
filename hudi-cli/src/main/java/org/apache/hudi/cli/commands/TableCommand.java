@@ -89,7 +89,7 @@ public class TableCommand implements CommandMarker {
       @CliOption(key = {"layoutVersion"}, help = "Specific Layout Version to use") Integer layoutVersion,
       @CliOption(key = {"payloadClass"}, unspecifiedDefaultValue = "org.apache.hudi.common.model.HoodieAvroPayload",
           help = "Payload Class") final String payloadClass,
-      @CliOption(key = {"payloadClass"},
+      @CliOption(key = {"bootstrapIndexClass"},
           unspecifiedDefaultValue = "org.apache.hudi.common.bootstrap.index.HFileBasedBootstrapIndex",
           help = "Bootstrap Index Class") final String bootstrapIndexClass)
       throws IOException {
