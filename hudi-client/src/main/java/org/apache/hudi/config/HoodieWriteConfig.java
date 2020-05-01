@@ -641,7 +641,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getFullBootstrapInputProvider() {
-    return props.getProperty(HoodieBootstrapConfig.FULL_BOOTRAP_INPUT_PROVIDER);
+    return props.getProperty(HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER);
   }
 
   public String getBootstrapKeyGeneratorClass() {
