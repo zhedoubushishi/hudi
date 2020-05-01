@@ -160,7 +160,7 @@ public class HFileBootstrapIndex extends BootstrapIndex {
   }
 
   @Override
-  protected boolean isPresent() {
+  public boolean isPresent() {
     return isPresent;
   }
 
