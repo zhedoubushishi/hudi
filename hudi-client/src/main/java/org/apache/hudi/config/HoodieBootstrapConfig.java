@@ -35,7 +35,7 @@ public class HoodieBootstrapConfig extends DefaultHoodieConfig {
 
   public static final String SOURCE_BASE_PATH_PROP = "hoodie.bootstrap.source.base.path";
   public static final String BOOTSTRAP_MODE_SELECTOR = "hoodie.bootstrap.mode.selector";
-  public static final String FULL_BOOTRAP_INPUT_PROVIDER = "hoodie.bootstrap.full.input.provider";
+  public static final String FULL_BOOTSTRAP_INPUT_PROVIDER = "hoodie.bootstrap.full.input.provider";
   public static final String BOOTSTRAP_KEYGEN_CLASS = "hoodie.bootstrap.keygen.class";
   public static final String BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS =
       "hoodie.bootstrap.partitionpath.translator.class";
@@ -82,7 +82,7 @@ public class HoodieBootstrapConfig extends DefaultHoodieConfig {
     }
 
     public Builder withFullBootstrapInputProvider(String partitionSelectorClass) {
-      props.setProperty(FULL_BOOTRAP_INPUT_PROVIDER, partitionSelectorClass);
+      props.setProperty(FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
       return this;
     }
 
