@@ -18,12 +18,15 @@
 
 package org.apache.hudi.cli.commands;
 
+import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.cli.DedupeSparkJob;
 import org.apache.hudi.cli.utils.SparkUtil;
 import org.apache.hudi.client.HoodieWriteClient;
+import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.common.util.StringUtils;
+import org.apache.hudi.config.HoodieBootstrapConfig;
 import org.apache.hudi.config.HoodieIndexConfig;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.exception.HoodieSavepointException;
@@ -55,7 +58,7 @@ public class SparkMain {
    * Commands.
    */
   enum SparkCommand {
-    ROLLBACK, DEDUPLICATE, ROLLBACK_TO_SAVEPOINT, SAVEPOINT, IMPORT, UPSERT, COMPACT_SCHEDULE, COMPACT_RUN,
+    BOOTSTRAP, ROLLBACK, DEDUPLICATE, ROLLBACK_TO_SAVEPOINT, SAVEPOINT, IMPORT, UPSERT, COMPACT_SCHEDULE, COMPACT_RUN,
     COMPACT_UNSCHEDULE_PLAN, COMPACT_UNSCHEDULE_FILE, COMPACT_VALIDATE, COMPACT_REPAIR, CLEAN, DELETE_SAVEPOINT
   }
 
@@ -70,6 +73,11 @@ public class SparkMain {
         : SparkUtil.initJavaSparkConf("hoodie-cli-" + command);
     int returnCode = 0;
     switch (cmd) {
+      case BOOTSTRAP:
+        assert (args.length == 8);
+        returnCode = doBootstrap(jsc, args[1], args[2], args[3], args[4], args[5], args[6],
+            Integer.parseInt(args[7]), args[8], args[9], args[10]);
+        break;
       case ROLLBACK:
         assert (args.length == 3);
         returnCode = rollback(jsc, args[1], args[2]);
@@ -278,6 +286,30 @@ public class SparkMain {
     DedupeSparkJob job = new DedupeSparkJob(basePath, duplicatedPartitionPath, repairedOutputPath, new SQLContext(jsc),
         FSUtils.getFs(basePath, jsc.hadoopConfiguration()));
     job.fixDuplicates(Boolean.parseBoolean(dryRun));
+    return 0;
+  }
+
+  private static int doBootstrap(JavaSparkContext jsc, String tableName, String basePath, String sourcePath, String schema,
+      String recordKeyCols, String partitionFields, int parallelism, String selectorClass, String keyGeneratorClass, String fullTestBootstrapInputProvider) {
+    TypedProperties properties = new TypedProperties();
+    properties.setProperty(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY(), recordKeyCols);
+    properties.setProperty(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY(), partitionFields);
+
+    HoodieWriteConfig config = HoodieWriteConfig.newBuilder()
+        .forTable(tableName)
+        .withPath(basePath)
+        .withAutoCommit(true)
+        .withSchema(schema)
+        .withProperties(properties)
+        .withBootstrapConfig(HoodieBootstrapConfig.newBuilder()
+            .withBootstrapSourceBasePath(sourcePath)
+            .withBootstrapKeyGenClass(keyGeneratorClass)
+            .withFullBootstrapInputProvider(fullTestBootstrapInputProvider)
+            .withBootstrapParallelism(parallelism)
+            .withBootstrapModeSelector(selectorClass).build())
+        .build();
+    HoodieWriteClient client = new HoodieWriteClient(jsc, config);
+    client.bootstrap(Option.empty());
     return 0;
   }
 
