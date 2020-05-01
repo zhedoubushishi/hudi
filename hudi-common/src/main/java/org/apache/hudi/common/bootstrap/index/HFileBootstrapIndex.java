@@ -160,7 +160,7 @@ public class HFileBootstrapIndex extends BootstrapIndex {
   }
 
   @Override
-  protected boolean isPresent() {
+  public boolean isPresent() {
     return isPresent;
   }
 
@@ -240,13 +240,21 @@ public class HFileBootstrapIndex extends BootstrapIndex {
     @Override
     public List<String> getIndexedPartitionPaths() {
       HFileScanner scanner = partitionIndexReader().getScanner(true, true);
-      return getAllKeys(scanner);
+      List<String> cellKeys = getAllKeys(scanner);
+      // cellKey is in this format:
+      // part=datestr=2452537//LATEST_TIMESTAMP/Put/vlen=2405/seqid=0
+      return cellKeys.stream().map(key -> key.split("//")[0].substring(5))
+          .distinct().collect(Collectors.toList());
     }
 
     @Override
     public List<String> getIndexedFileIds() {
       HFileScanner scanner = fileIdIndexReader().getScanner(true, true);
-      return getAllKeys(scanner);
+      List<String> cellKeys = getAllKeys(scanner);
+      // cellKey is in this format:
+      // part=datestr=2452537;fileid=baab9c50-c35e-49d1-b928-695aa7e37833//LATEST_TIMESTAMP/Put/vlen=2312/seqid=0
+      return cellKeys.stream().map(key -> key.split("//")[0].split(";")[1].split("=")[1])
+          .distinct().collect(Collectors.toList());
     }
 
     private List<String> getAllKeys(HFileScanner scanner) {
