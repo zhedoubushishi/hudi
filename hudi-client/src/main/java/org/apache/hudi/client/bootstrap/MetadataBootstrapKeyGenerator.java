@@ -28,13 +28,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BootstrapKeyGenerator implements Serializable {
+public class MetadataBootstrapKeyGenerator implements Serializable {
 
   private final HoodieWriteConfig writeConfig;
   private final List<String> keyColumns;
   private final List<String> topLevelKeyColumns;
 
-  public BootstrapKeyGenerator(HoodieWriteConfig writeConfig) {
+  public MetadataBootstrapKeyGenerator(HoodieWriteConfig writeConfig) {
     this.writeConfig = writeConfig;
     this.keyColumns = Arrays.asList(writeConfig.getBootstrapRecordKeyColumns().split(","));
     // For nested columns, pick top level column name

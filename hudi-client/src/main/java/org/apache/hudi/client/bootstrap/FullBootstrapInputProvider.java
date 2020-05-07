@@ -18,6 +18,7 @@
 
 package org.apache.hudi.client.bootstrap;
 
+import java.io.Serializable;
 import org.apache.hudi.avro.model.HoodieFileStatus;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.model.HoodieRecord;
@@ -30,12 +31,12 @@ import org.apache.spark.api.java.JavaSparkContext;
 
 import java.util.List;
 
-public abstract class FullBootstrapInputProvider {
+public abstract class FullBootstrapInputProvider implements Serializable {
 
   protected static final Logger LOG = LogManager.getLogger(FullBootstrapInputProvider.class);
 
   protected final TypedProperties props;
-  protected final JavaSparkContext jsc;
+  protected final transient JavaSparkContext jsc;
 
   public FullBootstrapInputProvider(TypedProperties props, JavaSparkContext jsc) {
     this.props = props;

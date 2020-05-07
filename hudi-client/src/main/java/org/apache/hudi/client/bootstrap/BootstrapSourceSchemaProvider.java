@@ -60,7 +60,7 @@ public class BootstrapSourceSchemaProvider {
   }
 
   /**
-   * By default, select a random file to be used to generate avro schema.
+   * Select a random file to be used to generate avro schema.
    * Override this method to get custom schema selection.
    * @param jsc Java Spark Context
    * @param partitions  List of partitions with files within them

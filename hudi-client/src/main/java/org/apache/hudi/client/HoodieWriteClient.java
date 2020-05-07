@@ -150,16 +150,29 @@ public class HoodieWriteClient<T extends HoodieRecordPayload> extends AbstractHo
    * Main API to run bootstrap to hudi.
    */
   public void bootstrap() {
+    if (rollbackPending) {
+      rollBackPendingBootstrap();
+    }
     HoodieTable<T> table = getTableAndInitCtx(WriteOperationType.UPSERT);
     table.bootstrap(jsc);
   }
 
   /**
-   * Main API to rollback bootstrap to hudi.
+   * Main API to rollback pending bootstrap.
    */
-  public void rollBackBootstrap() {
-    HoodieTable<T> table = getTableAndInitCtx(WriteOperationType.UPSERT);
-    table.rollbackBootstrap(jsc, HoodieActiveTimeline.createNewInstantTime());
+  protected void rollBackPendingBootstrap() {
+    LOG.info("Rolling back pending bootstrap if present");
+    HoodieTable<T> table = HoodieTable.create(config, jsc);
+    HoodieTimeline inflightTimeline = table.getMetaClient().getCommitsTimeline().filterPendingExcludingCompaction();
+    Option<String> instant = Option.fromJavaOptional(
+        inflightTimeline.getReverseOrderedInstants().map(HoodieInstant::getTimestamp).findFirst());
+    if (instant.isPresent() && HoodieTimeline.compareTimestamps(instant.get(), HoodieTimeline.LESSER_THAN_OR_EQUALS,
+        HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS)) {
+      LOG.info("Found pending bootstrap instants. Rolling them back");
+      table.rollbackBootstrap(jsc, HoodieActiveTimeline.createNewInstantTime());
+      LOG.info("Finished rolling back pending bootstrap");
+    }
+
   }
 
   /**
@@ -657,7 +670,7 @@ public class HoodieWriteClient<T extends HoodieRecordPayload> extends AbstractHo
     for (String commit : commits) {
       if (HoodieTimeline.compareTimestamps(commit, HoodieTimeline.LESSER_THAN_OR_EQUALS,
           HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS)) {
-        rollBackBootstrap();
+        rollBackPendingBootstrap();
         break;
       } else {
         rollback(commit);

@@ -20,6 +20,7 @@ package org.apache.hudi.utilities.deltastreamer;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hudi.DataSourceUtils;
+import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.client.HoodieWriteClient;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.fs.FSUtils;
@@ -687,6 +688,9 @@ public class HoodieDeltaStreamer implements Serializable {
       this.props = properties != null ? properties : UtilHelpers.readConfig(
           FSUtils.getFs(cfg.propsFilePath, jssc.hadoopConfiguration()),
           new Path(cfg.propsFilePath), cfg.configs).getConfig();
+      // Add more defaults if full bootstrap requested
+      this.props.putIfAbsent(DataSourceWriteOptions.PAYLOAD_CLASS_OPT_KEY(),
+          DataSourceWriteOptions.DEFAULT_PAYLOAD_OPT_VAL());
       this.schemaProvider = UtilHelpers.createSchemaProvider(cfg.schemaProviderClassName, props, jssc);
       HoodieWriteConfig.Builder builder =
           HoodieWriteConfig.newBuilder().withPath(cfg.targetBasePath)

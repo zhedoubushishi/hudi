@@ -36,6 +36,8 @@ import org.apache.hudi.common.model.HoodieKey;
 import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.model.HoodieTestUtils;
+import org.apache.hudi.common.table.timeline.HoodieInstant;
+import org.apache.hudi.common.table.timeline.HoodieInstant.State;
 import org.apache.hudi.common.table.timeline.HoodieTimeline;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.common.util.collection.Pair;
@@ -162,7 +164,9 @@ public class TestBootstrap extends TestHoodieClientBase {
         timestamp, false);
 
     // Rollback Bootstrap
-    client.rollBackBootstrap();
+    FSUtils.deleteInstantFile(metaClient.getFs(), metaClient.getMetaPath(), new HoodieInstant(State.COMPLETED,
+        HoodieTimeline.COMMIT_ACTION, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS));
+    client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,
@@ -217,7 +221,9 @@ public class TestBootstrap extends TestHoodieClientBase {
         timestamp, false);
 
     // Rollback Bootstrap
-    client.rollBackBootstrap();
+    FSUtils.deleteInstantFile(metaClient.getFs(), metaClient.getMetaPath(), new HoodieInstant(State.COMPLETED,
+        HoodieTimeline.COMMIT_ACTION, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS));
+    client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,
@@ -272,8 +278,12 @@ public class TestBootstrap extends TestHoodieClientBase {
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, true, 1,
         timestamp, timestamp, false);
     // Rollback Bootstrap
-    client.rollBackBootstrap();
+    FSUtils.deleteInstantFile(metaClient.getFs(), metaClient.getMetaPath(), new HoodieInstant(State.COMPLETED,
+        HoodieTimeline.DELTA_COMMIT_ACTION, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS));
+    client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
+    System.out.println("metaClient.getCommitsTimeline()=" + metaClient.getCommitsTimeline().getInstants()
+        .collect(Collectors.toList()));
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,
         (status) -> status.getName().endsWith(".parquet")).stream().flatMap(f -> f.getValue().stream()).count());
@@ -329,7 +339,9 @@ public class TestBootstrap extends TestHoodieClientBase {
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS, false, 1, timestamp,
         timestamp, false);
     // Rollback Bootstrap
-    client.rollBackBootstrap();
+    FSUtils.deleteInstantFile(metaClient.getFs(), metaClient.getMetaPath(), new HoodieInstant(State.COMPLETED,
+        HoodieTimeline.COMMIT_ACTION, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
+    client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,
@@ -381,7 +393,9 @@ public class TestBootstrap extends TestHoodieClientBase {
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS, false, 1, timestamp,
         timestamp, false);
     // Rollback Bootstrap
-    client.rollBackBootstrap();
+    FSUtils.deleteInstantFile(metaClient.getFs(), metaClient.getMetaPath(), new HoodieInstant(State.COMPLETED,
+        HoodieTimeline.DELTA_COMMIT_ACTION, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
+    client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,
@@ -439,7 +453,9 @@ public class TestBootstrap extends TestHoodieClientBase {
         timestamp, timestamp, false,
         Arrays.asList(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
     // Rollback Bootstrap
-    client.rollBackBootstrap();
+    FSUtils.deleteInstantFile(metaClient.getFs(), metaClient.getMetaPath(), new HoodieInstant(State.COMPLETED,
+        HoodieTimeline.COMMIT_ACTION, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
+    client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,
@@ -492,7 +508,9 @@ public class TestBootstrap extends TestHoodieClientBase {
         timestamp, timestamp, false,
         Arrays.asList(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
     // Rollback Bootstrap
-    client.rollBackBootstrap();
+    FSUtils.deleteInstantFile(metaClient.getFs(), metaClient.getMetaPath(), new HoodieInstant(State.COMPLETED,
+        HoodieTimeline.DELTA_COMMIT_ACTION, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
+    client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,

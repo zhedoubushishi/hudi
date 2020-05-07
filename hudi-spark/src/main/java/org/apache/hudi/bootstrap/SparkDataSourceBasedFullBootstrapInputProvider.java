@@ -18,9 +18,6 @@
 
 package org.apache.hudi.bootstrap;
 
-import java.io.IOException;
-import java.util.List;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.hudi.AvroConversionUtils;
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.avro.model.HoodieFileStatus;
@@ -31,11 +28,16 @@ import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.util.collection.Pair;
 import org.apache.hudi.exception.HoodieIOException;
 import org.apache.hudi.keygen.KeyGenerator;
+
+import org.apache.avro.generic.GenericRecord;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Spark Data frame based bootstrap input provider.
@@ -56,7 +58,7 @@ public class SparkDataSourceBasedFullBootstrapInputProvider extends FullBootstra
     String[] filePaths = partitionPathsWithFiles.stream().map(Pair::getValue)
         .flatMap(f -> f.stream().map(fs -> FileStatusUtils.toPath(fs.getPath()).toUri().getPath()))
         .toArray(String[]::new);
-    Dataset inputDataset = sparkSession.read().load(filePaths);
+    Dataset inputDataset = sparkSession.read().parquet(filePaths);
     try {
       KeyGenerator keyGenerator = DataSourceUtils.createKeyGenerator(props);
       String structName = tableName + "_record";
