@@ -190,6 +190,37 @@ private[hudi] object HoodieSparkSqlWriter {
     (writeSuccessful, common.util.Option.ofNullable(instantTime))
   }
 
+  def bootstrap(sqlContext: SQLContext,
+                mode: SaveMode,
+                parameters: Map[String, String],
+                df: DataFrame): Unit = {
+
+    val sparkContext = sqlContext.sparkContext
+    val path = parameters.get("path")
+    val tableName = parameters.get(HoodieWriteConfig.TABLE_NAME)
+
+    var schema: String = null
+    if (df.schema.nonEmpty) {
+      val structName = s"${tableName.get}_record"
+      val nameSpace = s"hoodie.${tableName.get}"
+      schema = AvroConversionUtils.convertStructTypeToAvroSchema(df.schema, structName, nameSpace).toString
+    } else {
+      schema = HoodieAvroUtils.getNullSchema.toString
+    }
+
+    val basePath = new Path(parameters("path"))
+    val fs = basePath.getFileSystem(sparkContext.hadoopConfiguration)
+    val exists = fs.exists(new Path(basePath, HoodieTableMetaClient.METAFOLDER_NAME))
+
+    initTable(mode, basePath, fs, exists, sparkContext, parameters)
+
+    val jsc = new JavaSparkContext(sqlContext.sparkContext)
+    val writeClient = DataSourceUtils.createHoodieClient(jsc, schema, path.get, tableName.get,
+      mapAsJavaMap(parameters))
+    writeClient.bootstrap(org.apache.hudi.common.util.Option.empty())
+    syncHiveIfEnabled(basePath, jsc, parameters)
+  }
+
   /**
     * Add default options for unspecified write options keys.
     *
