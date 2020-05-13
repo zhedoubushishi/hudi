@@ -18,10 +18,14 @@
 
 package org.apache.hudi.keygen;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.model.HoodieKey;
+import org.apache.hudi.exception.HoodieException;
 import org.apache.hudi.exception.HoodieKeyException;
 
 import org.apache.avro.generic.GenericRecord;
@@ -47,6 +51,8 @@ public class ComplexKeyGenerator extends KeyGenerator {
 
   protected final boolean hiveStylePartitioning;
 
+  protected final boolean encodePartitionPath;
+
   public ComplexKeyGenerator(TypedProperties props) {
     super(props);
     this.recordKeyFields = Arrays.asList(props.getString(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY()).split(","))
@@ -56,6 +62,8 @@ public class ComplexKeyGenerator extends KeyGenerator {
                 .stream().map(String::trim).collect(Collectors.toList());
     this.hiveStylePartitioning = props.getBoolean(DataSourceWriteOptions.HIVE_STYLE_PARTITIONING_OPT_KEY(),
         Boolean.parseBoolean(DataSourceWriteOptions.DEFAULT_HIVE_STYLE_PARTITIONING_OPT_VAL()));
+    this.encodePartitionPath = props.getBoolean(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY(),
+        Boolean.parseBoolean(DataSourceWriteOptions.DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL()));
   }
 
   @Override
@@ -90,6 +98,13 @@ public class ComplexKeyGenerator extends KeyGenerator {
         partitionPath.append(hiveStylePartitioning ? partitionPathField + "=" + DEFAULT_PARTITION_PATH
                 : DEFAULT_PARTITION_PATH);
       } else {
+        if (encodePartitionPath) {
+          try {
+            fieldVal = URLEncoder.encode(fieldVal, StandardCharsets.UTF_8.toString());
+          } catch (UnsupportedEncodingException uoe) {
+            throw new HoodieException(uoe.getMessage(), uoe);
+          }
+        }
         partitionPath.append(hiveStylePartitioning ? partitionPathField + "=" + fieldVal : fieldVal);
       }
       partitionPath.append(DEFAULT_PARTITION_PATH_SEPARATOR);

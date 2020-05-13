@@ -34,11 +34,13 @@ public class HoodieColumnStichingRecordReader implements RecordReader<NullWritab
   private final RecordReader<NullWritable, ArrayWritable> rightColsRecordReader;
 
   private final ArrayWritable values;
+  private final boolean validate;
 
   public HoodieColumnStichingRecordReader(RecordReader<NullWritable, ArrayWritable> left,
-      RecordReader<NullWritable, ArrayWritable> right) {
+      RecordReader<NullWritable, ArrayWritable> right, boolean validate) {
     this.leftColsRecordReader = left;
     this.rightColsRecordReader = right;
+    this.validate = validate;
 
     ArrayWritable leftW = leftColsRecordReader.createValue();
     ArrayWritable rightW = rightColsRecordReader.createValue();
@@ -59,7 +61,9 @@ public class HoodieColumnStichingRecordReader implements RecordReader<NullWritab
 
     boolean hasMoreOnLeft = leftColsRecordReader.next(leftColsRecordReader.createKey(), left);
     boolean hasMoreOnRight = rightColsRecordReader.next(rightColsRecordReader.createKey(), right);
-    ValidationUtils.checkArgument(hasMoreOnLeft == hasMoreOnRight);
+    if (validate) {
+      ValidationUtils.checkArgument(hasMoreOnLeft == hasMoreOnRight);
+    }
     int i = 0;
     for (;i < left.get().length; i++) {
       value.get()[i] = left.get()[i];
@@ -68,7 +72,7 @@ public class HoodieColumnStichingRecordReader implements RecordReader<NullWritab
     for (int j = 0; j < right.get().length; j++) {
       value.get()[i++] = right.get()[j];
     }
-    return hasMoreOnLeft;
+    return hasMoreOnLeft && hasMoreOnRight;
   }
 
   @Override

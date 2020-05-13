@@ -193,7 +193,7 @@ private[hudi] object HoodieSparkSqlWriter {
     val jsc = new JavaSparkContext(sqlContext.sparkContext)
     val writeClient = DataSourceUtils.createHoodieClient(jsc, schema, path.get, tableName.get,
       mapAsJavaMap(parameters))
-    writeClient.bootstrap()
+    writeClient.bootstrap(org.apache.hudi.common.util.Option.empty())
     syncHiveIfEnabled(basePath, jsc, parameters)
   }
 

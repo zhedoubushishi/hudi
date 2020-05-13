@@ -18,10 +18,10 @@
 
 package org.apache.hudi.hadoop;
 
-import org.apache.hudi.avro.HoodieAvroUtils;
 import org.apache.hudi.common.model.HoodieBaseFile;
 import org.apache.hudi.common.model.HoodieCommitMetadata;
 import org.apache.hudi.common.model.HoodiePartitionMetadata;
+import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.common.table.timeline.HoodieDefaultTimeline;
 import org.apache.hudi.common.table.timeline.HoodieInstant;
@@ -40,6 +40,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat;
+import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.FileSplit;
@@ -360,68 +361,99 @@ public class HoodieParquetInputFormat extends MapredParquetInputFormat implement
       ExternalBaseFileSplit eSplit = (ExternalBaseFileSplit)split;
       String[] rawColNames = HoodieColumnProjectionUtils.getReadColumnNames(job);
       List<Integer> rawColIds = HoodieColumnProjectionUtils.getReadColumnIDs(job);
-      List<Pair<Integer, String>> colsWithIndex =
+      List<Pair<Integer, String>> projectedColsWithIndex =
           IntStream.range(0, rawColIds.size()).mapToObj(idx -> Pair.of(rawColIds.get(idx), rawColNames[idx]))
               .collect(Collectors.toList());
 
-      List<Pair<Integer, String>> hoodieColsProjected = colsWithIndex.stream()
-          .filter(idxWithName -> idxWithName.getKey() < HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
+      List<Pair<Integer, String>> hoodieColsProjected = projectedColsWithIndex.stream()
+          .filter(idxWithName -> HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue()))
           .collect(Collectors.toList());
+      List<Pair<Integer, String>> externalColsProjected = projectedColsWithIndex.stream()
+          .filter(idxWithName -> !HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue())
+              && !VirtualColumn.VIRTUAL_COLUMN_NAMES.contains(idxWithName.getValue()))
+          .collect(Collectors.toList());
+      List<Pair<Integer, String>> virtualParquetColsProjected = projectedColsWithIndex.stream()
+          .filter(idxWithName -> VirtualColumn.VIRTUAL_COLUMN_NAMES.contains(
+              idxWithName.getValue())).collect(Collectors.toList());
+
       // This always matches hive table description
       List<Pair<String, String>> colNameWithTypes = HoodieColumnProjectionUtils.getIOColumnNameAndTypes(job);
-      List<Pair<String, String>> hoodieColNamesWithTypes = colNameWithTypes.subList(0, 5);
-      List<Pair<String, String>> otherColNamesWithTypes =
-          colNameWithTypes.subList(5, colNameWithTypes.size());
-      JobConf jobConf1 = new JobConf(job);
-      JobConf jobConf2 = new JobConf(job);
-      HoodieColumnProjectionUtils.setIOColumnNameAndTypes(jobConf1, hoodieColNamesWithTypes);
-      HoodieColumnProjectionUtils.setIOColumnNameAndTypes(jobConf2, otherColNamesWithTypes);
+      List<Pair<String, String>> hoodieColNamesOnlyWithTypes = colNameWithTypes.stream()
+          .filter(p -> HoodieRecord.HOODIE_META_COLUMNS.contains(p.getKey()))
+          .collect(Collectors.toList());
+      List<Pair<String, String>> colNamesWithTypesForSkeleton = colNameWithTypes.stream()
+          .filter(p -> HoodieRecord.HOODIE_META_COLUMNS.contains(p.getKey())
+              || VirtualColumn.VIRTUAL_COLUMN_NAMES.contains(p.getKey()))
+          .collect(Collectors.toList());
+      List<Pair<String, String>> colNamesWithTypesForExternal = colNameWithTypes.stream()
+              .filter(p -> !HoodieRecord.HOODIE_META_COLUMNS.contains(p.getKey())).collect(Collectors.toList());
+
       if (hoodieColsProjected.isEmpty()) {
-        // Adjust adjustedColsProjected
-        List<Integer> adjustednonHoodieColsProjected = colsWithIndex.stream()
-            .filter(idxWithName -> idxWithName.getKey() >= HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
-            .map(idxWithName -> idxWithName.getKey() - HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
+        JobConf jobConf2 = new JobConf(job);
+        HoodieColumnProjectionUtils.setIOColumnNameAndTypes(jobConf2, colNamesWithTypesForExternal);
+        LOG.info("External Column Names and Types :" + colNamesWithTypesForExternal);
+        // Adjust Projection Settings
+        List<String> externalColNamesWithVirtualCols = projectedColsWithIndex.stream()
+            .filter(idxWithName -> !HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue())
+                || VirtualColumn.VIRTUAL_COLUMN_NAMES.contains(idxWithName.getValue()))
+            .map(idxWithName -> idxWithName.getValue()).collect(Collectors.toList());
+        List<Integer> externalColIds = projectedColsWithIndex.stream()
+            .filter(idxWithName -> !HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue())
+                && !VirtualColumn.VIRTUAL_COLUMN_NAMES.contains(idxWithName.getValue()))
+            .map(idxWithName -> idxWithName.getKey() - HoodieRecord.HOODIE_META_COLUMNS.size())
             .collect(Collectors.toList());
-        List<String> adjustednonHoodieColNamesProjected = colsWithIndex.stream()
-            .filter(idxWithName -> idxWithName.getKey() >= HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
-            .map(idxWithName -> idxWithName.getValue())
-            .collect(Collectors.toList());
-        HoodieColumnProjectionUtils.setReadColumns(jobConf1, adjustednonHoodieColsProjected,
-            adjustednonHoodieColNamesProjected);
-        return super.getRecordReader(split, jobConf1, reporter);
+        List<Integer> externalColIdsWithVirtualCols = new ArrayList<>(externalColIds);
+        IntStream.range(0, virtualParquetColsProjected.size())
+            .forEach(idx -> externalColIdsWithVirtualCols.add(idx + externalColIds.size()));
+        HoodieColumnProjectionUtils.setReadColumns(jobConf2, new ArrayList<>(), new ArrayList<>());
+        List<String> groupCols = Arrays.asList(job.get(READ_NESTED_COLUMN_PATH_CONF_STR, "").split(","));
+        HoodieColumnProjectionUtils.appendReadColumns(jobConf2, externalColIdsWithVirtualCols,
+            externalColNamesWithVirtualCols, groupCols);
+        LOG.info("External Column Names Projected :" + externalColNamesWithVirtualCols);
+        LOG.info("External Column Ids Projected :" + externalColIdsWithVirtualCols);
+        return new HoodieColumnStichingRecordReader(new NullSkeletonRecordReader(),
+            super.getRecordReader(eSplit.getExternalFileSplit(), jobConf2, reporter), false);
+      } else if (externalColsProjected.isEmpty()) {
+        return super.getRecordReader(split, job, reporter);
       } else {
+        JobConf jobConf1 = new JobConf(job);
+        JobConf jobConf2 = new JobConf(job);
+        HoodieColumnProjectionUtils.setIOColumnNameAndTypes(jobConf1, hoodieColNamesOnlyWithTypes);
+        HoodieColumnProjectionUtils.setIOColumnNameAndTypes(jobConf2, colNamesWithTypesForExternal);
+
+        // Adjust Projection Settings
         HoodieColumnProjectionUtils.setReadColumns(jobConf1, new ArrayList<>(), new ArrayList<>());
         HoodieColumnProjectionUtils.setReadColumns(jobConf2, new ArrayList<>(), new ArrayList<>());
-        List<String> hoodieColNames = colsWithIndex.stream()
-            .filter(idxWithName -> idxWithName.getKey() < HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
+        List<String> hoodieColNames = projectedColsWithIndex.stream()
+            .filter(idxWithName -> HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue()))
             .map(idxWithName -> idxWithName.getValue()).collect(Collectors.toList());
-        List<Integer> hoodieColIds = colsWithIndex.stream()
-            .filter(idxWithName -> idxWithName.getKey() < HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
+        List<Integer> hoodieColIds = projectedColsWithIndex.stream()
+            .filter(idxWithName -> HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue()))
             .map(idxWithName -> idxWithName.getKey()).collect(Collectors.toList());
-        List<String> nonHoodieColNames = colsWithIndex.stream()
-            .filter(idxWithName -> idxWithName.getKey() >= HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
+
+        List<String> externalColNamesWithVirtualCols = projectedColsWithIndex.stream()
+            .filter(idxWithName -> !HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue()))
             .map(idxWithName -> idxWithName.getValue()).collect(Collectors.toList());
-        List<Integer> nonHoodieColIdsAdjusted = colsWithIndex.stream()
-            .filter(idxWithName -> idxWithName.getKey() >= HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
-            .map(idxWithName -> idxWithName.getKey() - HoodieAvroUtils.NUM_HUDI_METADATA_COLS)
+        List<Integer> externalColIds = projectedColsWithIndex.stream()
+            .filter(idxWithName -> !HoodieRecord.HOODIE_META_COLUMNS.contains(idxWithName.getValue())
+                && !VirtualColumn.VIRTUAL_COLUMN_NAMES.contains(idxWithName.getValue()))
+            .map(idxWithName -> idxWithName.getKey() - HoodieRecord.HOODIE_META_COLUMNS.size())
             .collect(Collectors.toList());
+        List<Integer> externalColIdsWithVirtualCols = new ArrayList<>(externalColIds);
+        IntStream.range(0, virtualParquetColsProjected.size())
+            .forEach(idx -> externalColIdsWithVirtualCols.add(idx + externalColIds.size()));
+        HoodieColumnProjectionUtils.setReadColumns(jobConf1, new ArrayList<>(), new ArrayList<>());
+        HoodieColumnProjectionUtils.setReadColumns(jobConf2, new ArrayList<>(), new ArrayList<>());
         List<String> groupCols = Arrays.asList(job.get(READ_NESTED_COLUMN_PATH_CONF_STR, "").split(","));
-        HoodieColumnProjectionUtils.appendReadColumns(jobConf1, hoodieColIds, hoodieColNames, new ArrayList<>());
-        HoodieColumnProjectionUtils.appendReadColumns(jobConf2, nonHoodieColIdsAdjusted, nonHoodieColNames, groupCols);
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("hoodieColNames=" + hoodieColNames + ", hoodieColIds=" + hoodieColIds
-              + ", SIZES : hoodieColNames=" + hoodieColNames.size() + ", hoodieColIds=" + hoodieColIds.size()
-              + ", nonHoodieColNames=" + nonHoodieColNames + ", nonHoodieColIdsAdjusted=" + nonHoodieColIdsAdjusted
-              + ", nonHoodieColNames=" + nonHoodieColNames.size() + ", nonHoodieColIdsAdjusted="
-              + nonHoodieColIdsAdjusted.size());
-        }
-        FileSystem fs = FileSystem.get(job);
-        //FileSplit rightSplit =
-        //    makeSplit(externalFile, 0, externalFileStatus.getLen(), new String[0], new String[0]);
+        HoodieColumnProjectionUtils.appendReadColumns(jobConf1, hoodieColIds,
+            hoodieColNames, new ArrayList<>());
+        HoodieColumnProjectionUtils.appendReadColumns(jobConf2, externalColIdsWithVirtualCols,
+            externalColNamesWithVirtualCols, groupCols);
+
         FileSplit rightSplit = eSplit.getExternalFileSplit();
-        LOG.info("Generating column stiching reader for " + eSplit.getPath() + " and " + rightSplit.getPath());
+        LOG.info("Generating column stitching reader for " + eSplit.getPath() + " and " + rightSplit.getPath());
         return new HoodieColumnStichingRecordReader(super.getRecordReader(eSplit, jobConf1, reporter),
-            super.getRecordReader(rightSplit, jobConf2, reporter));
+            super.getRecordReader(rightSplit, jobConf2, reporter), true);
       }
     }
     if (LOG.isDebugEnabled()) {

@@ -22,9 +22,14 @@ import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.model.HoodieKey;
+import org.apache.hudi.exception.HoodieException;
 import org.apache.hudi.exception.HoodieKeyException;
 
 import org.apache.avro.generic.GenericRecord;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Simple key generator, which takes names of fields to be used for recordKey and partitionPath as configs.
@@ -39,12 +44,16 @@ public class SimpleKeyGenerator extends KeyGenerator {
 
   protected final boolean hiveStylePartitioning;
 
+  protected final boolean encodePartitionPath;
+
   public SimpleKeyGenerator(TypedProperties props) {
     super(props);
     this.recordKeyField = props.getString(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY());
     this.partitionPathField = props.getString(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY());
     this.hiveStylePartitioning = props.getBoolean(DataSourceWriteOptions.HIVE_STYLE_PARTITIONING_OPT_KEY(),
         Boolean.parseBoolean(DataSourceWriteOptions.DEFAULT_HIVE_STYLE_PARTITIONING_OPT_VAL()));
+    this.encodePartitionPath = props.getBoolean(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY(),
+        Boolean.parseBoolean(DataSourceWriteOptions.DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL()));
   }
 
   @Override
@@ -62,6 +71,15 @@ public class SimpleKeyGenerator extends KeyGenerator {
     if (partitionPath == null || partitionPath.isEmpty()) {
       partitionPath = DEFAULT_PARTITION_PATH;
     }
+
+    if (encodePartitionPath) {
+      try {
+        partitionPath = URLEncoder.encode(partitionPath, StandardCharsets.UTF_8.toString());
+      } catch (UnsupportedEncodingException uoe) {
+        throw new HoodieException(uoe.getMessage(), uoe);
+      }
+    }
+
     if (hiveStylePartitioning) {
       partitionPath = partitionPathField + "=" + partitionPath;
     }

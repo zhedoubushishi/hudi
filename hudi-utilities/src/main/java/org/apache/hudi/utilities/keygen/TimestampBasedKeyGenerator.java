@@ -18,9 +18,14 @@
 
 package org.apache.hudi.utilities.keygen;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.apache.hudi.DataSourceUtils;
+import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.model.HoodieKey;
+import org.apache.hudi.exception.HoodieException;
 import org.apache.hudi.exception.HoodieKeyException;
 import org.apache.hudi.exception.HoodieNotSupportedException;
 import org.apache.hudi.keygen.SimpleKeyGenerator;
@@ -55,6 +60,8 @@ public class TimestampBasedKeyGenerator extends SimpleKeyGenerator {
   // https://docs.oracle.com/javase/8/docs/api/java/util/TimeZone.html
   private final TimeZone timeZone;
 
+  protected final boolean encodePartitionPath;
+
   /**
    * Supported configs.
    */
@@ -84,6 +91,9 @@ public class TimestampBasedKeyGenerator extends SimpleKeyGenerator {
       this.inputDateFormat = new SimpleDateFormat(config.getString(Config.TIMESTAMP_INPUT_DATE_FORMAT_PROP));
       this.inputDateFormat.setTimeZone(timeZone);
     }
+
+    this.encodePartitionPath = config.getBoolean(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY(),
+        Boolean.parseBoolean(DataSourceWriteOptions.DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL()));
   }
 
   @Override
@@ -116,8 +126,16 @@ public class TimestampBasedKeyGenerator extends SimpleKeyGenerator {
         throw new HoodieKeyException("recordKey value: \"" + recordKey + "\" for field: \"" + recordKeyField + "\" cannot be null or empty.");
       }
 
-      String partitionPath = hiveStylePartitioning ? partitionPathField + "=" + partitionPathFormat.format(timestamp)
-              : partitionPathFormat.format(timestamp);
+      String partitionPath = partitionPathFormat.format(timestamp);
+      if (encodePartitionPath) {
+        try {
+          partitionPath = URLEncoder.encode(partitionPath, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException uoe) {
+          throw new HoodieException(uoe.getMessage(), uoe);
+        }
+      }
+
+      partitionPath = hiveStylePartitioning ? partitionPathField + "=" + partitionPath : partitionPath;
       return new HoodieKey(recordKey, partitionPath);
     } catch (ParseException pe) {
       throw new HoodieDeltaStreamerException("Unable to parse input partition field :" + partitionVal, pe);

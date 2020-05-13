@@ -105,6 +105,11 @@ public class TestBootstrap extends TestHoodieClientBase {
     srcPath = tmpFolder.getRoot().getAbsolutePath() + "/data";
 
     // initialize parquet input format
+    reloadInputFormats();
+  }
+
+  private void reloadInputFormats() {
+    // initialize parquet input format
     roInputFormat = new HoodieParquetInputFormat();
     roJobConf = new JobConf(jsc.hadoopConfiguration());
     roInputFormat.setConf(roJobConf);
@@ -159,7 +164,7 @@ public class TestBootstrap extends TestHoodieClientBase {
         .withSchema(schema.toString())
         .withBootstrapModeSelector(MetadataOnlyBootstrapModeSelector.class.getName()).build();
     HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, true, 1, timestamp,
         timestamp, false);
 
@@ -177,7 +182,7 @@ public class TestBootstrap extends TestHoodieClientBase {
 
     // Run bootstrap again
     client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
 
     metaClient.reloadActiveTimeline();
     index = BootstrapIndex.getBootstrapIndex(metaClient);
@@ -216,7 +221,7 @@ public class TestBootstrap extends TestHoodieClientBase {
         .withSchema(schema.toString())
         .withBootstrapModeSelector(MetadataOnlyBootstrapModeSelector.class.getName()).build();
     HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, true, 1, timestamp,
         timestamp, false);
 
@@ -234,7 +239,7 @@ public class TestBootstrap extends TestHoodieClientBase {
 
     // Run bootstrap again
     client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
 
     metaClient.reloadActiveTimeline();
     index = BootstrapIndex.getBootstrapIndex(metaClient);
@@ -274,7 +279,7 @@ public class TestBootstrap extends TestHoodieClientBase {
         .withAutoCommit(true)
         .withBootstrapModeSelector(MetadataOnlyBootstrapModeSelector.class.getName()).build();
     HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, true, 1,
         timestamp, timestamp, false);
     // Rollback Bootstrap
@@ -282,8 +287,6 @@ public class TestBootstrap extends TestHoodieClientBase {
         HoodieTimeline.DELTA_COMMIT_ACTION, HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS));
     client.rollBackPendingBootstrap();
     metaClient.reloadActiveTimeline();
-    System.out.println("metaClient.getCommitsTimeline()=" + metaClient.getCommitsTimeline().getInstants()
-        .collect(Collectors.toList()));
     Assert.assertEquals(0, metaClient.getCommitsTimeline().countInstants());
     Assert.assertEquals(0L, FSUtils.getAllLeafFoldersWithFiles(metaClient.getFs(), basePath,
         (status) -> status.getName().endsWith(".parquet")).stream().flatMap(f -> f.getValue().stream()).count());
@@ -293,7 +296,7 @@ public class TestBootstrap extends TestHoodieClientBase {
 
     // Run bootstrap again
     client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
 
     metaClient.reloadActiveTimeline();
     index = BootstrapIndex.getBootstrapIndex(metaClient);
@@ -335,7 +338,7 @@ public class TestBootstrap extends TestHoodieClientBase {
         .withFullBootstrapInputProvider(FullTestBootstrapInputProvider.class.getName())
         .withBootstrapModeSelector(FullBootstrapModeSelector.class.getName()).build();
     HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS, false, 1, timestamp,
         timestamp, false);
     // Rollback Bootstrap
@@ -352,7 +355,7 @@ public class TestBootstrap extends TestHoodieClientBase {
 
     // Run bootstrap again
     client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
 
     metaClient.reloadActiveTimeline();
     index = BootstrapIndex.getBootstrapIndex(metaClient);
@@ -389,7 +392,7 @@ public class TestBootstrap extends TestHoodieClientBase {
         .withFullBootstrapInputProvider(FullTestBootstrapInputProvider.class.getName())
         .withBootstrapModeSelector(FullBootstrapModeSelector.class.getName()).build();
     HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS, false, 1, timestamp,
         timestamp, false);
     // Rollback Bootstrap
@@ -406,7 +409,7 @@ public class TestBootstrap extends TestHoodieClientBase {
 
     // Run bootstrap again
     client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
 
     metaClient.reloadActiveTimeline();
     index = BootstrapIndex.getBootstrapIndex(metaClient);
@@ -448,7 +451,7 @@ public class TestBootstrap extends TestHoodieClientBase {
         .withFullBootstrapInputProvider(FullTestBootstrapInputProvider.class.getName())
         .withBootstrapModeSelector(TestRandomBootstapModeSelector.class.getName()).build();
     HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS, false, 2, 2,
         timestamp, timestamp, false,
         Arrays.asList(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
@@ -466,7 +469,7 @@ public class TestBootstrap extends TestHoodieClientBase {
 
     // Run bootstrap again
     client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
 
     metaClient.reloadActiveTimeline();
     index = BootstrapIndex.getBootstrapIndex(metaClient);
@@ -503,7 +506,7 @@ public class TestBootstrap extends TestHoodieClientBase {
         .withFullBootstrapInputProvider(FullTestBootstrapInputProvider.class.getName())
         .withBootstrapModeSelector(TestRandomBootstapModeSelector.class.getName()).build();
     HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
     checkBootstrapResults(totalRecords, schema, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS, false, 2, 2,
         timestamp, timestamp, false,
         Arrays.asList(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS, HoodieTimeline.FULL_BOOTSTRAP_INSTANT_TS));
@@ -521,7 +524,7 @@ public class TestBootstrap extends TestHoodieClientBase {
 
     // Run bootstrap again
     client = new HoodieWriteClient(jsc, config);
-    client.bootstrap();
+    client.bootstrap(Option.empty());
 
     metaClient.reloadActiveTimeline();
     index = BootstrapIndex.getBootstrapIndex(metaClient);
@@ -587,6 +590,7 @@ public class TestBootstrap extends TestHoodieClientBase {
     }
 
     // RO Input Format Read
+    reloadInputFormats();
     List<GenericRecord> records = HoodieMergeOnReadTestUtils.getRecordsUsingInputFormat(
         FSUtils.getAllPartitionPaths(metaClient.getFs(), basePath, false).stream()
             .map(f -> basePath + "/" + f).collect(Collectors.toList()),
@@ -602,6 +606,7 @@ public class TestBootstrap extends TestHoodieClientBase {
     Assert.assertEquals(totalRecords, seenKeys.size());
 
     //RT Input Format Read
+    reloadInputFormats();
     seenKeys = new HashSet<>();
     records = HoodieMergeOnReadTestUtils.getRecordsUsingInputFormat(
         FSUtils.getAllPartitionPaths(metaClient.getFs(), basePath, false).stream()
@@ -614,6 +619,66 @@ public class TestBootstrap extends TestHoodieClientBase {
       Assert.assertEquals("Realtime Record :" + r, expTimestamp, ((DoubleWritable)r.get("timestamp")).get(),0.1);
       Assert.assertFalse(seenKeys.contains(r.get("_hoodie_record_key").toString()));
       seenKeys.add(r.get("_hoodie_record_key").toString());
+    }
+    Assert.assertEquals(totalRecords, seenKeys.size());
+
+    // RO Input Format Read - Project only Hoodie Columns
+    reloadInputFormats();
+    records = HoodieMergeOnReadTestUtils.getRecordsUsingInputFormat(
+        FSUtils.getAllPartitionPaths(metaClient.getFs(), basePath, false).stream()
+            .map(f -> basePath + "/" + f).collect(Collectors.toList()),
+        basePath, roJobConf, roInputFormat, schema, HoodieTestDataGenerator.TRIP_HIVE_COLUMN_TYPES, true,
+        HoodieRecord.HOODIE_META_COLUMNS);
+    Assert.assertEquals(totalRecords, records.size());
+    seenKeys = new HashSet<>();
+    for (GenericRecord r : records) {
+      Assert.assertFalse(seenKeys.contains(r.get("_hoodie_record_key").toString()));
+      seenKeys.add(r.get("_hoodie_record_key").toString());
+    }
+    Assert.assertEquals(totalRecords, seenKeys.size());
+
+    //RT Input Format Read - Project only Hoodie Columns
+    reloadInputFormats();
+    seenKeys = new HashSet<>();
+    records = HoodieMergeOnReadTestUtils.getRecordsUsingInputFormat(
+        FSUtils.getAllPartitionPaths(metaClient.getFs(), basePath, false).stream()
+            .map(f -> basePath + "/" + f).collect(Collectors.toList()),
+        basePath, rtJobConf, rtInputFormat, schema,  HoodieTestDataGenerator.TRIP_HIVE_COLUMN_TYPES, true,
+        HoodieRecord.HOODIE_META_COLUMNS);
+    Assert.assertEquals(totalRecords, records.size());
+    for (GenericRecord r : records) {
+      Assert.assertFalse(seenKeys.contains(r.get("_hoodie_record_key").toString()));
+      seenKeys.add(r.get("_hoodie_record_key").toString());
+    }
+    Assert.assertEquals(totalRecords, seenKeys.size());
+
+    // RO Input Format Read - Project only non-hoodie column
+    reloadInputFormats();
+    records = HoodieMergeOnReadTestUtils.getRecordsUsingInputFormat(
+        FSUtils.getAllPartitionPaths(metaClient.getFs(), basePath, false).stream()
+            .map(f -> basePath + "/" + f).collect(Collectors.toList()),
+        basePath, roJobConf, roInputFormat, schema, HoodieTestDataGenerator.TRIP_HIVE_COLUMN_TYPES, true,
+        Arrays.asList("_row_key"));
+    Assert.assertEquals(totalRecords, records.size());
+    seenKeys = new HashSet<>();
+    for (GenericRecord r : records) {
+      Assert.assertFalse(seenKeys.contains(r.get("_row_key").toString()));
+      seenKeys.add(r.get("_row_key").toString());
+    }
+    Assert.assertEquals(totalRecords, seenKeys.size());
+
+    //RT Input Format Read - Project only non-hoodie column
+    reloadInputFormats();
+    seenKeys = new HashSet<>();
+    records = HoodieMergeOnReadTestUtils.getRecordsUsingInputFormat(
+        FSUtils.getAllPartitionPaths(metaClient.getFs(), basePath, false).stream()
+            .map(f -> basePath + "/" + f).collect(Collectors.toList()),
+        basePath, rtJobConf, rtInputFormat, schema,  HoodieTestDataGenerator.TRIP_HIVE_COLUMN_TYPES, true,
+        Arrays.asList("_row_key"));
+    Assert.assertEquals(totalRecords, records.size());
+    for (GenericRecord r : records) {
+      Assert.assertFalse(seenKeys.contains(r.get("_row_key").toString()));
+      seenKeys.add(r.get("_row_key").toString());
     }
     Assert.assertEquals(totalRecords, seenKeys.size());
   }
@@ -681,10 +746,8 @@ public class TestBootstrap extends TestHoodieClientBase {
       partitions.stream().forEach(p -> {
         final BootstrapMode mode;
         if (currIdx == 0) {
-          System.out.println("METADATA bootstrap selected");
           mode = BootstrapMode.METADATA_ONLY_BOOTSTRAP;
         } else {
-          System.out.println("FULL bootstrap selected");
           mode = BootstrapMode.FULL_BOOTSTRAP;
         }
         currIdx = (currIdx + 1) % 2;

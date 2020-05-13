@@ -18,6 +18,7 @@
 
 package org.apache.hudi.hadoop.realtime;
 
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.mapred.SplitLocationInfo;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.model.FileSlice;
@@ -34,6 +35,7 @@ import org.apache.hudi.common.util.ValidationUtils;
 import org.apache.hudi.exception.HoodieException;
 import org.apache.hudi.exception.HoodieIOException;
 import org.apache.hudi.hadoop.ExternalBaseFileSplit;
+import org.apache.hudi.hadoop.HoodieColumnProjectionUtils;
 import org.apache.hudi.hadoop.HoodieParquetInputFormat;
 import org.apache.hudi.hadoop.UseFileSplitsFromInputFormat;
 
@@ -210,10 +212,15 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
   }
 
   private static void addRequiredProjectionFields(Configuration configuration) {
-    // Need this to do merge records in HoodieRealtimeRecordReader
-    addProjectionField(configuration, HoodieRecord.RECORD_KEY_METADATA_FIELD, HOODIE_RECORD_KEY_COL_POS);
-    addProjectionField(configuration, HoodieRecord.COMMIT_TIME_METADATA_FIELD, HOODIE_COMMIT_TIME_COL_POS);
-    addProjectionField(configuration, HoodieRecord.PARTITION_PATH_METADATA_FIELD, HOODIE_PARTITION_PATH_COL_POS);
+    List<Integer> projectedIds = new ArrayList<>(HoodieColumnProjectionUtils.getReadColumnIDs(configuration));
+    List<String> projectedNames = new ArrayList<>(
+        Arrays.asList(HoodieColumnProjectionUtils.getReadColumnNames(configuration)));
+    projectedIds.addAll(Arrays.asList(HOODIE_RECORD_KEY_COL_POS, HOODIE_COMMIT_TIME_COL_POS,
+        HOODIE_PARTITION_PATH_COL_POS));
+    projectedNames.addAll(Arrays.asList(HoodieRecord.RECORD_KEY_METADATA_FIELD, HoodieRecord.COMMIT_TIME_METADATA_FIELD,
+        HoodieRecord.PARTITION_PATH_METADATA_FIELD));
+
+    HoodieColumnProjectionUtils.setReadColumns(configuration, projectedIds, projectedNames);
   }
 
   /**
@@ -268,9 +275,16 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
     // sanity check
     ValidationUtils.checkArgument(split instanceof RealtimeSplit,
         "HoodieRealtimeRecordReader can only work on RealtimeSplit and not with " + split);
-
-    return new HoodieRealtimeRecordReader((RealtimeSplit)split, jobConf,
-        super.getRecordReader(split, jobConf, reporter));
+    JobConf jobConf1 = new JobConf(jobConf);
+    JobConf jobConf2 = new JobConf(jobConf);
+    if (split instanceof ExternalBaseFileSplit) {
+      // Group-By queries are failing because of Projection Pusher implementation which messes up the columnNames and
+      // columnIds in the configuration.
+      // TODO: ProjectionPusher needs to be overridden for both vectorized and non-vectorized parquet reading.
+      jobConf2.unset(ConfVars.PLAN.varname);
+    }
+    return new HoodieRealtimeRecordReader((RealtimeSplit)split, jobConf1,
+        super.getRecordReader(split, jobConf2, reporter));
   }
 
   @Override
