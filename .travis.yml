@@ -20,12 +20,8 @@ jdk:
   - openjdk8
 jobs:
   include:
-    - name: "Unit test for hudi-client"
-      env: HUDI_QUIETER_LOGGING=1 TEST_SUITE=unit MODULES=hudi-client
-    - name: "Unit test excludes hudi-client"
-      env: HUDI_QUIETER_LOGGING=1 TEST_SUITE=unit MODULES='!hudi-client'
-    - name: "Integration test"
-      env: TEST_SUITE=integration
+    - name: "Unit test for hudi-cli"
+      env: HUDI_QUIETER_LOGGING=1 TEST_SUITE=integration MODULES=hudi-cli
 install: true
 services:
   - docker
