@@ -18,9 +18,12 @@
 
 package org.apache.hudi.cli.integ;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.apache.hudi.cli.commands.TableCommand;
 import org.apache.hudi.cli.testutils.AbstractShellIntegrationTest;
 import org.apache.hudi.common.model.HoodieTableType;
+import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.common.table.timeline.versioning.TimelineLayoutVersion;
 import org.apache.hudi.testutils.HoodieTestDataGenerator;
 
@@ -49,6 +52,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
   private static final String RECORD_KEY_FIELD = "_row_key";
 
   private String srcPath;
+  String tablePath;
   private List<String> partitions;
 
   @BeforeEach
@@ -56,7 +60,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     String srcName = "src-table";
     String tableName = "test-table";
     srcPath = basePath + File.separator + srcName;
-    String tablePath = basePath + File.separator + tableName;
+    tablePath = basePath + File.separator + tableName;
 
     partitions = Arrays.asList("2020/04/01", "2020/04/02", "2020/04/03");
     double timestamp = new Double(Instant.now().toEpochMilli()).longValue();
@@ -75,10 +79,14 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
    * Test case for command 'bootstrap run'.
    */
   @Test
-  public void testBootstrapCommand() {
+  public void testBootstrapRunCommand() {
     // test bootstrap run command
     String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s", srcPath, RECORD_KEY_FIELD, PARTITION_FIELD);
     CommandResult cr = getShell().executeCommand(cmdStr);
     assertTrue(cr.isSuccess());
+
+    // Check hudi table exist
+    String metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME;
+    assertTrue(Files.exists(Paths.get(metaPath)), "Hoodie table not exist.");
   }
 }
