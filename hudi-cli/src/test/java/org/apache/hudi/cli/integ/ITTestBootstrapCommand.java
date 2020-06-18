@@ -86,7 +86,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     assertTrue(cr.isSuccess());
 
     // Check hudi table exist
-    String metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME;
+    String metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME + "/.aux/.bootstrap/.partitions/00000000-0000-0000-0000-000000000000-0_1-0-1_00000000000001.hfile";
     assertTrue(Files.exists(Paths.get(metaPath)), "Hoodie table not exist.");
   }
 }
