@@ -18,7 +18,6 @@
 
 package org.apache.hudi.cli.integ;
 
-import org.apache.hudi.cli.HoodiePrintHelper;
 import org.apache.hudi.cli.commands.TableCommand;
 import org.apache.hudi.cli.testutils.AbstractShellIntegrationTest;
 import org.apache.hudi.common.model.HoodieTableType;
@@ -38,7 +37,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -55,8 +53,8 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
 
   @BeforeEach
   public void init() throws IOException {
-    String srcName = "src_table";
-    String tableName = "test_table";
+    String srcName = "src-table";
+    String tableName = "test-table";
     srcPath = basePath + File.separator + srcName;
     String tablePath = basePath + File.separator + tableName;
 
@@ -74,7 +72,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
   }
 
   /**
-   * Test case for command 'bootstrap'.
+   * Test case for command 'bootstrap run'.
    */
   @Test
   public void testBootstrapCommand() {
@@ -82,19 +80,5 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s", srcPath, RECORD_KEY_FIELD, PARTITION_FIELD);
     CommandResult cr = getShell().executeCommand(cmdStr);
     assertTrue(cr.isSuccess());
-
-    // test bootstrap indexed partitions command
-    CommandResult cr2 = getShell().executeCommand("bootstrap show indexed partitions");
-    assertTrue(cr2.isSuccess());
-
-    String[] header = new String[] {"Indexed partitions"};
-    String[][] rows = new String[partitions.size()][1];
-    for (int i = 0; i < partitions.size(); i++) {
-      rows[i][0] = PARTITION_FIELD + "=" + partitions.get(i);
-    }
-    String expect = HoodiePrintHelper.print(header, rows);
-    expect = removeNonWordAndStripSpace(expect);
-    String got = removeNonWordAndStripSpace(cr2.getResult().toString());
-    assertEquals(expect, got);
   }
 }
