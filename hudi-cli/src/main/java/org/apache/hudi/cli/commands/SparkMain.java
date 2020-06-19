@@ -74,7 +74,7 @@ public class SparkMain {
     int returnCode = 0;
     switch (cmd) {
       case BOOTSTRAP:
-        assert (args.length == 8);
+        assert (args.length == 11);
         returnCode = doBootstrap(jsc, args[1], args[2], args[3], args[4], args[5], args[6],
             Integer.parseInt(args[7]), args[8], args[9], args[10]);
         break;
