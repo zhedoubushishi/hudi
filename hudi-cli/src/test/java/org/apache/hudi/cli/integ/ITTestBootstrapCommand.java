@@ -18,8 +18,10 @@
 
 package org.apache.hudi.cli.integ;
 
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.apache.hudi.cli.commands.BootstrapCommand;
 import org.apache.hudi.cli.commands.TableCommand;
 import org.apache.hudi.cli.testutils.AbstractShellIntegrationTest;
 import org.apache.hudi.common.model.HoodieTableType;
@@ -32,7 +34,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.shell.core.CommandResult;
+//import org.springframework.shell.core.CommandResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,11 +81,15 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
    * Test case for command 'bootstrap run'.
    */
   @Test
-  public void testBootstrapRunCommand() {
+  public void testBootstrapRunCommand()
+      throws InterruptedException, IOException, URISyntaxException {
     // test bootstrap run command
-    String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s", srcPath, RECORD_KEY_FIELD, PARTITION_FIELD);
-    CommandResult cr = getShell().executeCommand(cmdStr);
-    assertTrue(cr.isSuccess());
+    new BootstrapCommand().bootstrap(srcPath, RECORD_KEY_FIELD, PARTITION_FIELD, 1500, "",
+        "org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelector", "org.apache.hudi.keygen.SimpleKeyGenerator",
+        "org.apache.hudi.bootstrap.SparkDataSourceBasedFullBootstrapInputProvider");
+    // String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s", srcPath, RECORD_KEY_FIELD, PARTITION_FIELD);
+    // CommandResult cr = getShell().executeCommand(cmdStr);
+    // assertTrue(cr.isSuccess());
 
     // Check hudi table exist
     String metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME + "/.aux/.bootstrap/.partitions/00000000-0000-0000-0000-000000000000-0_1-0-1_00000000000001.hfile";
