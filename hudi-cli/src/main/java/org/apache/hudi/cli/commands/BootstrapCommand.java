@@ -31,8 +31,6 @@ import org.apache.hudi.common.model.HoodieFileGroupId;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.utilities.UtilHelpers;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.spark.launcher.SparkLauncher;
 import org.apache.spark.util.Utils;
 import org.springframework.shell.core.CommandMarker;
@@ -55,8 +53,6 @@ import scala.collection.JavaConverters;
  */
 @Component
 public class BootstrapCommand implements CommandMarker {
-
-  private static final Logger LOG = LogManager.getLogger(BootstrapCommand.class);
 
   @CliCommand(value = "bootstrap run", help = "Run a bootstrap action for current Hudi table")
   public String bootstrap(
