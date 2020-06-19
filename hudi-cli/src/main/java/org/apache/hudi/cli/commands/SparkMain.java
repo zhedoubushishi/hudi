@@ -74,9 +74,9 @@ public class SparkMain {
     int returnCode = 0;
     switch (cmd) {
       case BOOTSTRAP:
-        assert (args.length == 11);
-        returnCode = doBootstrap(jsc, args[1], args[2], args[3], args[4], args[5], args[6],
-            Integer.parseInt(args[7]), args[8], args[9], args[10]);
+        assert (args.length == 13);
+        returnCode = doBootstrap(jsc, args[3], args[4], args[5], args[6],
+            args[7], args[8], Integer.parseInt(args[9]), args[10], args[11], args[12]);
         break;
       case ROLLBACK:
         assert (args.length == 3);
@@ -182,7 +182,7 @@ public class SparkMain {
     List<SparkCommand> masterContained = Arrays.asList(SparkCommand.COMPACT_VALIDATE, SparkCommand.COMPACT_REPAIR,
         SparkCommand.COMPACT_UNSCHEDULE_PLAN, SparkCommand.COMPACT_UNSCHEDULE_FILE, SparkCommand.CLEAN,
         SparkCommand.IMPORT, SparkCommand.UPSERT, SparkCommand.DEDUPLICATE, SparkCommand.SAVEPOINT,
-        SparkCommand.DELETE_SAVEPOINT, SparkCommand.ROLLBACK_TO_SAVEPOINT);
+        SparkCommand.DELETE_SAVEPOINT, SparkCommand.ROLLBACK_TO_SAVEPOINT, SparkCommand.BOOTSTRAP);
     return masterContained.contains(command);
   }
 

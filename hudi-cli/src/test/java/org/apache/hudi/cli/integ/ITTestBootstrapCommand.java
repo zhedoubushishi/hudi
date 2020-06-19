@@ -42,6 +42,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -86,7 +87,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     // test bootstrap run command
     new BootstrapCommand().bootstrap(srcPath, RECORD_KEY_FIELD, PARTITION_FIELD, 1500, "",
         "org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelector", "org.apache.hudi.keygen.SimpleKeyGenerator",
-        "org.apache.hudi.bootstrap.SparkDataSourceBasedFullBootstrapInputProvider");
+        "org.apache.hudi.bootstrap.SparkDataSourceBasedFullBootstrapInputProvider", "local", "4G");
     // String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s", srcPath, RECORD_KEY_FIELD, PARTITION_FIELD);
     // CommandResult cr = getShell().executeCommand(cmdStr);
     // assertTrue(cr.isSuccess());
@@ -95,6 +96,9 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
 
     String metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME;
     assertTrue(Files.exists(Paths.get(metaPath)), "check1: Hoodie table not exist.");
+
+    metaClient = HoodieTableMetaClient.reload(metaClient);
+    assertEquals(1, metaClient.getActiveTimeline().getCommitsTimeline().countInstants(), "Should have 1 commit.");
 
     metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME + File.separator + "00000000000001.commit";
     assertTrue(Files.exists(Paths.get(metaPath)), "check2: Hoodie table not exist.");

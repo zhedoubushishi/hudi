@@ -70,7 +70,9 @@ public class BootstrapCommand implements CommandMarker {
       @CliOption(key = {"keyGeneratorClass"}, unspecifiedDefaultValue = "org.apache.hudi.keygen.SimpleKeyGenerator",
           help = "Key generator class for bootstrap") final String keyGeneratorClass,
       @CliOption(key = {"fullBootstrapInputProvider"}, unspecifiedDefaultValue = "org.apache.hudi.bootstrap.SparkDataSourceBasedFullBootstrapInputProvider",
-          help = "Class for Full bootstrap input provider") final String fullBootstrapInputProvider)
+          help = "Class for Full bootstrap input provider") final String fullBootstrapInputProvider,
+      @CliOption(key = "sparkMaster", unspecifiedDefaultValue = "", help = "Spark Master") String master,
+      @CliOption(key = "sparkMemory", unspecifiedDefaultValue = "4G", help = "Spark executor memory") final String sparkMemory)
       throws IOException, InterruptedException, URISyntaxException {
 
     boolean initialized = HoodieCLI.initConf();
@@ -85,7 +87,7 @@ public class BootstrapCommand implements CommandMarker {
 
     String cmd = SparkCommand.BOOTSTRAP.toString();
 
-    sparkLauncher.addAppArgs(cmd, metaClient.getTableConfig().getTableName(), metaClient.getBasePath(), sourcePath, schema, recordKeyCols,
+    sparkLauncher.addAppArgs(cmd, master, sparkMemory, metaClient.getTableConfig().getTableName(), metaClient.getBasePath(), sourcePath, schema, recordKeyCols,
         partitionsFields, String.valueOf(parallelism), selectorClass, keyGeneratorClass, fullBootstrapInputProvider);
     UtilHelpers.validateAndAddProperties(new String[] {}, sparkLauncher);
     Process process = sparkLauncher.launch();
