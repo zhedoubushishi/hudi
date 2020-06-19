@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 //import org.apache.hudi.cli.commands.BootstrapCommand;
 import org.apache.hadoop.fs.Path;
 import org.apache.hudi.cli.HoodieCLI;
+import org.apache.hudi.cli.HoodiePrintHelper;
 import org.apache.hudi.cli.commands.TableCommand;
 import org.apache.hudi.cli.testutils.AbstractShellIntegrationTest;
 import org.apache.hudi.common.model.HoodieTableType;
@@ -69,7 +70,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     tablePath = basePath + File.separator + tableName;
     targetPath = new Path(tablePath);
 
-    partitions = Arrays.asList("2020/04/01", "2020/04/02", "2020/04/03");
+    partitions = Arrays.asList("2018", "2019", "2020");
     double timestamp = new Double(Instant.now().toEpochMilli()).longValue();
     Dataset<Row> df = HoodieTestDataGenerator.generateTestRawTripDataset(timestamp,
         TOTAL_RECORDS, partitions, jsc, sqlContext);
@@ -108,5 +109,18 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
 
     metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME + File.separator + "00000000000001.commit";
     assertTrue(Files.exists(Paths.get(metaPath)), "check2: Hoodie table not exist.");
+
+    CommandResult cr2 = getShell().executeCommand("bootstrap show indexed partitions");
+    assertTrue(cr2.isSuccess());
+
+    String[] header = new String[] {"Indexed partitions"};
+    String[][] rows = new String[partitions.size()][1];
+    for (int i = 0; i < partitions.size(); i++) {
+      rows[i][0] = PARTITION_FIELD + "=" + partitions.get(i);
+    }
+    String expect = HoodiePrintHelper.print(header, rows);
+    expect = removeNonWordAndStripSpace(expect);
+    String got = removeNonWordAndStripSpace(cr2.getResult().toString());
+    assertEquals(expect, got);
   }
 }
