@@ -22,6 +22,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 //import org.apache.hudi.cli.commands.BootstrapCommand;
+import org.apache.hadoop.fs.Path;
+import org.apache.hudi.cli.HoodieCLI;
 import org.apache.hudi.cli.commands.TableCommand;
 import org.apache.hudi.cli.testutils.AbstractShellIntegrationTest;
 import org.apache.hudi.common.model.HoodieTableType;
@@ -54,26 +56,28 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
   private static final String PARTITION_FIELD = "datestr";
   private static final String RECORD_KEY_FIELD = "_row_key";
 
-  private String srcPath;
+  private Path sourcePath;
   String tablePath;
   private List<String> partitions;
+  private Path targetPath;
 
   @BeforeEach
   public void init() throws IOException {
     String srcName = "src-table";
     String tableName = "test-table";
-    srcPath = basePath + File.separator + srcName;
+    sourcePath = new Path(basePath, "source");
     tablePath = basePath + File.separator + tableName;
+    targetPath = new Path(tablePath);
 
     partitions = Arrays.asList("2020/04/01", "2020/04/02", "2020/04/03");
     double timestamp = new Double(Instant.now().toEpochMilli()).longValue();
     Dataset<Row> df = HoodieTestDataGenerator.generateTestRawTripDataset(timestamp,
         TOTAL_RECORDS, partitions, jsc, sqlContext);
-    df.write().partitionBy("datestr").format("parquet").mode(SaveMode.Overwrite).save(srcPath);
+    df.write().partitionBy("datestr").format("parquet").mode(SaveMode.Overwrite).save(sourcePath.toString());
 
     // Create table and connect
     new TableCommand().createTable(
-        tablePath, tableName, HoodieTableType.COPY_ON_WRITE.name(),
+        targetPath.toString(), tableName, HoodieTableType.COPY_ON_WRITE.name(),
         "", TimelineLayoutVersion.VERSION_1, "org.apache.hudi.common.model.HoodieAvroPayload",
         "org.apache.hudi.common.bootstrap.index.HFileBasedBootstrapIndex");
   }
@@ -88,7 +92,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     // new BootstrapCommand().bootstrap(srcPath, RECORD_KEY_FIELD, PARTITION_FIELD, 1500, "",
     // "org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelector", "org.apache.hudi.keygen.SimpleKeyGenerator",
     // "org.apache.hudi.bootstrap.SparkDataSourceBasedFullBootstrapInputProvider", "local", "4G");
-    String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s --sparkMaster %s", srcPath, RECORD_KEY_FIELD, PARTITION_FIELD, "local");
+    String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s --sparkMaster %s", sourcePath.toString(), RECORD_KEY_FIELD, PARTITION_FIELD, "local");
     CommandResult cr = getShell().executeCommand(cmdStr);
     assertTrue(cr.isSuccess());
 
@@ -97,7 +101,9 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     String metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME;
     assertTrue(Files.exists(Paths.get(metaPath)), "check1: Hoodie table not exist.");
 
-    metaClient = HoodieTableMetaClient.reload(metaClient);
+    new TableCommand().connect(targetPath.toString(), TimelineLayoutVersion.VERSION_1, false, 2000, 300000, 7);
+    metaClient = HoodieCLI.getTableMetaClient();
+
     assertEquals(1, metaClient.getActiveTimeline().getCommitsTimeline().countInstants(), "Should have 1 commit.");
 
     metaPath = tablePath + File.separator + HoodieTableMetaClient.METAFOLDER_NAME + File.separator + "00000000000001.commit";
