@@ -260,6 +260,8 @@ services:
       - "presto-coordinator-1"
     volumes:
       - ${HUDI_WS}:/var/hoodie/ws
+    ports:
+      - "5005:5005"
 
 volumes:
   namenode:
