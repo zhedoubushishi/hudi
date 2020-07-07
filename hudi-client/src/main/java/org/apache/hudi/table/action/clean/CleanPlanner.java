@@ -293,6 +293,8 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
         String lastVersion = fileSliceList.get(0).getBaseInstantTime();
         String lastVersionBeforeEarliestCommitToRetain =
             getLatestVersionBeforeCommit(fileSliceList, earliestCommitToRetain);
+        LOG.info("wenningd => lastVersion: " + lastVersion);
+        LOG.info("wenningd => lastVersionBeforeEarliestCommitToRetain: " + lastVersionBeforeEarliestCommitToRetain);
 
         // Ensure there are more than 1 version of the file (we only clean old files from updates)
         // i.e always spare the last commit.
@@ -301,6 +303,7 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
           String fileCommitTime = aSlice.getBaseInstantTime();
           if (aFile.isPresent() && savepointedFiles.contains(aFile.get().getFileName())) {
             // do not clean up a savepoint data file
+            LOG.info("wenningd => file commit time is: " + fileCommitTime + " skip because of 1");
             continue;
           }
           // Dont delete the latest commit and also the last commit before the earliest commit we
@@ -310,6 +313,7 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
           // uses this file.
           if (fileCommitTime.equals(lastVersion) || (fileCommitTime.equals(lastVersionBeforeEarliestCommitToRetain))) {
             // move on to the next file
+            LOG.info("wenningd => file commit time is: " + fileCommitTime + " skip because of 2");
             continue;
           }
 
@@ -318,19 +322,30 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
               .compareTimestamps(earliestCommitToRetain.getTimestamp(), HoodieTimeline.GREATER_THAN, fileCommitTime)) {
             // this is a commit, that should be cleaned.
             aFile.ifPresent(hoodieDataFile -> deletePaths.add(new HoodieDeleteFile(hoodieDataFile.getFileName(), false)));
+            // If is a metadata bootstrap commit, also delete the source file
+            if (aFile.isPresent() && aFile.get().getExternalBaseFile().isPresent()) {
+              LOG.info("wenningd => external file to be deleted: " + aFile.get().getExternalBaseFile().get().getPath());
+              deletePaths.add(new HoodieDeleteFile(aFile.get().getExternalBaseFile().get().getPath(), true));
+            }
             if (hoodieTable.getMetaClient().getTableType() == HoodieTableType.MERGE_ON_READ) {
               // If merge on read, then clean the log files for the commits as well
               deletePaths.addAll(aSlice.getLogFiles().map(s -> new HoodieDeleteFile(s.getFileName(), false)).collect(Collectors.toList()));
             }
             // If is a metadata bootstrap commit, also delete the source file
+
+            /*
             if (bootstrapIndexReader != null && fileCommitTime.equals(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS)) {
               if (aFile.isPresent()) {
                 List<HoodieFileGroupId> fileGroupIds = new ArrayList<>();
-                fileGroupIds.add(new HoodieFileGroupId(partitionPath, aFile.get().getFileId()));
+                // fileGroupIds.add(new HoodieFileGroupId(partitionPath, aFile.get().getFileId()));
+                fileGroupIds.add(fileGroup.getFileGroupId());
                 List<BootstrapSourceFileMapping> mappingList = new ArrayList<>(bootstrapIndexReader.getSourceFileMappingForFileIds(fileGroupIds).values());
+                LOG.info("wenningd => mappingList size is: " + mappingList.size());
+                LOG.info("wenningd => mappingList size is: " + bootstrapIndexReader.getSourceFileMappingForFileIds(fileGroupIds).values().size());
                 deletePaths.add(new HoodieDeleteFile(mappingList.get(0).getSourceFileStatus().getPath().getUri(), true));
               }
             }
+             */
           }
         }
       }
