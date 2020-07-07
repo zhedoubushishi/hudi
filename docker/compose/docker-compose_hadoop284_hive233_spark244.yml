@@ -262,6 +262,7 @@ services:
       - ${HUDI_WS}:/var/hoodie/ws
     ports:
       - "5005:5005"
+      - "5006:5006"
 
 volumes:
   namenode:

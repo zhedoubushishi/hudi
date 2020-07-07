@@ -54,8 +54,19 @@
         "values": {
           "type":"array",
           "items":{
-            "name":"filePath",
-            "type": "string"
+            "type": "record",
+            "name": "HoodieDeleteFile",
+            "fields": [
+              {
+                "name": "filePath",
+                "type": "string"
+              },
+              {
+                "name": "isExternal",
+                "type": "boolean",
+                "default": false
+              }
+            ]
           }
       }}],
       "default" : null

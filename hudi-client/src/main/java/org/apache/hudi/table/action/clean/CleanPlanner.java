@@ -19,8 +19,11 @@
 package org.apache.hudi.table.action.clean;
 
 import org.apache.hudi.avro.model.HoodieCleanMetadata;
+import org.apache.hudi.avro.model.HoodieDeleteFile;
 import org.apache.hudi.avro.model.HoodieSavepointMetadata;
+import org.apache.hudi.common.bootstrap.index.BootstrapIndex;
 import org.apache.hudi.common.fs.FSUtils;
+import org.apache.hudi.common.model.BootstrapSourceFileMapping;
 import org.apache.hudi.common.model.CompactionOperation;
 import org.apache.hudi.common.model.FileSlice;
 import org.apache.hudi.common.model.HoodieBaseFile;
@@ -28,7 +31,7 @@ import org.apache.hudi.common.model.HoodieCleaningPolicy;
 import org.apache.hudi.common.model.HoodieCommitMetadata;
 import org.apache.hudi.common.model.HoodieFileGroup;
 import org.apache.hudi.common.model.HoodieFileGroupId;
-import org.apache.hudi.common.model.HoodieLogFile;
+//import org.apache.hudi.common.model.HoodieLogFile;
 import org.apache.hudi.common.model.HoodieRecordPayload;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.table.timeline.HoodieInstant;
@@ -70,6 +73,7 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
   private final Map<HoodieFileGroupId, CompactionOperation> fgIdToPendingCompactionOperations;
   private HoodieTable<T> hoodieTable;
   private HoodieWriteConfig config;
+  private BootstrapIndex.IndexReader bootstrapIndexReader;
 
   public CleanPlanner(HoodieTable<T> hoodieTable, HoodieWriteConfig config) {
     this.hoodieTable = hoodieTable;
@@ -82,6 +86,8 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
                 new HoodieFileGroupId(entry.getValue().getPartitionPath(), entry.getValue().getFileId()),
                 entry.getValue()))
             .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    BootstrapIndex index = BootstrapIndex.getBootstrapIndex(hoodieTable.getMetaClient());
+    bootstrapIndexReader = index.isIndexAvailable() ? index.createReader() : null;
   }
 
   /**
@@ -189,11 +195,11 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
    * policy is useful, if you are simply interested in querying the table, and you don't want too many versions for a
    * single file (i.e run it with versionsRetained = 1)
    */
-  private List<String> getFilesToCleanKeepingLatestVersions(String partitionPath) {
+  private List<HoodieDeleteFile> getFilesToCleanKeepingLatestVersions(String partitionPath) {
     LOG.info("Cleaning " + partitionPath + ", retaining latest " + config.getCleanerFileVersionsRetained()
         + " file versions. ");
     List<HoodieFileGroup> fileGroups = fileSystemView.getAllFileGroups(partitionPath).collect(Collectors.toList());
-    List<String> deletePaths = new ArrayList<>();
+    List<HoodieDeleteFile> deletePaths = new ArrayList<>();
     // Collect all the datafiles savepointed by all the savepoints
     List<String> savepointedFiles = hoodieTable.getSavepoints().stream()
         .flatMap(this::getSavepointedDataFiles)
@@ -224,11 +230,20 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
         FileSlice nextSlice = fileSliceIterator.next();
         if (nextSlice.getBaseFile().isPresent()) {
           HoodieBaseFile dataFile = nextSlice.getBaseFile().get();
-          deletePaths.add(dataFile.getFileName());
+          deletePaths.add(new HoodieDeleteFile(dataFile.getFileName(), false));
+
+          String fileCommitTime = nextSlice.getBaseInstantTime();
+
+          if (bootstrapIndexReader != null && fileCommitTime.equals(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS)) {
+            List<HoodieFileGroupId> fileGroupIds = new ArrayList<>();
+            fileGroupIds.add(new HoodieFileGroupId(partitionPath, nextSlice.getFileId()));
+            List<BootstrapSourceFileMapping> mappingList = new ArrayList<>(bootstrapIndexReader.getSourceFileMappingForFileIds(fileGroupIds).values());
+            deletePaths.add(new HoodieDeleteFile(mappingList.get(0).getSourceFileStatus().getPath().getUri(), true));
+          }
         }
         if (hoodieTable.getMetaClient().getTableType() == HoodieTableType.MERGE_ON_READ) {
           // If merge on read, then clean the log files for the commits as well
-          deletePaths.addAll(nextSlice.getLogFiles().map(HoodieLogFile::getFileName).collect(Collectors.toList()));
+          deletePaths.addAll(nextSlice.getLogFiles().map(s -> new HoodieDeleteFile(s.getFileName(), false)).collect(Collectors.toList()));
         }
       }
     }
@@ -249,10 +264,10 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
    * <p>
    * This policy is the default.
    */
-  private List<String> getFilesToCleanKeepingLatestCommits(String partitionPath) {
+  private List<HoodieDeleteFile> getFilesToCleanKeepingLatestCommits(String partitionPath) {
     int commitsRetained = config.getCleanerCommitsRetained();
     LOG.info("Cleaning " + partitionPath + ", retaining latest " + commitsRetained + " commits. ");
-    List<String> deletePaths = new ArrayList<>();
+    List<HoodieDeleteFile> deletePaths = new ArrayList<>();
 
     // Collect all the datafiles savepointed by all the savepoints
     List<String> savepointedFiles = hoodieTable.getSavepoints().stream()
@@ -268,6 +283,11 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
 
         if (fileSliceList.isEmpty()) {
           continue;
+        }
+
+        LOG.info("wenningd => Here is for file group: " + fileGroup.toString());
+        for (FileSlice f : fileSliceList) {
+          LOG.info("wenningd => instant time is: " + f.getBaseInstantTime());
         }
 
         String lastVersion = fileSliceList.get(0).getBaseInstantTime();
@@ -297,10 +317,19 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
           if (!isFileSliceNeededForPendingCompaction(aSlice) && HoodieTimeline
               .compareTimestamps(earliestCommitToRetain.getTimestamp(), HoodieTimeline.GREATER_THAN, fileCommitTime)) {
             // this is a commit, that should be cleaned.
-            aFile.ifPresent(hoodieDataFile -> deletePaths.add(hoodieDataFile.getFileName()));
+            aFile.ifPresent(hoodieDataFile -> deletePaths.add(new HoodieDeleteFile(hoodieDataFile.getFileName(), false)));
             if (hoodieTable.getMetaClient().getTableType() == HoodieTableType.MERGE_ON_READ) {
               // If merge on read, then clean the log files for the commits as well
-              deletePaths.addAll(aSlice.getLogFiles().map(HoodieLogFile::getFileName).collect(Collectors.toList()));
+              deletePaths.addAll(aSlice.getLogFiles().map(s -> new HoodieDeleteFile(s.getFileName(), false)).collect(Collectors.toList()));
+            }
+            // If is a metadata bootstrap commit, also delete the source file
+            if (bootstrapIndexReader != null && fileCommitTime.equals(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS)) {
+              if (aFile.isPresent()) {
+                List<HoodieFileGroupId> fileGroupIds = new ArrayList<>();
+                fileGroupIds.add(new HoodieFileGroupId(partitionPath, aFile.get().getFileId()));
+                List<BootstrapSourceFileMapping> mappingList = new ArrayList<>(bootstrapIndexReader.getSourceFileMappingForFileIds(fileGroupIds).values());
+                deletePaths.add(new HoodieDeleteFile(mappingList.get(0).getSourceFileStatus().getPath().getUri(), true));
+              }
             }
           }
         }
@@ -329,9 +358,9 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
   /**
    * Returns files to be cleaned for the given partitionPath based on cleaning policy.
    */
-  public List<String> getDeletePaths(String partitionPath) {
+  public List<HoodieDeleteFile> getDeletePaths(String partitionPath) {
     HoodieCleaningPolicy policy = config.getCleanerPolicy();
-    List<String> deletePaths;
+    List<HoodieDeleteFile> deletePaths;
     if (policy == HoodieCleaningPolicy.KEEP_LATEST_COMMITS) {
       deletePaths = getFilesToCleanKeepingLatestCommits(partitionPath);
     } else if (policy == HoodieCleaningPolicy.KEEP_LATEST_FILE_VERSIONS) {

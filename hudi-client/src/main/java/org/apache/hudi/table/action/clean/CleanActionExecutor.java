@@ -23,6 +23,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hudi.avro.model.HoodieActionInstant;
 import org.apache.hudi.avro.model.HoodieCleanMetadata;
 import org.apache.hudi.avro.model.HoodieCleanerPlan;
+import org.apache.hudi.avro.model.HoodieDeleteFile;
 import org.apache.hudi.common.HoodieCleanStat;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.model.HoodieCleaningPolicy;
@@ -81,7 +82,12 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
       int cleanerParallelism = Math.min(partitionsToClean.size(), config.getCleanerParallelism());
       LOG.info("Using cleanerParallelism: " + cleanerParallelism);
 
-      Map<String, List<String>> cleanOps = jsc
+      // tmp debug
+      for (String p : partitionsToClean) {
+        List<HoodieDeleteFile> res = planner.getDeletePaths(p);
+      }
+
+      Map<String, List<HoodieDeleteFile>> cleanOps = jsc
           .parallelize(partitionsToClean, cleanerParallelism)
           .map(partitionPathToClean -> Pair.of(partitionPathToClean, planner.getDeletePaths(partitionPathToClean)))
           .collect().stream()
@@ -95,20 +101,24 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
     }
   }
 
-  private static PairFlatMapFunction<Iterator<Tuple2<String, String>>, String, PartitionCleanStat> deleteFilesFunc(
+  private static PairFlatMapFunction<Iterator<Tuple2<String, HoodieDeleteFile>>, String, PartitionCleanStat> deleteFilesFunc(
       HoodieTable table) {
-    return (PairFlatMapFunction<Iterator<Tuple2<String, String>>, String, PartitionCleanStat>) iter -> {
+    return (PairFlatMapFunction<Iterator<Tuple2<String, HoodieDeleteFile>>, String, PartitionCleanStat>) iter -> {
       Map<String, PartitionCleanStat> partitionCleanStatMap = new HashMap<>();
 
       FileSystem fs = table.getMetaClient().getFs();
       Path basePath = new Path(table.getMetaClient().getBasePath());
       while (iter.hasNext()) {
-        Tuple2<String, String> partitionDelFileTuple = iter.next();
+        Tuple2<String, HoodieDeleteFile> partitionDelFileTuple = iter.next();
         String partitionPath = partitionDelFileTuple._1();
-        String delFileName = partitionDelFileTuple._2();
-        Path deletePath = FSUtils.getPartitionPath(FSUtils.getPartitionPath(basePath, partitionPath), delFileName);
+        String delFile = partitionDelFileTuple._2().getFilePath();
+        Boolean isExternalFile = partitionDelFileTuple._2().getIsExternal();
+
+        Path deletePath = isExternalFile ? new Path(delFile) : FSUtils
+            .getPartitionPath(FSUtils.getPartitionPath(basePath, partitionPath), delFile);
         String deletePathStr = deletePath.toString();
         Boolean deletedFileResult = deleteFileAndGetResult(fs, deletePathStr);
+
         if (!partitionCleanStatMap.containsKey(partitionPath)) {
           partitionCleanStatMap.put(partitionPath, new PartitionCleanStat(partitionPath));
         }

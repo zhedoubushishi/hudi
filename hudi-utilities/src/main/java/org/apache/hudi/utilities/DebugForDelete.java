@@ -23,46 +23,40 @@ import java.util.Map;
 import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.config.HoodieWriteConfig;
-
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.DataFrameWriter;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.Row;
 
-public class TestForDebug {
+public class DebugForDelete {
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
 
     Map<String, String> additionalSparkConfigs = new HashMap<>();
     JavaSparkContext jssc =
         UtilHelpers.buildSparkContext("bootstrap", "local[2]", additionalSparkConfigs);
     SparkSession ss = SparkSession.builder().config(jssc.getConf()).getOrCreate();
 
-    Dataset<Row> df = ss.emptyDataFrame();
-    String tableType = HoodieTableType.COPY_ON_WRITE.name();
-    String bootstrapTableName = "bootstrap_test1_6";
+    String bootstrapTableName = "bootstrap_test1_1";
     String sourceTableName = "test1";
     String sourcePath = "hdfs:///user/hive/" + sourceTableName + "/";
     String tablePath = "hdfs:///user/hive/" + bootstrapTableName + "/";
+    String tableType = HoodieTableType.MERGE_ON_READ.name();
 
-    DataFrameWriter<Row> writer = df.write()
-        .format("org.apache.hudi")
-        .option(HoodieWriteConfig.TABLE_NAME, bootstrapTableName)
-        .option(DataSourceWriteOptions.OPERATION_OPT_KEY(), DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL())
-        .option("hoodie.bootstrap.source.base.path", sourcePath)
-        .option("hoodie.bootstrap.recordkey.columns", "event_id")
-        .option("hoodie.bootstrap.keygen.class", "org.apache.hudi.keygen.ComplexKeyGenerator")
-        .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY(), tableType)
+    Dataset<Row> originDf = ss.read().format("parquet").load(sourcePath);
+    Dataset<Row> df2 = originDf.limit(1);
+
+    df2.write().format("org.apache.hudi").option(DataSourceWriteOptions.OPERATION_OPT_KEY(), "delete")
+        .option(DataSourceWriteOptions.STORAGE_TYPE_OPT_KEY(), tableType)
+        .option(DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY(), "event_id")
         .option(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY(), "event_id")
-        .option(DataSourceWriteOptions.HIVE_SYNC_ENABLED_OPT_KEY(), "true")
-        .option(DataSourceWriteOptions.HIVE_DATABASE_OPT_KEY(), "default")
-        .option(DataSourceWriteOptions.HIVE_TABLE_OPT_KEY(), bootstrapTableName)
-        .option(DataSourceWriteOptions.HIVE_PARTITION_FIELDS_OPT_KEY(), "event_type")
-        .option(DataSourceWriteOptions.HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY(), "org.apache.hudi.hive.MultiPartKeysValueExtractor")
-        .mode(SaveMode.Overwrite);
-
-    writer.save(tablePath);
+        .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY(), "event_type")
+        .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY(), "org.apache.hudi.keygen.ComplexKeyGenerator")
+        .option(HoodieWriteConfig.TABLE_NAME, bootstrapTableName)
+        .option(DataSourceWriteOptions.HIVE_STYLE_PARTITIONING_OPT_KEY(), "true")
+        .option("hoodie.compact.inline", "false")
+        .mode(SaveMode.Append)
+        .save(tablePath);
   }
 }
