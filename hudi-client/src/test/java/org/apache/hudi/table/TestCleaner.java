@@ -24,8 +24,10 @@ import org.apache.hudi.avro.model.HoodieCompactionPlan;
 import org.apache.hudi.client.HoodieWriteClient;
 import org.apache.hudi.client.WriteStatus;
 import org.apache.hudi.common.HoodieCleanStat;
+import org.apache.hudi.common.bootstrap.TestBootstrapIndex;
 import org.apache.hudi.common.fs.ConsistencyGuardConfig;
 import org.apache.hudi.common.fs.FSUtils;
+import org.apache.hudi.common.model.BootstrapFileMapping;
 import org.apache.hudi.common.model.FileSlice;
 import org.apache.hudi.common.model.HoodieBaseFile;
 import org.apache.hudi.common.model.HoodieCleaningPolicy;
@@ -64,6 +66,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -87,6 +90,7 @@ import static org.apache.hudi.testutils.Assertions.assertNoWriteErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -883,6 +887,109 @@ public class TestCleaner extends HoodieClientTestBase {
         file1P0C0));
     assertTrue(HoodieTestUtils.doesDataFileExist(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "001",
         file2P0C1));
+  }
+
+  @Test
+  public void testBootstrapSourceFileCleanWithKeepLatestFileVersions() throws IOException {
+    testBootstrapSourceFileClean(HoodieCleaningPolicy.KEEP_LATEST_FILE_VERSIONS);
+  }
+
+  @Test
+  public void testBootstrapSourceFileCleanWithKeepLatestCommits() throws IOException {
+    testBootstrapSourceFileClean(HoodieCleaningPolicy.KEEP_LATEST_COMMITS);
+  }
+
+  /**
+   * Test HoodieTable.clean() with Bootstrap source file clean enable.
+   */
+  @Test
+  private void testBootstrapSourceFileClean(HoodieCleaningPolicy cleaningPolicy) throws IOException {
+    HoodieWriteConfig config = HoodieWriteConfig.newBuilder().withPath(basePath).withAssumeDatePartitioning(true)
+        .withCompactionConfig(HoodieCompactionConfig.newBuilder()
+            .withCleanBootstrapSourceFileEnabled(true)
+            .withCleanerPolicy(cleaningPolicy).retainCommits(1).retainFileVersions(2).build())
+        .build();
+
+    // create source data path
+    java.nio.file.Path sourcePath = tempDir.resolve("data");
+    java.nio.file.Files.createDirectories(sourcePath);
+    assertTrue(new File(sourcePath.toString()).exists());
+
+    // generate bootstrap index
+    List<BootstrapFileMapping> mappingList = TestBootstrapIndex.generateBootstrapIndex(
+        metaClient, sourcePath.toString(), new String[] {HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH}, 2)
+        .get(HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH);
+
+    // create source data file
+    new File(sourcePath.toString() + "/" + HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH).mkdirs();
+    new File(mappingList.get(0).getBoostrapFileStatus().getPath().getUri()).createNewFile();
+    new File(mappingList.get(1).getBoostrapFileStatus().getPath().getUri()).createNewFile();
+
+    assertTrue(new File(mappingList.get(0).getBoostrapFileStatus().getPath().getUri()).exists());
+    assertTrue(new File(mappingList.get(1).getBoostrapFileStatus().getPath().getUri()).exists());
+
+    // make 1 bootstrap commit, with 2 files per partition
+    HoodieTestUtils.createInflightCommitFiles(basePath, "00000000000001");
+
+    String file1P0C0 = mappingList.get(0).getFileId();
+    String file2P0C0 = mappingList.get(1).getFileId();
+    HoodieTestUtils
+        .createDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000001", file1P0C0); // insert
+    HoodieTestUtils
+        .createDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000001", file2P0C0); // insert
+
+    HoodieCommitMetadata commitMetadata = generateCommitMetadata(
+        Collections.unmodifiableMap(new HashMap<String, List<String>>() {
+          {
+            put(HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, CollectionUtils.createImmutableList(file1P0C0, file2P0C0));
+          }
+        })
+    );
+
+    metaClient.getActiveTimeline().saveAsComplete(
+        new HoodieInstant(State.INFLIGHT, HoodieTimeline.COMMIT_ACTION, "00000000000001"),
+        Option.of(commitMetadata.toJsonString().getBytes(StandardCharsets.UTF_8)));
+
+    // make next commit, with 2 updates to existing files
+    HoodieTestUtils.createInflightCommitFiles(basePath, "00000000000002");
+    metaClient = HoodieTableMetaClient.reload(metaClient);
+
+    HoodieTestUtils
+        .createDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000002", file1P0C0); // update
+    HoodieTestUtils
+        .createDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000002", file2P0C0); // update
+
+    commitMetadata = generateCommitMetadata(CollectionUtils
+        .createImmutableMap(HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH,
+            CollectionUtils.createImmutableList(file1P0C0, file2P0C0)));
+    metaClient.getActiveTimeline().saveAsComplete(
+        new HoodieInstant(State.INFLIGHT, HoodieTimeline.COMMIT_ACTION, "00000000000002"),
+        Option.of(commitMetadata.toJsonString().getBytes(StandardCharsets.UTF_8)));
+
+    // make next commit, with 1 update to existing file, and 1 insert
+    HoodieTestUtils.createInflightCommitFiles(basePath, "00000000000003");
+    metaClient = HoodieTableMetaClient.reload(metaClient);
+    String file3P0C2 =
+        HoodieTestUtils.createNewDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000003"); // insert
+    HoodieTestUtils
+        .createDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000003", file1P0C0); // update
+
+    commitMetadata = generateCommitMetadata(CollectionUtils
+        .createImmutableMap(HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH,
+            CollectionUtils.createImmutableList(file1P0C0, file3P0C2)));
+    metaClient.getActiveTimeline().saveAsComplete(
+        new HoodieInstant(State.INFLIGHT, HoodieTimeline.COMMIT_ACTION, "00000000000003"),
+        Option.of(commitMetadata.toJsonString().getBytes(StandardCharsets.UTF_8)));
+    metaClient = HoodieTableMetaClient.reload(metaClient);
+
+    List<HoodieCleanStat> hoodieCleanStats = runCleaner(config, false);
+    HoodieCleanStat cleanStat = getCleanStat(hoodieCleanStats, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH);
+
+    assertNotEquals(0, cleanStat.getSuccessDeleteFiles().size());
+    assertTrue(HoodieTestUtils.doesDataFileExist(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000003", file1P0C0));
+    assertFalse(HoodieTestUtils.doesDataFileExist(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000001", file1P0C0));
+    // make sure the source data file is deleted
+    assertFalse(new File(mappingList.get(0).getBoostrapFileStatus().getPath().getUri()).exists());
   }
 
   /**
