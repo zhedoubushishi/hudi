@@ -35,7 +35,10 @@
      "type": "string"
   },{
      "name": "high", 
-     "type": "double"
+     "type": "bytes",
+     "logicalType": "decimal",
+     "precision": 8,
+     "scale": 4
   },{
      "name": "low", 
      "type": "double"
