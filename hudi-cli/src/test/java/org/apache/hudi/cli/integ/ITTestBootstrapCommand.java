@@ -92,7 +92,7 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     assertEquals(1, metaClient.getActiveTimeline().getCommitsTimeline().countInstants(), "Should have 1 commit.");
 
     // test bootstrap show indexed partitions
-    CommandResult crForIndexedPartitions = getShell().executeCommand("bootstrap show indexed partitions");
+    CommandResult crForIndexedPartitions = getShell().executeCommand("bootstrap index showPartitions");
     assertTrue(crForIndexedPartitions.isSuccess());
 
     String[] header = new String[] {"Indexed partitions"};

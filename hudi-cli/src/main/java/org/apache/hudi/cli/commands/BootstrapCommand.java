@@ -56,9 +56,9 @@ public class BootstrapCommand implements CommandMarker {
 
   @CliCommand(value = "bootstrap run", help = "Run a bootstrap action for current Hudi table")
   public String bootstrap(
-      @CliOption(key = {"sourcePath"}, mandatory = true, help = "Source data path of the table") final String sourcePath,
-      @CliOption(key = {"recordKeyColumns"}, mandatory = true, help = "Record key columns for bootstrap data") final String recordKeyCols,
-      @CliOption(key = {"partitionFields"}, unspecifiedDefaultValue = "", help = "Partition fields for bootstrap data") final String partitionsFields,
+      @CliOption(key = {"srcPath"}, mandatory = true, help = "Source data path of the table") final String srcPath,
+      @CliOption(key = {"rowKeyField"}, mandatory = true, help = "Record key columns for bootstrap data") final String rowKeyField,
+      @CliOption(key = {"partitionPathField"}, unspecifiedDefaultValue = "", help = "Partition fields for bootstrap data") final String partitionPathField,
       @CliOption(key = {"parallelism"}, unspecifiedDefaultValue = "1500", help = "Bootstrap writer parallelism") final int parallelism,
       @CliOption(key = {"schema"}, unspecifiedDefaultValue = "", help = "Schema of the source data file") final String schema,
       @CliOption(key = {"selectorClass"}, unspecifiedDefaultValue = "org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelector",
@@ -83,8 +83,8 @@ public class BootstrapCommand implements CommandMarker {
 
     String cmd = SparkCommand.BOOTSTRAP.toString();
 
-    sparkLauncher.addAppArgs(cmd, master, sparkMemory, metaClient.getTableConfig().getTableName(), metaClient.getBasePath(), sourcePath, schema, recordKeyCols,
-        partitionsFields, String.valueOf(parallelism), selectorClass, keyGeneratorClass, fullBootstrapInputProvider);
+    sparkLauncher.addAppArgs(cmd, master, sparkMemory, metaClient.getTableConfig().getTableName(), metaClient.getBasePath(), srcPath, schema, rowKeyField,
+        partitionPathField, String.valueOf(parallelism), selectorClass, keyGeneratorClass, fullBootstrapInputProvider);
     UtilHelpers.validateAndAddProperties(new String[] {}, sparkLauncher);
     Process process = sparkLauncher.launch();
     InputStreamConsumer.captureOutput(process);
@@ -95,7 +95,7 @@ public class BootstrapCommand implements CommandMarker {
     return "Bootstrapped source data as Hudi dataset";
   }
 
-  @CliCommand(value = "bootstrap show index mapping", help = "Show bootstrap index mapping")
+  @CliCommand(value = "bootstrap index showMapping", help = "Show bootstrap index mapping")
   public String showBootstrapIndexMapping(
       @CliOption(key = {"partitionPath"}, unspecifiedDefaultValue = "", help = "A valid paritition path") String partition,
       @CliOption(key = {"fileIds"}, unspecifiedDefaultValue = "", help = "Valid fileIds split by comma") String fileIds,
@@ -106,7 +106,7 @@ public class BootstrapCommand implements CommandMarker {
       final boolean headerOnly) {
 
     if (partition.isEmpty() && !fileIds.isEmpty()) {
-      throw new IllegalStateException("Both paritionPath and fileIds are required");
+      throw new IllegalStateException("When passing fileIds, partitionPath is mandatory");
     }
     BootstrapIndex.IndexReader indexReader = createBootstrapIndexReader();
 
@@ -144,7 +144,7 @@ public class BootstrapCommand implements CommandMarker {
         limit, headerOnly, rows);
   }
 
-  @CliCommand(value = "bootstrap show indexed partitions", help = "Show bootstrap indexed partitions")
+  @CliCommand(value = "bootstrap index showPartitions", help = "Show bootstrap indexed partitions")
   public String showIndexedPartitions() {
 
     BootstrapIndex.IndexReader indexReader = createBootstrapIndexReader();
@@ -159,7 +159,7 @@ public class BootstrapCommand implements CommandMarker {
     return HoodiePrintHelper.print(header, rows);
   }
 
-  @CliCommand(value = "bootstrap show basic info", help = "Show bootstrap index info")
+  @CliCommand(value = "bootstrap index show", help = "Show basic bootstrap index info")
   public String showBootstrapIndexInfo() {
 
     BootstrapIndex.IndexReader indexReader = createBootstrapIndexReader();
