@@ -22,9 +22,9 @@ import org.apache.hudi.cli.HoodieCLI;
 import org.apache.hudi.cli.HoodiePrintHelper;
 import org.apache.hudi.cli.commands.TableCommand;
 import org.apache.hudi.cli.testutils.AbstractShellIntegrationTest;
+import org.apache.hudi.client.TestBootstrap;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.table.timeline.versioning.TimelineLayoutVersion;
-import org.apache.hudi.testutils.HoodieTestDataGenerator;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -51,28 +51,23 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
   private static final String PARTITION_FIELD = "datestr";
   private static final String RECORD_KEY_FIELD = "_row_key";
 
+  private String tableName;
   private String sourcePath;
   private String tablePath;
   private List<String> partitions;
 
   @BeforeEach
-  public void init() throws IOException {
+  public void init() {
     String srcName = "source";
-    String tableName = "test-table";
+    tableName = "test-table";
     sourcePath = basePath + File.separator + srcName;
     tablePath = basePath + File.separator + tableName;
 
     partitions = Arrays.asList("2018", "2019", "2020");
     double timestamp = new Double(Instant.now().toEpochMilli()).longValue();
-    Dataset<Row> df = HoodieTestDataGenerator.generateTestRawTripDataset(timestamp,
+    Dataset<Row> df = TestBootstrap.generateTestRawTripDataset(timestamp,
         TOTAL_RECORDS, partitions, jsc, sqlContext);
     df.write().partitionBy("datestr").format("parquet").mode(SaveMode.Overwrite).save(sourcePath);
-
-    // Create table and connect
-    new TableCommand().createTable(
-        tablePath, tableName, HoodieTableType.COPY_ON_WRITE.name(),
-        "", TimelineLayoutVersion.VERSION_1, "org.apache.hudi.common.model.HoodieAvroPayload",
-        "org.apache.hudi.common.bootstrap.index.HFileBasedBootstrapIndex");
   }
 
   /**
@@ -81,18 +76,19 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
   @Test
   public void testBootstrapRunCommand() throws IOException {
     // test bootstrap run command
-    String cmdStr = String.format("bootstrap run --sourcePath %s --recordKeyColumns %s --partitionFields %s --sparkMaster %s",
-        sourcePath, RECORD_KEY_FIELD, PARTITION_FIELD, "local");
+    String cmdStr = String.format(
+        "bootstrap run --targetPath %s --tableName %s --tableType %s --sourcePath %s --recordKeyColumns %s --partitionFields %s --sparkMaster %s",
+        tablePath, tableName, HoodieTableType.COPY_ON_WRITE.name(), sourcePath, RECORD_KEY_FIELD, PARTITION_FIELD, "local");
     CommandResult cr = getShell().executeCommand(cmdStr);
     assertTrue(cr.isSuccess());
 
-    // Check hudi table exist
+    // Connect & check Hudi table exist
     new TableCommand().connect(tablePath, TimelineLayoutVersion.VERSION_1, false, 2000, 300000, 7);
     metaClient = HoodieCLI.getTableMetaClient();
     assertEquals(1, metaClient.getActiveTimeline().getCommitsTimeline().countInstants(), "Should have 1 commit.");
 
-    // test bootstrap show indexed partitions
-    CommandResult crForIndexedPartitions = getShell().executeCommand("bootstrap show indexed partitions");
+    // test "bootstrap index showPartitions"
+    CommandResult crForIndexedPartitions = getShell().executeCommand("bootstrap index showPartitions");
     assertTrue(crForIndexedPartitions.isSuccess());
 
     String[] header = new String[] {"Indexed partitions"};
@@ -104,5 +100,9 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
     expect = removeNonWordAndStripSpace(expect);
     String got = removeNonWordAndStripSpace(crForIndexedPartitions.getResult().toString());
     assertEquals(expect, got);
+
+    // test "bootstrap index showMapping"
+    CommandResult crForIndexedMapping = getShell().executeCommand("bootstrap index showMapping");
+    assertTrue(crForIndexedMapping.isSuccess());
   }
 }

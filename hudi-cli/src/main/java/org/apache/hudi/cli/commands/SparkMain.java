@@ -38,11 +38,16 @@ import org.apache.hudi.utilities.HoodieCleaner;
 import org.apache.hudi.utilities.HoodieCompactionAdminTool;
 import org.apache.hudi.utilities.HoodieCompactionAdminTool.Operation;
 import org.apache.hudi.utilities.HoodieCompactor;
+import org.apache.hudi.utilities.UtilHelpers;
+import org.apache.hudi.utilities.deltastreamer.BootstrapExecutor;
+import org.apache.hudi.utilities.deltastreamer.HoodieDeltaStreamer;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SQLContext;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,11 +78,6 @@ public class SparkMain {
         : SparkUtil.initJavaSparkConf("hoodie-cli-" + command);
     int returnCode = 0;
     switch (cmd) {
-      case BOOTSTRAP:
-        assert (args.length == 13);
-        returnCode = doBootstrap(jsc, args[3], args[4], args[5], args[6],
-            args[7], args[8], Integer.parseInt(args[9]), args[10], args[11], args[12]);
-        break;
       case ROLLBACK:
         assert (args.length == 5);
         returnCode = rollback(jsc, args[3], args[4]);
@@ -171,6 +171,19 @@ public class SparkMain {
       case DELETE_SAVEPOINT:
         assert (args.length == 5);
         returnCode = deleteSavepoint(jsc, args[3], args[4]);
+        break;
+      case BOOTSTRAP:
+        assert (args.length >= 18);
+        propsFilePath = null;
+        if (!StringUtils.isNullOrEmpty(args[17])) {
+          propsFilePath = args[17];
+        }
+        configs = new ArrayList<>();
+        if (args.length > 18) {
+          configs.addAll(Arrays.asList(args).subList(18, args.length));
+        }
+        returnCode = doBootstrap(jsc, args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10],
+            args[11], args[12], args[13], args[14], args[15], args[16], propsFilePath, configs);
         break;
       default:
         break;
@@ -289,27 +302,33 @@ public class SparkMain {
     return 0;
   }
 
-  private static int doBootstrap(JavaSparkContext jsc, String tableName, String basePath, String sourcePath, String schema,
-      String recordKeyCols, String partitionFields, int parallelism, String selectorClass, String keyGeneratorClass, String fullTestBootstrapInputProvider) {
-    TypedProperties properties = new TypedProperties();
+  private static int doBootstrap(JavaSparkContext jsc, String tableName, String tableType, String basePath,
+      String sourcePath, String recordKeyCols, String partitionFields, String parallelism, String schemaProviderClass,
+      String bootstrapIndexClass, String selectorClass, String keyGeneratorClass, String fullBootstrapInputProvider,
+      String payloadClassName, String enableHiveSync, String propsFilePath, List<String> configs) throws IOException {
+
+    TypedProperties properties = propsFilePath == null ? UtilHelpers.buildProperties(configs)
+        : UtilHelpers.readConfig(FSUtils.getFs(propsFilePath, jsc.hadoopConfiguration()), new Path(propsFilePath), configs).getConfig();
+
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP, sourcePath);
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS, keyGeneratorClass);
+    properties.setProperty(HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER, fullBootstrapInputProvider);
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM, parallelism);
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR, selectorClass);
     properties.setProperty(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY(), recordKeyCols);
     properties.setProperty(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY(), partitionFields);
 
-    HoodieWriteConfig config = HoodieWriteConfig.newBuilder()
-        .forTable(tableName)
-        .withPath(basePath)
-        .withAutoCommit(true)
-        .withSchema(schema)
-        .withProperties(properties)
-        .withBootstrapConfig(HoodieBootstrapConfig.newBuilder()
-            .withBootstrapBasePath(sourcePath)
-            .withBootstrapKeyGenClass(keyGeneratorClass)
-            .withFullBootstrapInputProvider(fullTestBootstrapInputProvider)
-            .withBootstrapParallelism(parallelism)
-            .withBootstrapModeSelector(selectorClass).build())
-        .build();
-    HoodieWriteClient client = new HoodieWriteClient(jsc, config);
-    client.bootstrap(Option.empty());
+    HoodieDeltaStreamer.Config cfg = new HoodieDeltaStreamer.Config();
+    cfg.targetTableName = tableName;
+    cfg.targetBasePath = basePath;
+    cfg.tableType = tableType;
+    cfg.schemaProviderClassName = schemaProviderClass;
+    cfg.bootstrapIndexClass = bootstrapIndexClass;
+    cfg.payloadClassName = payloadClassName;
+    cfg.enableHiveSync = Boolean.valueOf(enableHiveSync);
+
+    new BootstrapExecutor(cfg, jsc, FSUtils.getFs(basePath, jsc.hadoopConfiguration()),
+        jsc.hadoopConfiguration(), properties).execute();
     return 0;
   }
 

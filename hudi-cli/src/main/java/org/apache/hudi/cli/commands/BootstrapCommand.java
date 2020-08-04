@@ -18,7 +18,6 @@
 
 package org.apache.hudi.cli.commands;
 
-import org.apache.hudi.avro.model.BootstrapIndexInfo;
 import org.apache.hudi.cli.HoodieCLI;
 import org.apache.hudi.cli.HoodiePrintHelper;
 import org.apache.hudi.cli.TableHeader;
@@ -26,7 +25,7 @@ import org.apache.hudi.cli.commands.SparkMain.SparkCommand;
 import org.apache.hudi.cli.utils.InputStreamConsumer;
 import org.apache.hudi.cli.utils.SparkUtil;
 import org.apache.hudi.common.bootstrap.index.BootstrapIndex;
-import org.apache.hudi.common.model.BootstrapSourceFileMapping;
+import org.apache.hudi.common.model.BootstrapFileMapping;
 import org.apache.hudi.common.model.HoodieFileGroupId;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.utilities.UtilHelpers;
@@ -56,25 +55,35 @@ public class BootstrapCommand implements CommandMarker {
 
   @CliCommand(value = "bootstrap run", help = "Run a bootstrap action for current Hudi table")
   public String bootstrap(
-      @CliOption(key = {"sourcePath"}, mandatory = true, help = "Source data path of the table") final String sourcePath,
-      @CliOption(key = {"recordKeyColumns"}, mandatory = true, help = "Record key columns for bootstrap data") final String recordKeyCols,
-      @CliOption(key = {"partitionFields"}, unspecifiedDefaultValue = "", help = "Partition fields for bootstrap data") final String partitionsFields,
-      @CliOption(key = {"parallelism"}, unspecifiedDefaultValue = "1500", help = "Bootstrap writer parallelism") final int parallelism,
-      @CliOption(key = {"schema"}, unspecifiedDefaultValue = "", help = "Schema of the source data file") final String schema,
+      @CliOption(key = {"srcPath"}, mandatory = true, help = "Bootstrap source data path of the table") final String srcPath,
+      @CliOption(key = {"targetPath"}, mandatory = true,
+          help = "Base path for the target hoodie table") final String targetPath,
+      @CliOption(key = {"tableName"}, mandatory = true, help = "Hoodie table name") final String tableName,
+      @CliOption(key = {"tableType"}, mandatory = true, help = "Hoodie table type") final String tableType,
+      @CliOption(key = {"rowKeyField"}, mandatory = true, help = "Record key columns for bootstrap data") final String rowKeyField,
+      @CliOption(key = {"partitionPathField"}, unspecifiedDefaultValue = "",
+          help = "Partition fields for bootstrap source data") final String partitionPathField,
+      @CliOption(key = {"bootstrapIndexClass"}, unspecifiedDefaultValue = "org.apache.hudi.common.bootstrap.index.HFileBootstrapIndex",
+          help = "Bootstrap Index Class") final String bootstrapIndexClass,
       @CliOption(key = {"selectorClass"}, unspecifiedDefaultValue = "org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelector",
           help = "Selector class for bootstrap") final String selectorClass,
       @CliOption(key = {"keyGeneratorClass"}, unspecifiedDefaultValue = "org.apache.hudi.keygen.SimpleKeyGenerator",
           help = "Key generator class for bootstrap") final String keyGeneratorClass,
-      @CliOption(key = {"fullBootstrapInputProvider"}, unspecifiedDefaultValue = "org.apache.hudi.bootstrap.SparkDataSourceBasedFullBootstrapInputProvider",
+      @CliOption(key = {"fullBootstrapInputProvider"}, unspecifiedDefaultValue = "org.apache.hudi.bootstrap.SparkParquetBootstrapDataProvider",
           help = "Class for Full bootstrap input provider") final String fullBootstrapInputProvider,
-      @CliOption(key = "sparkMaster", unspecifiedDefaultValue = "", help = "Spark Master") String master,
-      @CliOption(key = "sparkMemory", unspecifiedDefaultValue = "4G", help = "Spark executor memory") final String sparkMemory)
+      @CliOption(key = {"schemaProviderClass"}, unspecifiedDefaultValue = "",
+          help = "SchemaProvider to attach schemas to bootstrap source data") final String schemaProviderClass,
+      @CliOption(key = {"payloadClass"}, unspecifiedDefaultValue = "org.apache.hudi.common.model.HoodieAvroPayload",
+          help = "Payload Class") final String payloadClass,
+      @CliOption(key = {"parallelism"}, unspecifiedDefaultValue = "1500", help = "Bootstrap writer parallelism") final int parallelism,
+      @CliOption(key = {"sparkMaster"}, unspecifiedDefaultValue = "", help = "Spark Master") String master,
+      @CliOption(key = {"sparkMemory"}, unspecifiedDefaultValue = "4G", help = "Spark executor memory") final String sparkMemory,
+      @CliOption(key = {"enableHiveSync"}, unspecifiedDefaultValue = "false", help = "Enable Hive sync") final Boolean enableHiveSync,
+      @CliOption(key = {"propsFilePath"}, help = "path to properties file on localfs or dfs with configurations for hoodie client for importing",
+          unspecifiedDefaultValue = "") final String propsFilePath,
+      @CliOption(key = {"hoodieConfigs"}, help = "Any configuration that can be set in the properties file can be passed here in the form of an array",
+          unspecifiedDefaultValue = "") final String[] configs)
       throws IOException, InterruptedException, URISyntaxException {
-
-    boolean initialized = HoodieCLI.initConf();
-    HoodieCLI.initFS(initialized);
-
-    HoodieTableMetaClient metaClient = HoodieCLI.getTableMetaClient();
 
     String sparkPropertiesPath =
         Utils.getDefaultPropertiesFile(JavaConverters.mapAsScalaMapConverter(System.getenv()).asScala());
@@ -83,9 +92,10 @@ public class BootstrapCommand implements CommandMarker {
 
     String cmd = SparkCommand.BOOTSTRAP.toString();
 
-    sparkLauncher.addAppArgs(cmd, master, sparkMemory, metaClient.getTableConfig().getTableName(), metaClient.getBasePath(), sourcePath, schema, recordKeyCols,
-        partitionsFields, String.valueOf(parallelism), selectorClass, keyGeneratorClass, fullBootstrapInputProvider);
-    UtilHelpers.validateAndAddProperties(new String[] {}, sparkLauncher);
+    sparkLauncher.addAppArgs(cmd, master, sparkMemory, tableName, tableType, targetPath, srcPath, rowKeyField,
+        partitionPathField, String.valueOf(parallelism), schemaProviderClass, bootstrapIndexClass, selectorClass,
+        keyGeneratorClass, fullBootstrapInputProvider, payloadClass, String.valueOf(enableHiveSync), propsFilePath);
+    UtilHelpers.validateAndAddProperties(configs, sparkLauncher);
     Process process = sparkLauncher.launch();
     InputStreamConsumer.captureOutput(process);
     int exitCode = process.waitFor();
@@ -95,9 +105,9 @@ public class BootstrapCommand implements CommandMarker {
     return "Bootstrapped source data as Hudi dataset";
   }
 
-  @CliCommand(value = "bootstrap show index mapping", help = "Show bootstrap index mapping")
+  @CliCommand(value = "bootstrap index showMapping", help = "Show bootstrap index mapping")
   public String showBootstrapIndexMapping(
-      @CliOption(key = {"partitionPath"}, unspecifiedDefaultValue = "", help = "A valid paritition path") String partition,
+      @CliOption(key = {"partitionPathField"}, unspecifiedDefaultValue = "", help = "A valid paritition path") String partitionPathField,
       @CliOption(key = {"fileIds"}, unspecifiedDefaultValue = "", help = "Valid fileIds split by comma") String fileIds,
       @CliOption(key = {"limit"}, unspecifiedDefaultValue = "-1", help = "Limit rows to be displayed") Integer limit,
       @CliOption(key = {"sortBy"}, unspecifiedDefaultValue = "", help = "Sorting Field") final String sortByField,
@@ -105,27 +115,27 @@ public class BootstrapCommand implements CommandMarker {
       @CliOption(key = {"headeronly"}, unspecifiedDefaultValue = "false", help = "Print Header Only")
       final boolean headerOnly) {
 
-    if (partition.isEmpty() && !fileIds.isEmpty()) {
-      throw new IllegalStateException("Both paritionPath and fileIds are required");
+    if (partitionPathField.isEmpty() && !fileIds.isEmpty()) {
+      throw new IllegalStateException("When passing fileIds, partitionPath is mandatory");
     }
     BootstrapIndex.IndexReader indexReader = createBootstrapIndexReader();
 
     // TODO tmp solution because the indexedPartition name is not clean
-    // List<String> indexedPartitions = indexReader.getIndexedPartitions();
-    List<String> indexedPartitions = indexReader.getIndexedPartitions().stream()
+    // List<String> indexedPartitions = indexReader.getIndexedPartitionPaths();
+    List<String> indexedPartitions = indexReader.getIndexedPartitionPaths().stream()
         .map(p -> p.split("//")[0].substring(5)).collect(Collectors.toList());
 
-    if (!partition.isEmpty() && !indexedPartitions.contains(partition)) {
-      return partition + " is not an valid indexed partition";
+    if (!partitionPathField.isEmpty() && !indexedPartitions.contains(partitionPathField)) {
+      return partitionPathField + " is not an valid indexed partition";
     }
 
-    List<BootstrapSourceFileMapping> mappingList = new ArrayList<>();
+    List<BootstrapFileMapping> mappingList = new ArrayList<>();
     if (!fileIds.isEmpty()) {
       List<HoodieFileGroupId> fileGroupIds = Arrays.stream(fileIds.split(","))
-          .map(fileId -> new HoodieFileGroupId(partition, fileId)).collect(Collectors.toList());
+          .map(fileId -> new HoodieFileGroupId(partitionPathField, fileId)).collect(Collectors.toList());
       mappingList.addAll(indexReader.getSourceFileMappingForFileIds(fileGroupIds).values());
-    } else if (!partition.isEmpty()) {
-      mappingList.addAll(indexReader.getSourceFileMappingForPartition(partition));
+    } else if (!partitionPathField.isEmpty()) {
+      mappingList.addAll(indexReader.getSourceFileMappingForPartition(partitionPathField));
     } else {
       for (String part : indexedPartitions) {
         mappingList.addAll(indexReader.getSourceFileMappingForPartition(part));
@@ -144,11 +154,11 @@ public class BootstrapCommand implements CommandMarker {
         limit, headerOnly, rows);
   }
 
-  @CliCommand(value = "bootstrap show indexed partitions", help = "Show bootstrap indexed partitions")
+  @CliCommand(value = "bootstrap index showPartitions", help = "Show bootstrap indexed partitions")
   public String showIndexedPartitions() {
 
     BootstrapIndex.IndexReader indexReader = createBootstrapIndexReader();
-    List<String> indexedPartitions = indexReader.getIndexedPartitions();
+    List<String> indexedPartitions = indexReader.getIndexedPartitionPaths();
 
     String[] header = new String[] {"Indexed partitions"};
     String[][] rows = new String[indexedPartitions.size()][1];
@@ -159,33 +169,20 @@ public class BootstrapCommand implements CommandMarker {
     return HoodiePrintHelper.print(header, rows);
   }
 
-  @CliCommand(value = "bootstrap show basic info", help = "Show bootstrap index info")
-  public String showBootstrapIndexInfo() {
-
-    BootstrapIndex.IndexReader indexReader = createBootstrapIndexReader();
-    BootstrapIndexInfo indexInfo = indexReader.getIndexInfo();
-
-    String[] header = new String[] {"Version", "Source Base Path", "Created Timestamp", "Number of keys"};
-    String[][] rows = {{String.valueOf(indexInfo.getVersion()), indexInfo.getSourceBasePath(),
-        String.valueOf(indexInfo.getCreatedTimestamp()), String.valueOf(indexInfo.getNumKeys())}};
-
-    return HoodiePrintHelper.print(header, rows);
-  }
-
   private BootstrapIndex.IndexReader createBootstrapIndexReader() {
     HoodieTableMetaClient metaClient = HoodieCLI.getTableMetaClient();
     BootstrapIndex index = BootstrapIndex.getBootstrapIndex(metaClient);
-    if (!index.checkIndex()) {
+    if (!index.isPresent()) {
       throw new IllegalStateException("This is not a bootstraped Hudi table. Don't have any index info");
     }
     return index.createReader();
   }
 
-  private List<Comparable[]> convertBootstrapSourceFileMapping(List<BootstrapSourceFileMapping> mappingList) {
+  private List<Comparable[]> convertBootstrapSourceFileMapping(List<BootstrapFileMapping> mappingList) {
     final List<Comparable[]> rows = new ArrayList<>();
-    for (BootstrapSourceFileMapping mapping : mappingList) {
-      rows.add(new Comparable[] {mapping.getHudiPartitionPath(), mapping.getHudiFileId(),
-          mapping.getSourceBasePath(), mapping.getSourcePartitionPath(), mapping.getSourceFileStatus().getPath().getUri()});
+    for (BootstrapFileMapping mapping : mappingList) {
+      rows.add(new Comparable[] {mapping.getPartitionPath(), mapping.getFileId(),
+          mapping.getBootstrapBasePath(), mapping.getBootstrapPartitionPath(), mapping.getBoostrapFileStatus().getPath().getUri()});
     }
     return rows;
   }
