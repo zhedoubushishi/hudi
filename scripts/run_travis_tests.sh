@@ -35,7 +35,9 @@ elif [ "$mode" = "integration" ]; then
   export SPARK_HOME=$PWD/spark-${sparkVersion}-bin-hadoop${hadoopVersion}
   mkdir /tmp/spark-events/
   echo "Running Integration Tests"
-  mvn verify -Pintegration-tests -B
+  # mvn verify -pl hudi-cli -DskipUTs=true -B
+  mvn clean install -DskipTests -DskipITs
+  mvn test -Dtest=ITTestBootstrapCommand -pl hudi-cli
 else
   echo "Unknown mode $mode"
   exit 1
