@@ -39,7 +39,7 @@ elif [ "$mode" = "integration" ]; then
   echo $SPARK_HOME
   ls $SPARK_HOME/jars
   grep -rnw $SPARK_HOME -e ".*MapredParquetInputFormat.*"
-  # mvn verify -Pintegration-tests -B
+  mvn verify -Pintegration-tests -B
 else
   echo "Unknown mode $mode"
   exit 1

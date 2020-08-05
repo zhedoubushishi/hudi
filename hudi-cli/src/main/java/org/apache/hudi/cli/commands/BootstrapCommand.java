@@ -73,7 +73,7 @@ public class BootstrapCommand implements CommandMarker {
           help = "Class for Full bootstrap input provider") final String fullBootstrapInputProvider,
       @CliOption(key = {"schemaProviderClass"}, unspecifiedDefaultValue = "",
           help = "SchemaProvider to attach schemas to bootstrap source data") final String schemaProviderClass,
-      @CliOption(key = {"payloadClass"}, unspecifiedDefaultValue = "org.apache.hudi.common.model.HoodieAvroPayload",
+      @CliOption(key = {"payloadClass"}, unspecifiedDefaultValue = "org.apache.hudi.common.model.OverwriteWithLatestAvroPayload",
           help = "Payload Class") final String payloadClass,
       @CliOption(key = {"parallelism"}, unspecifiedDefaultValue = "1500", help = "Bootstrap writer parallelism") final int parallelism,
       @CliOption(key = {"sparkMaster"}, unspecifiedDefaultValue = "", help = "Spark Master") String master,

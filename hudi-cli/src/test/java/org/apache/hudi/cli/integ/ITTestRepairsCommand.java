@@ -18,6 +18,8 @@
 
 package org.apache.hudi.cli.integ;
 
+import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.hudi.avro.HoodieAvroUtils;
 import org.apache.hudi.cli.HoodieCLI;
 import org.apache.hudi.cli.commands.RepairsCommand;
@@ -52,6 +54,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import scala.collection.JavaConversions;
 
 import static org.apache.spark.sql.functions.lit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -107,6 +110,13 @@ public class ITTestRepairsCommand extends AbstractShellIntegrationTest {
 
     String fileName3 = "3_0_20160401010202.parquet";
     commitTime = FSUtils.getCommitTime(fileName3);
+
+    Map<String, String> map = JavaConversions.mapAsJavaMap(sqlContext.getAllConfs());
+    for (Entry<String, String> e : map.entrySet()) {
+      System.out.println("wenningd => key is: " + e.getKey());
+      System.out.println("wenningd => val is: " + e.getValue());
+    }
+
     df.limit(10).withColumn("_hoodie_commit_time", lit(commitTime))
         .write().parquet(duplicatedPartitionPath + File.separator + fileName3);
     Files.createFile(Paths.get(tablePath + "/.hoodie/" + commitTime + ".commit"));

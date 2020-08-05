@@ -150,6 +150,9 @@ public class HoodieClientTestUtils {
       sparkConf.set("spark.eventLog.dir", evlogDir);
     }
 
+    // sparkConf.set("spark.driver.extraClassPath", System.getenv("SPARK_HOME") + "/" + "jars");
+    // sparkConf.set("spark.executor.extraClassPath", System.getenv("SPARK_HOME") + "/" + "jars");
+
     return HoodieReadClient.addHoodieSupport(sparkConf);
   }
 

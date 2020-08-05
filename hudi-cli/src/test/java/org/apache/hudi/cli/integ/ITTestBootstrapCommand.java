@@ -18,6 +18,9 @@
 
 package org.apache.hudi.cli.integ;
 
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.hudi.cli.HoodieCLI;
 import org.apache.hudi.cli.HoodiePrintHelper;
 import org.apache.hudi.cli.commands.TableCommand;
@@ -28,7 +31,7 @@ import org.apache.hudi.common.table.timeline.versioning.TimelineLayoutVersion;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
+//import org.apache.spark.sql.SaveMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.shell.core.CommandResult;
@@ -38,7 +41,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-
+import scala.collection.JavaConversions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -57,17 +60,36 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
   private List<String> partitions;
 
   @BeforeEach
-  public void init() {
+  public void init() throws IOException, URISyntaxException {
     String srcName = "source";
     tableName = "test-table";
     sourcePath = basePath + File.separator + srcName;
     tablePath = basePath + File.separator + tableName;
 
-    partitions = Arrays.asList("2018", "2019", "2020");
+    // HoodieCLI.conf = jsc.hadoopConfiguration();
+
+    //partitions = Arrays.asList("2018", "2019", "2020");
+    partitions = Arrays.asList("2018");
     double timestamp = new Double(Instant.now().toEpochMilli()).longValue();
     Dataset<Row> df = TestBootstrap.generateTestRawTripDataset(timestamp,
-        TOTAL_RECORDS, partitions, jsc, sqlContext);
-    df.write().partitionBy("datestr").format("parquet").mode(SaveMode.Overwrite).save(sourcePath);
+        TOTAL_RECORDS, null, jsc, sqlContext);
+    System.out.println("wenningd => spark home is: " + System.getenv("SPARK_HOME"));
+    System.out.println("wenningd => " + sqlContext.toString());
+    for (String s : jsc.jars()) {
+      System.out.println("wenningd => current jar is: " + s);
+    }
+    // System.out.println("wenningd => " + sqlContext.getConf("spark.jars"));
+    // jsc.addJar(System.getenv("SPARK_HOME") + "/jars/hive-exec-1.2.1.spark2.jar");
+    // sqlContext.setConf("spark.sql.hive.convertMetastoreParquet", "true");
+    Map<String, String> map = JavaConversions.mapAsJavaMap(sqlContext.getAllConfs());
+    for (Entry<String, String> e : map.entrySet()) {
+      System.out.println("wenningd => key is: " + e.getKey());
+      System.out.println("wenningd => val is: " + e.getValue());
+    }
+
+    // df.write().partitionBy(PARTITION_FIELD).parquet(sourcePath);
+    System.out.println("wenningd => wrote path: " + sourcePath + File.separator + PARTITION_FIELD + "=" + partitions.get(0));
+    df.write().parquet(sourcePath + File.separator + PARTITION_FIELD + "=" + partitions.get(0));
   }
 
   /**
@@ -77,8 +99,9 @@ public class ITTestBootstrapCommand extends AbstractShellIntegrationTest {
   public void testBootstrapRunCommand() throws IOException {
     // test bootstrap run command
     String cmdStr = String.format(
-        "bootstrap run --targetPath %s --tableName %s --tableType %s --sourcePath %s --recordKeyColumns %s --partitionFields %s --sparkMaster %s",
+        "bootstrap run --targetPath %s --tableName %s --tableType %s --srcPath %s --rowKeyField %s --partitionPathField %s --sparkMaster %s",
         tablePath, tableName, HoodieTableType.COPY_ON_WRITE.name(), sourcePath, RECORD_KEY_FIELD, PARTITION_FIELD, "local");
+    System.out.println("wenningd => " + cmdStr);
     CommandResult cr = getShell().executeCommand(cmdStr);
     assertTrue(cr.isSuccess());
 
