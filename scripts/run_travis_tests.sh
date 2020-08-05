@@ -35,7 +35,11 @@ elif [ "$mode" = "integration" ]; then
   export SPARK_HOME=$PWD/spark-${sparkVersion}-bin-hadoop${hadoopVersion}
   mkdir /tmp/spark-events/
   echo "Running Integration Tests"
-  mvn verify -Pintegration-tests -B
+  echo "wenningd =>"
+  echo $SPARK_HOME
+  ls $SPARK_HOME/jars
+  grep -rnw $SPARK_HOME -e ".*MapredParquetInputFormat.*"
+  # mvn verify -Pintegration-tests -B
 else
   echo "Unknown mode $mode"
   exit 1
