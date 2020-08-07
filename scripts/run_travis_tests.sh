@@ -24,7 +24,8 @@ hadoopVersion=2.7
 if [ "$mode" = "unit" ]; then
   mvn clean install -DskipTests -q
   echo "Running Unit Tests"
-  mvn test -Punit-tests -pl "$modules" -B
+  mvn -Dtest=TestCleaner test -DfailIfNoTests=false -B
+  # mvn test -Punit-tests -pl "$modules" -B
 elif [ "$mode" = "functional" ]; then
   echo "Running Functional Tests"
   mvn test -Pfunctional-tests -B
