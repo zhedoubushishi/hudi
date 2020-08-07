@@ -24,10 +24,13 @@ import org.apache.hudi.avro.model.HoodieActionInstant;
 import org.apache.hudi.avro.model.HoodieCleanMetadata;
 import org.apache.hudi.avro.model.HoodieCleanerPlan;
 import org.apache.hudi.common.HoodieCleanStat;
+import org.apache.hudi.common.fs.FSUtils;
+import org.apache.hudi.common.model.HoodieBaseFile;
 import org.apache.hudi.common.model.HoodieCleaningPolicy;
 import org.apache.hudi.common.table.timeline.HoodieInstant;
 import org.apache.hudi.common.table.timeline.HoodieTimeline;
 import org.apache.hudi.common.table.timeline.TimelineMetadataUtils;
+import org.apache.hudi.common.table.view.SyncableFileSystemView;
 import org.apache.hudi.common.util.CleanerUtils;
 import org.apache.hudi.common.util.HoodieTimer;
 import org.apache.hudi.common.util.Option;
@@ -56,8 +59,11 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LogManager.getLogger(CleanActionExecutor.class);
 
+  private static SyncableFileSystemView fileSystemView;
+
   public CleanActionExecutor(JavaSparkContext jsc, HoodieWriteConfig config, HoodieTable<?> table, String instantTime) {
     super(jsc, config, table, instantTime);
+    fileSystemView = table.getHoodieView();
   }
 
   /**
@@ -96,17 +102,40 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
   }
 
   private static PairFlatMapFunction<Iterator<Tuple2<String, String>>, String, PartitionCleanStat> deleteFilesFunc(
-      HoodieTable table) {
+      HoodieTable table, Boolean cleanBootstrapSourceFileEnabled) {
     return (PairFlatMapFunction<Iterator<Tuple2<String, String>>, String, PartitionCleanStat>) iter -> {
       Map<String, PartitionCleanStat> partitionCleanStatMap = new HashMap<>();
 
       FileSystem fs = table.getMetaClient().getFs();
+      Path basePath = new Path(table.getMetaClient().getBasePath());
       while (iter.hasNext()) {
         Tuple2<String, String> partitionDelFileTuple = iter.next();
         String partitionPath = partitionDelFileTuple._1();
-        String deletePathStr = partitionDelFileTuple._2();
-        Path deletePath = new Path(deletePathStr);
-        Boolean deletedFileResult = deleteFileAndGetResult(fs, deletePathStr);
+        String delFileName = partitionDelFileTuple._2();
+        Path deletePath = FSUtils.getPartitionPath(FSUtils.getPartitionPath(basePath, partitionPath), delFileName);
+
+        // If CleanBootstrapSourceFileEnabled and it is a metadata bootstrap commit, also delete the corresponding source file
+        if (cleanBootstrapSourceFileEnabled && !FSUtils.isLogFile(deletePath) && FSUtils.getCommitTime(delFileName).equals(HoodieTimeline.METADATA_BOOTSTRAP_INSTANT_TS)) {
+          Option<HoodieBaseFile> baseFile = fileSystemView.getBaseFileOn(partitionPath, FSUtils.getCommitTime(delFileName), FSUtils.getFileId(delFileName));
+          if (baseFile.isPresent() && baseFile.get().getBootstrapBaseFile().isPresent()) {
+            String bootstrapBaseFilePath = baseFile.get().getBootstrapBaseFile().get().getPath();
+            // deleteFileAndSaveResult(fs, bootstrapBaseFilePath, partitionPath, partitionCleanStatMap);
+
+            Boolean deletedFileResult = deleteFileAndSaveResult(fs, bootstrapBaseFilePath);
+            if (!partitionCleanStatMap.containsKey(partitionPath)) {
+              partitionCleanStatMap.put(partitionPath, new PartitionCleanStat(partitionPath));
+            }
+            PartitionCleanStat partitionCleanStat = partitionCleanStatMap.get(partitionPath);
+            partitionCleanStat.addDeleteFilePatterns(deletePath.getName());
+            partitionCleanStat.addDeletedFileResult(deletePath.getName(), deletedFileResult);
+          }
+        }
+
+
+        String deletePathStr = deletePath.toString();
+        // deleteFileAndSaveResult(fs, deletePathStr, partitionPath, partitionCleanStatMap);
+
+        Boolean deletedFileResult = deleteFileAndSaveResult(fs, deletePathStr);
         if (!partitionCleanStatMap.containsKey(partitionPath)) {
           partitionCleanStatMap.put(partitionPath, new PartitionCleanStat(partitionPath));
         }
@@ -119,19 +148,30 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
     };
   }
 
-  private static Boolean deleteFileAndGetResult(FileSystem fs, String deletePathStr) throws IOException {
+  // private static boolean deleteFileAndSaveResult(FileSystem fs, String deletePathStr, String partitionPath, Map<String, PartitionCleanStat> partitionCleanStatMap) throws IOException {
+  private static boolean deleteFileAndSaveResult(FileSystem fs, String deletePathStr) throws IOException {
     Path deletePath = new Path(deletePathStr);
+    boolean deleteResult = false;
     LOG.debug("Working on delete path :" + deletePath);
     try {
-      boolean deleteResult = fs.delete(deletePath, false);
+      deleteResult = fs.delete(deletePath, false);
       if (deleteResult) {
         LOG.debug("Cleaned file at path :" + deletePath);
       }
       return deleteResult;
     } catch (FileNotFoundException fio) {
-      // With cleanPlan being used for retried cleaning operations, its possible to clean a file twice
       return false;
+      // With cleanPlan being used for retried cleaning operations, its possible to clean a file twice
+    } /*
+    finally {
+      if (!partitionCleanStatMap.containsKey(partitionPath)) {
+        partitionCleanStatMap.put(partitionPath, new PartitionCleanStat(partitionPath));
+      }
+      PartitionCleanStat partitionCleanStat = partitionCleanStatMap.get(partitionPath);
+      partitionCleanStat.addDeleteFilePatterns(deletePath.getName());
+      partitionCleanStat.addDeletedFileResult(deletePath.getName(), deleteResult);
     }
+    */
   }
 
   /**
@@ -151,7 +191,7 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
         .parallelize(cleanerPlan.getFilesToBeDeletedPerPartition().entrySet().stream()
             .flatMap(x -> x.getValue().stream().map(y -> new Tuple2<>(x.getKey(), y)))
             .collect(Collectors.toList()), cleanerParallelism)
-        .mapPartitionsToPair(deleteFilesFunc(table))
+        .mapPartitionsToPair(deleteFilesFunc(table, config.getCleanBootstrapSourceFileEnabled()))
         .reduceByKey(PartitionCleanStat::merge).collect();
 
     Map<String, PartitionCleanStat> partitionCleanStatsMap = partitionCleanStats.stream()

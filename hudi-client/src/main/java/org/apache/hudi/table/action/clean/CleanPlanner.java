@@ -28,6 +28,7 @@ import org.apache.hudi.common.model.HoodieCleaningPolicy;
 import org.apache.hudi.common.model.HoodieCommitMetadata;
 import org.apache.hudi.common.model.HoodieFileGroup;
 import org.apache.hudi.common.model.HoodieFileGroupId;
+import org.apache.hudi.common.model.HoodieLogFile;
 import org.apache.hudi.common.model.HoodieRecordPayload;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.table.timeline.HoodieInstant;
@@ -223,15 +224,11 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
         FileSlice nextSlice = fileSliceIterator.next();
         if (nextSlice.getBaseFile().isPresent()) {
           HoodieBaseFile dataFile = nextSlice.getBaseFile().get();
-          deletePaths.add(dataFile.getPath());
-          // If CleanBootstrapSourceFileEnabled and it is a metadata bootstrap commit, also delete the corresponding source file
-          if (config.getCleanBootstrapSourceFileEnabled() && dataFile.getBootstrapBaseFile().isPresent()) {
-            deletePaths.add(dataFile.getBootstrapBaseFile().get().getPath());
-          }
+          deletePaths.add(dataFile.getFileName());
         }
         if (hoodieTable.getMetaClient().getTableType() == HoodieTableType.MERGE_ON_READ) {
           // If merge on read, then clean the log files for the commits as well
-          deletePaths.addAll(nextSlice.getLogFiles().map(logFile -> logFile.getPath().toString()).collect(Collectors.toList()));
+          deletePaths.addAll(nextSlice.getLogFiles().map(HoodieLogFile::getFileName).collect(Collectors.toList()));
         }
       }
     }
@@ -300,14 +297,10 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
           if (!isFileSliceNeededForPendingCompaction(aSlice) && HoodieTimeline
               .compareTimestamps(earliestCommitToRetain.getTimestamp(), HoodieTimeline.GREATER_THAN, fileCommitTime)) {
             // this is a commit, that should be cleaned.
-            aFile.ifPresent(hoodieDataFile -> deletePaths.add(hoodieDataFile.getPath()));
-            // If CleanBootstrapSourceFileEnabled and it is a metadata bootstrap commit, also delete the corresponding source file
-            if (config.getCleanBootstrapSourceFileEnabled() && aFile.isPresent() && aFile.get().getBootstrapBaseFile().isPresent()) {
-              deletePaths.add(aFile.get().getBootstrapBaseFile().get().getPath());
-            }
+            aFile.ifPresent(hoodieDataFile -> deletePaths.add(hoodieDataFile.getFileName()));
             if (hoodieTable.getMetaClient().getTableType() == HoodieTableType.MERGE_ON_READ) {
               // If merge on read, then clean the log files for the commits as well
-              deletePaths.addAll(aSlice.getLogFiles().map(logFile -> logFile.getPath().toString()).collect(Collectors.toList()));
+              deletePaths.addAll(aSlice.getLogFiles().map(HoodieLogFile::getFileName).collect(Collectors.toList()));
             }
           }
         }
