@@ -24,8 +24,10 @@ import org.apache.hudi.avro.model.HoodieCompactionPlan;
 import org.apache.hudi.client.HoodieWriteClient;
 import org.apache.hudi.client.WriteStatus;
 import org.apache.hudi.common.HoodieCleanStat;
+import org.apache.hudi.common.bootstrap.TestBootstrapIndex;
 import org.apache.hudi.common.fs.ConsistencyGuardConfig;
 import org.apache.hudi.common.fs.FSUtils;
+import org.apache.hudi.common.model.BootstrapFileMapping;
 import org.apache.hudi.common.model.FileSlice;
 import org.apache.hudi.common.model.HoodieBaseFile;
 import org.apache.hudi.common.model.HoodieCleaningPolicy;
@@ -64,6 +66,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -76,6 +79,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -708,7 +712,7 @@ public class TestCleaner extends HoodieClientTestBase {
   }
 
   /**
-   * Test HoodieTable.clean() Cleaning by commit logic for MOR table with Log files.
+   * Test HoodieTable.clean() Cleaning by commit logic for COW table.
    */
   @Test
   public void testKeepLatestCommits() throws IOException {
@@ -716,7 +720,7 @@ public class TestCleaner extends HoodieClientTestBase {
   }
 
   /**
-   * Test HoodieTable.clean() Cleaning by commit logic for MOR table with Log files. Here the operations are simulated
+   * Test HoodieTable.clean() Cleaning by commit logic for COW table. Here the operations are simulated
    * such that first clean attempt failed after files were cleaned and a subsequent cleanup succeeds.
    */
   @Test
@@ -725,7 +729,7 @@ public class TestCleaner extends HoodieClientTestBase {
   }
 
   /**
-   * Test HoodieTable.clean() Cleaning by commit logic for MOR table with Log files.
+   * Test HoodieTable.clean() Cleaning by commit logic for COW table.
    */
   @Test
   public void testKeepLatestCommitsIncrMode() throws IOException {
@@ -733,7 +737,15 @@ public class TestCleaner extends HoodieClientTestBase {
   }
 
   /**
-   * Test HoodieTable.clean() Cleaning by commit logic for MOR table with Log files.
+   * Test HoodieTable.clean() Cleaning by commit logic for COW table with Bootstrap source file clean enable.
+   */
+  @Test
+  public void testBootstrapSourceFileCleanWithKeepLatestCommits() throws IOException {
+    testKeepLatestCommits(false, false, true);
+  }
+
+  /**
+   * Test HoodieTable.clean() Cleaning by commit logic for COW table.
    */
   private void testKeepLatestCommits(boolean simulateFailureRetry, boolean enableIncrementalClean, boolean enableBootstrapSourceClean) throws IOException {
     HoodieWriteConfig config = HoodieWriteConfig.newBuilder().withPath(basePath).withAssumeDatePartitioning(true)
@@ -743,13 +755,19 @@ public class TestCleaner extends HoodieClientTestBase {
             .withCleanerPolicy(HoodieCleaningPolicy.KEEP_LATEST_COMMITS).retainCommits(2).build())
         .build();
 
+    Map<String, List<BootstrapFileMapping>> bootstrapMapping = enableBootstrapSourceClean ? generateBootstrapIndexAndSourceData() : null;
+
     // make 1 commit, with 1 file per partition
     HoodieTestUtils.createInflightCommitFiles(basePath, "00000000000001");
 
-    String file1P0C0 =
-        HoodieTestUtils.createNewDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000001");
-    String file1P1C0 =
-        HoodieTestUtils.createNewDataFile(basePath, HoodieTestDataGenerator.DEFAULT_SECOND_PARTITION_PATH, "00000000000001");
+    String file1P0C0 = enableBootstrapSourceClean ? bootstrapMapping.get(HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH).get(0).getFileId()
+        : UUID.randomUUID().toString();
+    String file1P1C0 = enableBootstrapSourceClean ? bootstrapMapping.get(HoodieTestDataGenerator.DEFAULT_SECOND_PARTITION_PATH).get(0).getFileId()
+        : UUID.randomUUID().toString();
+    HoodieTestUtils
+        .createDataFile(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000001", file1P0C0); // insert
+    HoodieTestUtils
+        .createDataFile(basePath, HoodieTestDataGenerator.DEFAULT_SECOND_PARTITION_PATH, "00000000000001", file1P1C0); // insert
 
     HoodieCommitMetadata commitMetadata = generateCommitMetadata(
         Collections.unmodifiableMap(new HashMap<String, List<String>>() {
@@ -847,12 +865,17 @@ public class TestCleaner extends HoodieClientTestBase {
         Option.of(commitMetadata.toJsonString().getBytes(StandardCharsets.UTF_8)));
 
     List<HoodieCleanStat> hoodieCleanStatsFour = runCleaner(config, simulateFailureRetry);
-    assertEquals(1,
+    // enableBootstrapSourceClean would delete thee bootstrap base file as the same time
+    assertEquals(enableBootstrapSourceClean ? 2 : 1,
         getCleanStat(hoodieCleanStatsFour, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH).getSuccessDeleteFiles()
             .size(), "Must not clean one old file");
 
     assertFalse(HoodieTestUtils.doesDataFileExist(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000001",
         file1P0C0));
+    if (enableBootstrapSourceClean) {
+      assertFalse(new File(bootstrapMapping.get(
+          HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH).get(0).getBoostrapFileStatus().getPath().getUri()).exists());
+    }
     assertTrue(HoodieTestUtils.doesDataFileExist(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000002",
         file1P0C0));
     assertTrue(HoodieTestUtils.doesDataFileExist(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000003",
@@ -884,6 +907,31 @@ public class TestCleaner extends HoodieClientTestBase {
         file1P0C0));
     assertTrue(HoodieTestUtils.doesDataFileExist(basePath, HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, "00000000000002",
         file2P0C1));
+  }
+
+  /**
+   * Generate Bootstrap index, bootstrap base file and corresponding metaClient.
+   * @return Partition to BootstrapFileMapping Map
+   * @throws IOException
+   */
+  private Map<String, List<BootstrapFileMapping>> generateBootstrapIndexAndSourceData() throws IOException {
+    // create bootstrap source data path
+    java.nio.file.Path sourcePath = tempDir.resolve("data");
+    java.nio.file.Files.createDirectories(sourcePath);
+    assertTrue(new File(sourcePath.toString()).exists());
+
+    // recreate metaClient with Bootstrap base path
+    metaClient = HoodieTestUtils.init(basePath, getTableType(), sourcePath.toString());
+
+    // generate bootstrap index
+    Map<String, List<BootstrapFileMapping>> bootstrapMapping = TestBootstrapIndex.generateBootstrapIndex(metaClient, sourcePath.toString(),
+        new String[] {HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH, HoodieTestDataGenerator.DEFAULT_SECOND_PARTITION_PATH}, 1);
+
+    for (Map.Entry<String, List<BootstrapFileMapping>> entry : bootstrapMapping.entrySet()) {
+      new File(sourcePath.toString() + "/" + entry.getKey()).mkdirs();
+      assertTrue(new File(entry.getValue().get(0).getBoostrapFileStatus().getPath().getUri()).createNewFile());
+    }
+    return bootstrapMapping;
   }
 
   /**
