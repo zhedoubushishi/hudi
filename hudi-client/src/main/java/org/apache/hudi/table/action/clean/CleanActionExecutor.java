@@ -171,8 +171,7 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
         (int) (cleanerPlan.getFilesToBeDeletedPerPartition().values().stream().mapToInt(List::size).count()),
         config.getCleanerParallelism());
     LOG.info("Using cleanerParallelism: " + cleanerParallelism);
-    System.out.println("wenningd => " + config.getCleanBootstrapSourceFileEnabled());
-    
+
     jsc.setJobGroup(this.getClass().getSimpleName(), "Perform cleaning of partitions");
     List<Tuple2<String, PartitionCleanStat>> partitionCleanStats = jsc
         .parallelize(cleanerPlan.getFilesToBeDeletedPerPartition().entrySet().stream()
