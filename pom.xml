@@ -126,6 +126,7 @@
     <utilities.bundle.hive.shade.prefix></utilities.bundle.hive.shade.prefix>
     <argLine>-Xmx2g</argLine>
     <jacoco.version>0.8.5</jacoco.version>
+    <timeline.service.jetty.shade.prefix>org.apache.hudi.timeline-service-jetty.</timeline.service.jetty.shade.prefix>
   </properties>
 
   <scm>
