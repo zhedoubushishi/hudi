@@ -101,6 +101,7 @@ public class TestHBaseIndex extends FunctionalTestHarness {
     // Initialize HbaseMiniCluster
     hbaseConfig = HBaseConfiguration.create();
     hbaseConfig.set("zookeeper.znode.parent", "/hudi-hbase-test");
+    // hbaseConfig.set("hbase.unsafe.stream.capability.enforce", "false");
 
     utility = new HBaseTestingUtility(hbaseConfig);
     utility.startMiniCluster();
