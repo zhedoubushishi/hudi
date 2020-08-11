@@ -24,6 +24,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellComparatorImpl;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.io.hfile.CacheConfig;
@@ -92,7 +94,7 @@ public class TestInLineFileSystemHFileInLining {
     HFile.Writer writer = HFile.getWriterFactory(inMemoryConf, cacheConf)
         .withOutputStream(fout)
         .withFileContext(meta)
-        .withComparator(new KeyValue.KVComparator())
+        .withComparator(new CellComparatorImpl())
         .create();
 
     writeRecords(writer);
@@ -109,7 +111,7 @@ public class TestInLineFileSystemHFileInLining {
     InLineFileSystem inlineFileSystem = (InLineFileSystem) inlinePath.getFileSystem(inlineConf);
     FSDataInputStream fin = inlineFileSystem.open(inlinePath);
 
-    HFile.Reader reader = HFile.createReader(inlineFileSystem, inlinePath, cacheConf, inlineConf);
+    HFile.Reader reader = HFile.createReader(inlineFileSystem, inlinePath, cacheConf, true, inlineConf);
     // Load up the index.
     reader.loadFileInfo();
     // Get a scanner that caches and that does not use pread.
@@ -120,21 +122,21 @@ public class TestInLineFileSystemHFileInLining {
 
     Set<Integer> rowIdsToSearch = getRandomValidRowIds(10);
     for (int rowId : rowIdsToSearch) {
-      assertEquals(0, scanner.seekTo(KeyValue.createKeyValueFromKey(getSomeKey(rowId))),
+      assertEquals(0, scanner.seekTo(new KeyValue.KeyOnlyKeyValue(getSomeKey(rowId))),
           "location lookup failed");
       // read the key and see if it matches
-      ByteBuffer readKey = scanner.getKey();
-      assertArrayEquals(getSomeKey(rowId), Bytes.toBytes(readKey), "seeked key does not match");
-      scanner.seekTo(KeyValue.createKeyValueFromKey(getSomeKey(rowId)));
+      Cell readKey = scanner.getKey();
+      assertArrayEquals(getSomeKey(rowId), new KeyValue(readKey).getKey(), "seeked key does not match");
+      scanner.seekTo(new KeyValue.KeyOnlyKeyValue(getSomeKey(rowId)));
       ByteBuffer val1 = scanner.getValue();
-      scanner.seekTo(KeyValue.createKeyValueFromKey(getSomeKey(rowId)));
+      scanner.seekTo(new KeyValue.KeyOnlyKeyValue(getSomeKey(rowId)));
       ByteBuffer val2 = scanner.getValue();
       assertArrayEquals(Bytes.toBytes(val1), Bytes.toBytes(val2));
     }
 
     int[] invalidRowIds = {-4, maxRows, maxRows + 1, maxRows + 120, maxRows + 160, maxRows + 1000};
     for (int rowId : invalidRowIds) {
-      assertNotEquals(0, scanner.seekTo(KeyValue.createKeyValueFromKey(getSomeKey(rowId))),
+      assertNotEquals(0, scanner.seekTo(new KeyValue.KeyOnlyKeyValue(getSomeKey(rowId))),
           "location lookup should have failed");
     }
     reader.close();
@@ -191,16 +193,16 @@ public class TestInLineFileSystemHFileInLining {
     String value = "value";
     int i = start;
     for (; i < (start + n); i++) {
-      ByteBuffer key = scanner.getKey();
+      Cell key = scanner.getKey();
       ByteBuffer val = scanner.getValue();
       String keyStr = String.format(LOCAL_FORMATTER, Integer.valueOf(i));
       String valStr = value + keyStr;
       KeyValue kv = new KeyValue(Bytes.toBytes(keyStr), Bytes.toBytes("family"),
           Bytes.toBytes("qual"), Bytes.toBytes(valStr));
-      byte[] keyBytes = new KeyValue.KeyOnlyKeyValue(Bytes.toBytes(key), 0,
-          Bytes.toBytes(key).length).getKey();
+      byte[] keyBytes = new KeyValue.KeyOnlyKeyValue(new KeyValue(key).getKey(), 0,
+          new KeyValue(key).getKey().length).getKey();
       assertArrayEquals(kv.getKey(), keyBytes,
-          "bytes for keys do not match " + keyStr + " " + Bytes.toString(Bytes.toBytes(key)));
+          "bytes for keys do not match " + keyStr + " " + Bytes.toString(new KeyValue(key).getKey()));
       byte[] valBytes = Bytes.toBytes(val);
       assertArrayEquals(Bytes.toBytes(valStr), valBytes,
           "bytes for vals do not match " + valStr + " " + Bytes.toString(valBytes));

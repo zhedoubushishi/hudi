@@ -37,6 +37,7 @@ import org.apache.hudi.exception.HoodieIOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.CellComparatorImpl;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.KeyValue;
@@ -179,7 +180,7 @@ public class HFileBootstrapIndex extends BootstrapIndex {
     try {
       LOG.info("Opening HFile for reading :" + hFilePath);
       HFile.Reader reader = HFile.createReader(fileSystem, new HFilePathForReader(hFilePath),
-          new CacheConfig(conf), conf);
+          new CacheConfig(conf), true, conf);
       return reader;
     } catch (IOException ioe) {
       throw new HoodieIOException(ioe.getMessage(), ioe);
@@ -306,7 +307,7 @@ public class HFileBootstrapIndex extends BootstrapIndex {
       try {
         boolean available = scanner.seekTo();
         while (available) {
-          keys.add(converter.apply(getUserKeyFromCellKey(CellUtil.getCellKeyAsString(scanner.getKeyValue()))));
+          keys.add(converter.apply(getUserKeyFromCellKey(CellUtil.getCellKeyAsString(scanner.getKey()))));
           available = scanner.next();
         }
       } catch (IOException ioe) {
@@ -581,6 +582,6 @@ public class HFileBootstrapIndex extends BootstrapIndex {
    * This class is explicitly used as Key Comparator to workaround hard coded
    * legacy format class names inside HBase. Otherwise we will face issues with shading.
    */
-  public static class HoodieKVComparator extends KeyValue.KVComparator {
+  public static class HoodieKVComparator extends CellComparatorImpl {
   }
 }

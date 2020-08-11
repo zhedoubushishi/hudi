@@ -82,6 +82,7 @@ public class TestHBaseIndex extends FunctionalTestHarness {
   private static final String TABLE_NAME = "test_table";
   private static HBaseTestingUtility utility;
   private static Configuration hbaseConfig;
+  private static TableName hbaseTableName;
 
   private Configuration hadoopConf;
   private HoodieTestDataGenerator dataGen;
@@ -90,7 +91,7 @@ public class TestHBaseIndex extends FunctionalTestHarness {
   @AfterAll
   public static void clean() throws Exception {
     if (utility != null) {
-      utility.deleteTable(TABLE_NAME);
+      utility.deleteTable(hbaseTableName);
       utility.shutdownMiniCluster();
     }
   }
@@ -104,7 +105,8 @@ public class TestHBaseIndex extends FunctionalTestHarness {
     utility = new HBaseTestingUtility(hbaseConfig);
     utility.startMiniCluster();
     hbaseConfig = utility.getConnection().getConfiguration();
-    utility.createTable(TableName.valueOf(TABLE_NAME), Bytes.toBytes("_s"));
+    hbaseTableName = TableName.valueOf(TABLE_NAME);
+    utility.createTable(hbaseTableName, Bytes.toBytes("_s"));
   }
 
   @BeforeEach
