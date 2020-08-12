@@ -128,8 +128,12 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
       return;
     }
     LOG.info("Adding partitions " + partitionsToAdd.size() + " to table " + tableName);
-    String sql = constructAddPartitions(tableName, partitionsToAdd);
-    updateHiveSQL(sql);
+    if (syncConfig.useJdbc) {
+      String sql = constructAddPartitions(tableName, partitionsToAdd);
+      updateHiveSQL(sql);
+    } else {
+      addPartitionsUsingMetastoreClient(tableName, partitionsToAdd);
+    }
   }
 
   /**
@@ -142,9 +146,31 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
       return;
     }
     LOG.info("Changing partitions " + changedPartitions.size() + " on " + tableName);
-    List<String> sqls = constructChangePartitions(tableName, changedPartitions);
-    for (String sql : sqls) {
-      updateHiveSQL(sql);
+    if (syncConfig.useJdbc) {
+      List<String> sqls = constructChangePartitions(tableName, changedPartitions);
+      for (String sql : sqls) {
+        updateHiveSQL(sql);
+      }
+    } else {
+      changePartitionsUsingMetastoreClient(tableName, changedPartitions);
+    }
+  }
+
+  private void addPartitionsUsingMetastoreClient(String tableName, List<String> partitionsToAdd) {
+    try {
+      org.apache.hadoop.hive.ql.metadata.Table table = new org.apache.hadoop.hive.ql.metadata.Table(
+          client.getTable(syncConfig.databaseName, tableName));
+      List<Partition> hivePartitionsToAdd = new ArrayList<>();
+      for (String partition : partitionsToAdd) {
+        Path fullPartitionPath = FSUtils.getPartitionPath(syncConfig.basePath, partition);
+        Map<String, String> partitionToSpec = client.partitionNameToSpec(
+            getHiveFormatPartitionString(partition));
+        hivePartitionsToAdd.add(org.apache.hadoop.hive.ql.metadata.Partition
+            .createMetaPartitionObject(table, partitionToSpec, fullPartitionPath));
+      }
+      client.add_partitions(hivePartitionsToAdd);
+    } catch (HiveException | TException e) {
+      throw new HoodieHiveSyncException("Failed to add partition for " + tableName, e);
     }
   }
 
@@ -154,7 +180,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
             .append(HIVE_ESCAPE_CHARACTER).append(".").append(HIVE_ESCAPE_CHARACTER)
             .append(tableName).append(HIVE_ESCAPE_CHARACTER).append(" ADD IF NOT EXISTS ");
     for (String partition : partitions) {
-      String partitionClause = getPartitionClause(partition);
+      String partitionClause = getHiveFormatPartitionString(partition);
       String fullPartitionPath = FSUtils.getPartitionPath(syncConfig.basePath, partition).toString();
       alterSQL.append("  PARTITION (").append(partitionClause).append(") LOCATION '").append(fullPartitionPath)
           .append("' ");
@@ -163,21 +189,43 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
   }
 
   /**
-   * Generate Hive Partition from partition values.
+   * Generate Hive Partition String from partition values.
+   * If using JDBC, it will return the partition clause. if using metastore client, it will return the hive format partition path.
    *
    * @param partition Partition path
    * @return
    */
-  private String getPartitionClause(String partition) {
+  private String getHiveFormatPartitionString(String partition) {
     List<String> partitionValues = partitionValueExtractor.extractPartitionValuesInPath(partition);
     ValidationUtils.checkArgument(syncConfig.partitionFields.size() == partitionValues.size(),
         "Partition key parts " + syncConfig.partitionFields + " does not match with partition values " + partitionValues
             + ". Check partition strategy. ");
     List<String> partBuilder = new ArrayList<>();
     for (int i = 0; i < syncConfig.partitionFields.size(); i++) {
-      partBuilder.add("`" + syncConfig.partitionFields.get(i) + "`='" + partitionValues.get(i) + "'");
+      if (syncConfig.useJdbc) {
+        partBuilder.add("`" + syncConfig.partitionFields.get(i) + "`='" + partitionValues.get(i) + "'");
+      } else {
+        partBuilder.add(syncConfig.partitionFields.get(i) + "=" + partitionValues.get(i));
+      }
     }
-    return String.join(",", partBuilder);
+    return String.join(syncConfig.useJdbc ? "," : "/", partBuilder);
+  }
+
+  private void changePartitionsUsingMetastoreClient(String tableName, List<String> changedPartitions) {
+    try {
+      for (String partition : changedPartitions) {
+        Partition newPartition = client.getPartition(syncConfig.databaseName, tableName,
+            getHiveFormatPartitionString(partition));
+        Path partitionPath = FSUtils.getPartitionPath(syncConfig.basePath, partition);
+        String partitionScheme = partitionPath.toUri().getScheme();
+        String fullPartitionPath = StorageSchemes.HDFS.getScheme().equals(partitionScheme)
+            ? FSUtils.getDFSFullPartitionPath(fs, partitionPath) : partitionPath.toString();
+        newPartition.getSd().setLocation(fullPartitionPath);
+        client.alter_partition(syncConfig.databaseName, tableName, newPartition);
+      }
+    } catch (TException e) {
+      throw new HoodieHiveSyncException("Failed to change partition for " + tableName, e);
+    }
   }
 
   private List<String> constructChangePartitions(String tableName, List<String> partitions) {
@@ -187,7 +235,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     changePartitions.add(useDatabase);
     String alterTable = "ALTER TABLE " + HIVE_ESCAPE_CHARACTER + tableName + HIVE_ESCAPE_CHARACTER;
     for (String partition : partitions) {
-      String partitionClause = getPartitionClause(partition);
+      String partitionClause = getHiveFormatPartitionString(partition);
       Path partitionPath = FSUtils.getPartitionPath(syncConfig.basePath, partition);
       String partitionScheme = partitionPath.toUri().getScheme();
       String fullPartitionPath = StorageSchemes.HDFS.getScheme().equals(partitionScheme)
