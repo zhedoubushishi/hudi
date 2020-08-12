@@ -29,6 +29,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
@@ -93,6 +94,8 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     if (cfg.useJdbc) {
       LOG.info("Creating hive connection " + cfg.jdbcUrl);
       createHiveConnection();
+    } else {
+      LOG.info("Creating hive connection without JDBC");
     }
     try {
       this.client = Hive.get(configuration).getMSC();
@@ -255,12 +258,45 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
 
   @Override
   public void createTable(String tableName, MessageType storageSchema, String inputFormatClass, String outputFormatClass, String serdeClass) {
+    if (syncConfig.useJdbc) {
+      try {
+        String createSQLQuery =
+            HiveSchemaUtil.generateCreateDDL(tableName, storageSchema, syncConfig, inputFormatClass,
+                outputFormatClass, serdeClass);
+        LOG.info("Creating table with " + createSQLQuery);
+        updateHiveSQL(createSQLQuery);
+      } catch (IOException e) {
+        throw new HoodieHiveSyncException("Failed to create table " + tableName, e);
+      }
+    } else {
+      createTableUsingMetastoreClient(tableName, storageSchema, inputFormatClass, outputFormatClass, serdeClass);
+    }
+  }
+
+  private void createTableUsingMetastoreClient(String tableName, MessageType storageSchema, String inputFormatClass, String outputFormatClass, String serdeClass) {
     try {
-      String createSQLQuery =
-          HiveSchemaUtil.generateCreateDDL(tableName, storageSchema, syncConfig, inputFormatClass, outputFormatClass, serdeClass);
-      LOG.info("Creating table with " + createSQLQuery);
-      updateHiveSQL(createSQLQuery);
-    } catch (IOException e) {
+      org.apache.hadoop.hive.ql.metadata.Table table = new org.apache.hadoop.hive.ql.metadata.Table(syncConfig.databaseName, tableName);
+      table.setInputFormatClass(inputFormatClass);
+      table.setOutputFormatClass(outputFormatClass);
+      table.setSerializationLib(serdeClass);
+      table.setOwner(syncConfig.hiveUser);
+      table.setDataLocation(new Path(syncConfig.basePath));
+
+      table.setProperty("EXTERNAL", "TRUE");
+      table.setTableType(TableType.EXTERNAL_TABLE);
+
+      Map<String, String> hiveSchema = HiveSchemaUtil.convertParquetSchemaToHiveSchema(storageSchema, false);
+      for (Map.Entry<String, String> entry : hiveSchema.entrySet()) {
+        if (!syncConfig.partitionFields.contains(entry.getKey())) {
+          table.getCols().add(new FieldSchema(entry.getKey(), entry.getValue(), ""));
+        }
+      }
+      for (String partitionField : syncConfig.partitionFields) {
+        table.getPartCols().add(new FieldSchema(partitionField, HiveSchemaUtil.getPartitionKeyTypeForHiveThriftFormat(
+            hiveSchema, partitionField), ""));
+      }
+      Hive.get(configuration).createTable(table, true);
+    } catch (HiveException | IOException e) {
       throw new HoodieHiveSyncException("Failed to create table " + tableName, e);
     }
   }

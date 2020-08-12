@@ -22,6 +22,7 @@ import org.apache.hudi.hive.HiveSyncConfig;
 import org.apache.hudi.hive.HoodieHiveSyncException;
 import org.apache.hudi.hive.SchemaDifference;
 
+import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.parquet.schema.DecimalMetadata;
@@ -133,6 +134,10 @@ public class HiveSchemaUtil {
    * @return : Hive Table schema read from parquet file MAP[String,String]
    */
   public static Map<String, String> convertParquetSchemaToHiveSchema(MessageType messageType) throws IOException {
+    return convertParquetSchemaToHiveSchema(messageType, true);
+  }
+
+  public static Map<String, String> convertParquetSchemaToHiveSchema(MessageType messageType, Boolean isTickSurround) throws IOException {
     Map<String, String> schema = new LinkedHashMap<>();
     List<Type> parquetFields = messageType.getFields();
     for (Type parquetType : parquetFields) {
@@ -144,7 +149,7 @@ public class HiveSchemaUtil {
         result.append(convertField(parquetType));
       }
 
-      schema.put(hiveCompatibleFieldName(key, false), result.toString());
+      schema.put(hiveCompatibleFieldName(key, false, isTickSurround), result.toString());
     }
     return schema;
   }
@@ -277,7 +282,7 @@ public class HiveSchemaUtil {
     for (Type field : parquetFields) {
       // TODO: struct field name is only translated to support special char($)
       // We will need to extend it to other collection type
-      struct.append(hiveCompatibleFieldName(field.getName(), true)).append(" : ");
+      struct.append(hiveCompatibleFieldName(field.getName(), true, true)).append(" : ");
       struct.append(convertField(field)).append(", ");
     }
     struct.delete(struct.length() - 2, struct.length()); // Remove the last
@@ -291,12 +296,12 @@ public class HiveSchemaUtil {
     return finalStr;
   }
 
-  private static String hiveCompatibleFieldName(String fieldName, boolean isNested) {
+  private static String hiveCompatibleFieldName(String fieldName, boolean isNested, boolean isTickSurround) {
     String result = fieldName;
     if (isNested) {
       result = ColumnNameXLator.translateNestedColumn(fieldName);
     }
-    return tickSurround(result);
+    return isTickSurround ? tickSurround(result) : result;
   }
 
   private static String tickSurround(String result) {
@@ -390,7 +395,7 @@ public class HiveSchemaUtil {
     for (String partitionKey : config.partitionFields) {
       String partitionKeyWithTicks = tickSurround(partitionKey);
       partitionFields.add(new StringBuilder().append(partitionKeyWithTicks).append(" ")
-          .append(getPartitionKeyType(hiveSchema, partitionKeyWithTicks)).toString());
+          .append(getPartitionKeyTypeForSQLFormat(hiveSchema, partitionKeyWithTicks)).toString());
     }
 
     String partitionsStr = String.join(",", partitionFields);
@@ -407,13 +412,22 @@ public class HiveSchemaUtil {
     return sb.toString();
   }
 
-  private static String getPartitionKeyType(Map<String, String> hiveSchema, String partitionKey) {
+  private static String getPartitionKeyTypeForSQLFormat(Map<String, String> hiveSchema, String partitionKey) {
+    if (hiveSchema.containsKey(partitionKey)) {
+      return hiveSchema.get(partitionKey).toUpperCase();
+    }
+    // Default the unknown partition fields to be STRING
+    // TODO - all partition fields should be part of the schema. datestr is treated as special.
+    // Dont do that
+    return "STRING";
+  }
+
+  public static String getPartitionKeyTypeForHiveThriftFormat(Map<String, String> hiveSchema, String partitionKey) {
     if (hiveSchema.containsKey(partitionKey)) {
       return hiveSchema.get(partitionKey);
     }
-    // Default the unknown partition fields to be String
+    // Default the unknown partition fields to be string
     // TODO - all partition fields should be part of the schema. datestr is treated as special.
-    // Dont do that
-    return "String";
+    return serdeConstants.STRING_TYPE_NAME;
   }
 }

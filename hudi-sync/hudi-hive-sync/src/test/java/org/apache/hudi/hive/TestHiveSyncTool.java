@@ -26,10 +26,11 @@ import org.apache.hudi.sync.common.AbstractSyncHoodieClient.PartitionEvent.Parti
 import org.apache.hudi.hive.testutils.HiveTestUtil;
 import org.apache.hudi.hive.util.HiveSchemaUtil;
 
+import org.apache.hadoop.hive.metastore.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.OriginalType;
-import org.apache.parquet.schema.PrimitiveType;
+import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName;
 import org.apache.parquet.schema.Types;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.AfterAll;
@@ -41,11 +42,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestHiveSyncTool {
@@ -82,7 +86,7 @@ public class TestHiveSyncTool {
   public void testSchemaConvertArray() throws IOException {
     // Testing the 3-level annotation structure
     MessageType schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeatedGroup()
-        .optional(PrimitiveType.PrimitiveTypeName.INT32).named("element").named("list").named("int_list")
+        .optional(PrimitiveTypeName.INT32).named("element").named("list").named("int_list")
         .named("ArrayOfInts");
 
     String schemaString = HiveSchemaUtil.generateSchemaString(schema);
@@ -90,14 +94,14 @@ public class TestHiveSyncTool {
 
     // A array of arrays
     schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeatedGroup().requiredGroup()
-        .as(OriginalType.LIST).repeatedGroup().required(PrimitiveType.PrimitiveTypeName.INT32).named("element")
+        .as(OriginalType.LIST).repeatedGroup().required(PrimitiveTypeName.INT32).named("element")
         .named("list").named("element").named("list").named("int_list_list").named("ArrayOfArrayOfInts");
 
     schemaString = HiveSchemaUtil.generateSchemaString(schema);
     assertEquals("`int_list_list` ARRAY< ARRAY< int>>", schemaString);
 
     // A list of integers
-    schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeated(PrimitiveType.PrimitiveTypeName.INT32)
+    schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeated(PrimitiveTypeName.INT32)
         .named("element").named("int_list").named("ArrayOfInts");
 
     schemaString = HiveSchemaUtil.generateSchemaString(schema);
@@ -105,7 +109,7 @@ public class TestHiveSyncTool {
 
     // A list of structs with two fields
     schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeatedGroup()
-        .required(PrimitiveType.PrimitiveTypeName.BINARY).named("str").required(PrimitiveType.PrimitiveTypeName.INT32)
+        .required(PrimitiveTypeName.BINARY).named("str").required(PrimitiveTypeName.INT32)
         .named("num").named("element").named("tuple_list").named("ArrayOfTuples");
 
     schemaString = HiveSchemaUtil.generateSchemaString(schema);
@@ -115,7 +119,7 @@ public class TestHiveSyncTool {
     // For this case, since the inner group name is "array", we treat the
     // element type as a one-element struct.
     schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeatedGroup()
-        .required(PrimitiveType.PrimitiveTypeName.BINARY).named("str").named("array").named("one_tuple_list")
+        .required(PrimitiveTypeName.BINARY).named("str").named("array").named("one_tuple_list")
         .named("ArrayOfOneTuples");
 
     schemaString = HiveSchemaUtil.generateSchemaString(schema);
@@ -125,7 +129,7 @@ public class TestHiveSyncTool {
     // For this case, since the inner group name ends with "_tuple", we also treat the
     // element type as a one-element struct.
     schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeatedGroup()
-        .required(PrimitiveType.PrimitiveTypeName.BINARY).named("str").named("one_tuple_list_tuple")
+        .required(PrimitiveTypeName.BINARY).named("str").named("one_tuple_list_tuple")
         .named("one_tuple_list").named("ArrayOfOneTuples2");
 
     schemaString = HiveSchemaUtil.generateSchemaString(schema);
@@ -135,7 +139,7 @@ public class TestHiveSyncTool {
     // Unlike the above two cases, for this the element type is the type of the
     // only field in the struct.
     schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeatedGroup()
-        .required(PrimitiveType.PrimitiveTypeName.BINARY).named("str").named("one_tuple_list").named("one_tuple_list")
+        .required(PrimitiveTypeName.BINARY).named("str").named("one_tuple_list").named("one_tuple_list")
         .named("ArrayOfOneTuples3");
 
     schemaString = HiveSchemaUtil.generateSchemaString(schema);
@@ -143,12 +147,44 @@ public class TestHiveSyncTool {
 
     // A list of maps
     schema = Types.buildMessage().optionalGroup().as(OriginalType.LIST).repeatedGroup().as(OriginalType.MAP)
-        .repeatedGroup().as(OriginalType.MAP_KEY_VALUE).required(PrimitiveType.PrimitiveTypeName.BINARY)
-        .as(OriginalType.UTF8).named("string_key").required(PrimitiveType.PrimitiveTypeName.INT32).named("int_value")
+        .repeatedGroup().as(OriginalType.MAP_KEY_VALUE).required(PrimitiveTypeName.BINARY)
+        .as(OriginalType.UTF8).named("string_key").required(PrimitiveTypeName.INT32).named("int_value")
         .named("key_value").named("array").named("map_list").named("ArrayOfMaps");
 
     schemaString = HiveSchemaUtil.generateSchemaString(schema);
     assertEquals("`map_list` ARRAY< MAP< string, int>>", schemaString);
+  }
+
+  @Test
+  public void testHiveSchemaUtils() throws IOException {
+    // test for Hive schema conversion
+    MessageType parquetSchema = Types.buildMessage()
+        .optionalGroup().as(OriginalType.LIST).repeatedGroup()
+        .optional(PrimitiveTypeName.INT32).named("element").named("list").named("int_list")
+        .optional(PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("string_type")
+        .optional(PrimitiveTypeName.INT32).named("int_type")
+        .optional(PrimitiveTypeName.BOOLEAN).named("boolean_type")
+        .optional(PrimitiveTypeName.DOUBLE).named("double_type")
+        .optional(PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY).length(7).as(OriginalType.DECIMAL).precision(9).named("decimal_type")
+        .named("TestForSchemaConversion");
+    Map<String, String> expectedHiveSchemaMap = new HashMap<String, String>() {{
+        put("int_list", "ARRAY< int>");
+        put("int_type", "int");
+        put("string_type", "string");
+        put("boolean_type", "boolean");
+        put("double_type", "double");
+        put("decimal_type", "DECIMAL(9 , 0)");
+      }};
+    Map<String, String> hiveSchemaMap = HiveSchemaUtil.convertParquetSchemaToHiveSchema(parquetSchema, false);
+    for (Map.Entry<String, String> e : hiveSchemaMap.entrySet()) {
+      assertTrue(expectedHiveSchemaMap.containsKey(e.getKey()));
+      assertEquals(expectedHiveSchemaMap.get(e.getKey()), e.getValue());
+    }
+
+    // test for getPartitionKeyTypeForHiveThriftFormat
+    assertNull(MetaStoreUtils.validateColumnType(HiveSchemaUtil.getPartitionKeyTypeForHiveThriftFormat(hiveSchemaMap, "int_type")));
+    assertNull(MetaStoreUtils.validateColumnType(HiveSchemaUtil.getPartitionKeyTypeForHiveThriftFormat(hiveSchemaMap, "double_type")));
+    assertNull(MetaStoreUtils.validateColumnType(HiveSchemaUtil.getPartitionKeyTypeForHiveThriftFormat(hiveSchemaMap, "unknown_key")));
   }
 
   @ParameterizedTest
