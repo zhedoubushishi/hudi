@@ -43,7 +43,7 @@ import org.apache.hudi.common.testutils.minicluster.ZookeeperTestService;
 import org.apache.hudi.common.util.FileIOUtils;
 import org.apache.hudi.hive.HiveSyncConfig;
 import org.apache.hudi.hive.HiveSyncTool;
-import org.apache.hudi.hive.HoodieHiveClient;
+import org.apache.hudi.hive.client.HoodieHiveClient;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;

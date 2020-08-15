@@ -18,6 +18,8 @@
 
 package org.apache.hudi.hive;
 
+import org.apache.hudi.hive.client.HoodieHiveJDBCClient;
+
 import com.beust.jcommander.Parameter;
 
 import java.io.Serializable;
@@ -71,6 +73,9 @@ public class HiveSyncConfig implements Serializable {
   @Parameter(names = {"--use-jdbc"}, description = "Hive jdbc connect url")
   public Boolean useJdbc = true;
 
+  @Parameter(names = {"--hive-client-class"}, description = "Class which perform Hive functionalities")
+  public String hiveClientClass = HoodieHiveJDBCClient.class.getName();
+
   @Parameter(names = {"--skip-ro-suffix"}, description = "Skip the `_ro` suffix for Read optimized table, when registering")
   public Boolean skipROSuffix = false;
 
@@ -89,11 +94,14 @@ public class HiveSyncConfig implements Serializable {
     newConfig.jdbcUrl = cfg.jdbcUrl;
     newConfig.tableName = cfg.tableName;
     newConfig.usePreApacheInputFormat = cfg.usePreApacheInputFormat;
+    newConfig.useJdbc = cfg.useJdbc;
+    newConfig.hiveClientClass = cfg.hiveClientClass;
     return newConfig;
   }
 
   @Override
   public String toString() {
+    //TODO
     return "HiveSyncConfig{databaseName='" + databaseName + '\'' + ", tableName='" + tableName + '\''
         + ", hiveUser='" + hiveUser + '\'' + ", hivePass='" + hivePass + '\'' + ", jdbcUrl='" + jdbcUrl + '\''
         + ", basePath='" + basePath + '\'' + ", partitionFields=" + partitionFields + ", partitionValueExtractorClass='"

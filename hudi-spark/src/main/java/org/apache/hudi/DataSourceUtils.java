@@ -325,6 +325,9 @@ public class DataSourceUtils {
             SlashEncodedDayPartitionValueExtractor.class.getName());
     hiveSyncConfig.useJdbc = Boolean.valueOf(props.getString(DataSourceWriteOptions.HIVE_USE_JDBC_OPT_KEY(),
         DataSourceWriteOptions.DEFAULT_HIVE_USE_JDBC_OPT_VAL()));
+    hiveSyncConfig.hiveClientClass =
+        props.getString(DataSourceWriteOptions.HIVE_CLIENT_CLASS_OPT_KEY(),
+            DataSourceWriteOptions.DEFAULT_HIVE_CLIENT_CLASS_OPT_VAL());
     return hiveSyncConfig;
   }
 }

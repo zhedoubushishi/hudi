@@ -21,6 +21,7 @@ import org.apache.hudi.common.model.HoodieTableType
 import org.apache.hudi.common.model.OverwriteWithLatestAvroPayload
 import org.apache.hudi.hive.HiveSyncTool
 import org.apache.hudi.hive.SlashEncodedDayPartitionValueExtractor
+import org.apache.hudi.hive.client.HoodieHiveJDBCClient
 import org.apache.hudi.keygen.SimpleKeyGenerator
 import org.apache.log4j.LogManager
 
@@ -288,7 +289,9 @@ object DataSourceWriteOptions {
   val HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY = "hoodie.datasource.hive_sync.partition_extractor_class"
   val HIVE_ASSUME_DATE_PARTITION_OPT_KEY = "hoodie.datasource.hive_sync.assume_date_partitioning"
   val HIVE_USE_PRE_APACHE_INPUT_FORMAT_OPT_KEY = "hoodie.datasource.hive_sync.use_pre_apache_input_format"
+  @deprecated
   val HIVE_USE_JDBC_OPT_KEY = "hoodie.datasource.hive_sync.use_jdbc"
+  val HIVE_CLIENT_CLASS_OPT_KEY = "hoodie.datasource.hive_sync.hive_client_class"
 
   // DEFAULT FOR HIVE SPECIFIC CONFIGS
   val DEFAULT_HIVE_SYNC_ENABLED_OPT_VAL = "false"
@@ -304,6 +307,7 @@ object DataSourceWriteOptions {
   val DEFAULT_HIVE_ASSUME_DATE_PARTITION_OPT_VAL = "false"
   val DEFAULT_USE_PRE_APACHE_INPUT_FORMAT_OPT_VAL = "false"
   val DEFAULT_HIVE_USE_JDBC_OPT_VAL = "true"
+  val DEFAULT_HIVE_CLIENT_CLASS_OPT_VAL = classOf[HoodieHiveJDBCClient].getCanonicalName
 
   // Async Compaction - Enabled by default for MOR
   val ASYNC_COMPACT_ENABLE_OPT_KEY = "hoodie.datasource.compaction.async.enable"

@@ -21,8 +21,12 @@ package org.apache.hudi.hive;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.model.HoodieFileFormat;
 import org.apache.hudi.common.util.Option;
+import org.apache.hudi.common.util.ReflectionUtils;
+import org.apache.hudi.exception.HoodieException;
 import org.apache.hudi.exception.InvalidTableException;
 import org.apache.hudi.hadoop.utils.HoodieInputFormatUtils;
+import org.apache.hudi.hive.client.HoodieHiveClient;
+import org.apache.hudi.hive.client.HoodieHiveJDBCClient;
 import org.apache.hudi.sync.common.AbstractSyncHoodieClient.PartitionEvent;
 import org.apache.hudi.sync.common.AbstractSyncHoodieClient.PartitionEvent.PartitionEventType;
 import org.apache.hudi.hive.util.HiveSchemaUtil;
@@ -63,7 +67,7 @@ public class HiveSyncTool extends AbstractSyncTool {
 
   public HiveSyncTool(HiveSyncConfig cfg, HiveConf configuration, FileSystem fs) {
     super(configuration.getAllProperties(), fs);
-    this.hoodieHiveClient = new HoodieHiveClient(cfg, configuration, fs);
+    this.hoodieHiveClient = getHoodieHiveClient(cfg, configuration, fs);
     this.cfg = cfg;
     // Set partitionFields to empty, when the NonPartitionedExtractor is used
     if (NonPartitionedExtractor.class.getName().equals(cfg.partitionValueExtractorClass)) {
@@ -84,6 +88,15 @@ public class HiveSyncTool extends AbstractSyncTool {
         LOG.error("Unknown table type " + hoodieHiveClient.getTableType());
         throw new InvalidTableException(hoodieHiveClient.getBasePath());
     }
+  }
+
+  private HoodieHiveClient getHoodieHiveClient(HiveSyncConfig cfg, HiveConf configuration, FileSystem fs) {
+    if ((cfg.useJdbc && !cfg.hiveClientClass.equals(HoodieHiveJDBCClient.class.getName()))
+        || (!cfg.useJdbc && cfg.hiveClientClass.equals(HoodieHiveJDBCClient.class.getName()))) {
+      LOG.error("!!!");
+      throw new HoodieException("!!!");
+    }
+    return (HoodieHiveClient) ReflectionUtils.loadClass(cfg.hiveClientClass, cfg, configuration, fs);
   }
 
   @Override
