@@ -29,6 +29,7 @@ import org.apache.hudi.hive.PartitionValueExtractor;
 import org.apache.hudi.hive.SchemaDifference;
 
 import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hudi.hive.client.HoodieHiveClient;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.parquet.schema.DecimalMetadata;
@@ -467,13 +468,13 @@ public class HiveSchemaUtil {
             + ". Check partition strategy. ");
     List<String> partBuilder = new ArrayList<>();
     for (int i = 0; i < syncConfig.partitionFields.size(); i++) {
-      if (syncConfig.useJdbc) {
+      if (!syncConfig.hiveClientClass.equals(HoodieHiveClient.class.getName())) {
         partBuilder.add("`" + syncConfig.partitionFields.get(i) + "`='" + partitionValues.get(i) + "'");
       } else {
         partBuilder.add(syncConfig.partitionFields.get(i) + "=" + partitionValues.get(i));
       }
     }
-    return String.join(syncConfig.useJdbc ? "," : "/", partBuilder);
+    return String.join(!syncConfig.hiveClientClass.equals(HoodieHiveClient.class.getName()) ? "," : "/", partBuilder);
   }
 
   public static String generateUpdateTableDefinitionDDL(String tableName, MessageType newSchema, HiveSyncConfig syncConfig)

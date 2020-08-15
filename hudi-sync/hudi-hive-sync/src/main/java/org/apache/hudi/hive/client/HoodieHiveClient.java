@@ -78,7 +78,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
   protected IMetaStoreClient client;
   protected HiveSyncConfig syncConfig;
   protected FileSystem fs;
-  private Connection connection;
+  protected Connection connection;
   protected HoodieTimeline activeTimeline;
   protected HiveConf configuration;
 
@@ -88,7 +88,6 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     this.fs = fs;
 
     this.configuration = configuration;
-
 
     if (cfg.useJdbc) {
       LOG.info("Creating hive connection " + cfg.jdbcUrl);
@@ -315,9 +314,16 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
   }
 
   public void close() {
-    if (client != null) {
-      Hive.closeCurrent();
-      client = null;
+    try {
+      if (client != null) {
+        Hive.closeCurrent();
+        client = null;
+      }
+      if (connection != null) {
+        connection.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Could not close connection ", e);
     }
   }
 
@@ -340,7 +346,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
 
   // TODO: can be removed after updateTableDefinition is implemented by Hive Metastore
   public void updateHiveSQL(String s) {
-    if (syncConfig.useJdbc) {
+    if (syncConfig.hiveClientClass.equals(HoodieHiveJDBCClient.class.getName())) {
       Statement stmt = null;
       try {
         stmt = connection.createStatement();

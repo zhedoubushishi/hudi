@@ -259,6 +259,7 @@
               ${surefire-log4j.file}
             </log4j.configuration>
           </systemPropertyVariables>
+          <trimStackTrace>false</trimStackTrace>
         </configuration>
       </plugin>
       <plugin>
@@ -1023,6 +1024,7 @@
                 <exclude>**/IT*.java</exclude>
                 <exclude>**/testsuite/**/Test*.java</exclude>
               </excludes>
+              <trimStackTrace>false</trimStackTrace>
             </configuration>
           </plugin>
           <plugin>
@@ -1075,6 +1077,7 @@
               <includes>
                 <include>**/*FunctionalTestSuite.java</include>
               </includes>
+              <trimStackTrace>false</trimStackTrace>
             </configuration>
           </plugin>
           <plugin>
@@ -1115,6 +1118,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration combine.self="override">
               <skip>${skipUTs}</skip>
+              <trimStackTrace>false</trimStackTrace>
             </configuration>
           </plugin>
           <plugin>
