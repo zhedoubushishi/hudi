@@ -89,7 +89,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
 
     this.configuration = configuration;
 
-    if (cfg.useJdbc) {
+    if (cfg.hiveClientClass.equals(HoodieHiveJDBCClient.class.getName())) {
       LOG.info("Creating hive connection " + cfg.jdbcUrl);
       createHiveConnection();
     }
@@ -344,7 +344,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     }
   }
 
-  // TODO: can be removed after updateTableDefinition is implemented by Hive Metastore
+  // TODO: can be removed after updateTableDefinition is supported by Hive Metastore
   public void updateHiveSQL(String s) {
     if (syncConfig.hiveClientClass.equals(HoodieHiveJDBCClient.class.getName())) {
       Statement stmt = null;
@@ -367,13 +367,13 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
    *
    * @param sql SQL statement to execute
    */
-  // TODO: can be removed after updateTableDefinition is implemented by Hive Metastore
+  // TODO: can be removed after updateTableDefinition is supported by Hive Metastore
   public CommandProcessorResponse updateHiveSQLUsingHiveDriver(String sql) {
     List<CommandProcessorResponse> responses = updateHiveSQLs(Collections.singletonList(sql));
     return responses.get(responses.size() - 1);
   }
 
-  // TODO: can be removed after updateTableDefinition is implemented by Hive Metastore
+  // TODO: can be removed after updateTableDefinition is supported by Hive Metastore
   private List<CommandProcessorResponse> updateHiveSQLs(List<String> sqls) {
     SessionState ss = null;
     org.apache.hadoop.hive.ql.Driver hiveDriver = null;
@@ -412,7 +412,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     return responses;
   }
 
-  // TODO: can be removed after updateTableDefinition is implemented by Hive Metastore
+  // TODO: can be removed after updateTableDefinition is supported by Hive Metastore
   private void createHiveConnection() {
     if (connection == null) {
       try {
@@ -431,7 +431,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     }
   }
 
-  // TODO: can be removed after updateTableDefinition is implemented by Hive Metastore
+  // TODO: can be removed after updateTableDefinition is supported by Hive Metastore
   private String getHiveJdbcUrlWithDefaultDBName() {
     String hiveJdbcUrl = syncConfig.jdbcUrl;
     String urlAppend = null;

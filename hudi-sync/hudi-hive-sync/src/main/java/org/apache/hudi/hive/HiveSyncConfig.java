@@ -70,9 +70,6 @@ public class HiveSyncConfig implements Serializable {
           + "org.apache.hudi input format.")
   public Boolean usePreApacheInputFormat = false;
 
-  @Parameter(names = {"--use-jdbc"}, description = "Hive jdbc connect url")
-  public Boolean useJdbc = true;
-
   @Parameter(names = {"--hive-client-class"}, description = "Class which perform Hive functionalities")
   public String hiveClientClass = HoodieHiveJDBCClient.class.getName();
 
@@ -94,7 +91,6 @@ public class HiveSyncConfig implements Serializable {
     newConfig.jdbcUrl = cfg.jdbcUrl;
     newConfig.tableName = cfg.tableName;
     newConfig.usePreApacheInputFormat = cfg.usePreApacheInputFormat;
-    newConfig.useJdbc = cfg.useJdbc;
     newConfig.hiveClientClass = cfg.hiveClientClass;
     return newConfig;
   }
@@ -106,6 +102,7 @@ public class HiveSyncConfig implements Serializable {
         + ", hiveUser='" + hiveUser + '\'' + ", hivePass='" + hivePass + '\'' + ", jdbcUrl='" + jdbcUrl + '\''
         + ", basePath='" + basePath + '\'' + ", partitionFields=" + partitionFields + ", partitionValueExtractorClass='"
         + partitionValueExtractorClass + '\'' + ", assumeDatePartitioning=" + assumeDatePartitioning
-        + ", usePreApacheInputFormat=" + usePreApacheInputFormat + ", useJdbc=" + useJdbc + ", help=" + help + '}';
+        + ", usePreApacheInputFormat=" + usePreApacheInputFormat + ", hiveClientClass=" + hiveClientClass
+        + ", help=" + help + '}';
   }
 }

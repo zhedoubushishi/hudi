@@ -57,31 +57,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestHiveSyncTool {
 
-  private static Stream<String> useJdbc() {
+  private static Stream<String> useHoodieHiveClient() {
     return Stream.of(HoodieHiveClient.class.getName(), HoodieHiveJDBCClient.class.getName(),
         HoodieHiveDriverClient.class.getName());
   }
 
-  private static Iterable<Object[]> useJdbcAndSchemaFromCommitMetadata() {
+  private static Iterable<Object[]> useHoodieHiveClientAndSchemaFromCommitMetadata() {
     return Arrays.asList(new Object[][] { { HoodieHiveClient.class.getName(), true },
         { HoodieHiveJDBCClient.class.getName(), true }, { HoodieHiveDriverClient.class.getName(), true },
         { HoodieHiveClient.class.getName(), false }, { HoodieHiveJDBCClient.class.getName(), false },
         { HoodieHiveDriverClient.class.getName(), false }});
-    /*
-    return Arrays.asList(new Object[][] { { HoodieHiveClient.class.getName(), true },
-        { HoodieHiveClient.class.getName(), false }});
-     */
   }
 
   @BeforeEach
   public void setUp() throws IOException, InterruptedException {
-    System.out.println("wenningd => set up");
     HiveTestUtil.setUp();
   }
 
   @AfterEach
   public void teardown() throws IOException {
-    System.out.println("wenningd => tear down");
     HiveTestUtil.clear();
   }
 
@@ -201,9 +195,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource({"useJdbcAndSchemaFromCommitMetadata"})
+  @MethodSource({"useHoodieHiveClientAndSchemaFromCommitMetadata"})
   public void testBasicSync(String hiveClientClass, boolean useSchemaFromCommitMetadata) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String instantTime = "100";
     HiveTestUtil.createCOWTable(instantTime, 5, useSchemaFromCommitMetadata);
@@ -266,9 +259,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource("useJdbc")
+  @MethodSource("useHoodieHiveClient")
   public void testSyncIncremental(String hiveClientClass) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String commitTime1 = "100";
     HiveTestUtil.createCOWTable(commitTime1, 5, true);
@@ -306,9 +298,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource("useJdbc")
+  @MethodSource("useHoodieHiveClient")
   public void testSyncIncrementalWithSchemaEvolution(String hiveClientClass) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String commitTime1 = "100";
     HiveTestUtil.createCOWTable(commitTime1, 5, true);
@@ -344,9 +335,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource("useJdbcAndSchemaFromCommitMetadata")
+  @MethodSource("useHoodieHiveClientAndSchemaFromCommitMetadata")
   public void testSyncMergeOnRead(String hiveClientClass, boolean useSchemaFromCommitMetadata) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String instantTime = "100";
     String deltaCommitTime = "101";
@@ -411,9 +401,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource("useJdbcAndSchemaFromCommitMetadata")
+  @MethodSource("useHoodieHiveClientAndSchemaFromCommitMetadata")
   public void testSyncMergeOnReadRT(String hiveClientClass, boolean useSchemaFromCommitMetadata) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String instantTime = "100";
     String deltaCommitTime = "101";
@@ -482,9 +471,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource("useJdbc")
+  @MethodSource("useHoodieHiveClient")
   public void testMultiPartitionKeySync(String hiveClientClass) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String instantTime = "100";
     HiveTestUtil.createCOWTable(instantTime, 5, true);
@@ -513,9 +501,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource("useJdbc")
+  @MethodSource("useHoodieHiveClient")
   public void testNonPartitionedSync(String hiveClientClass) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String instantTime = "100";
     HiveTestUtil.createCOWTable(instantTime, 5, true);
@@ -543,9 +530,8 @@ public class TestHiveSyncTool {
   }
 
   @ParameterizedTest
-  @MethodSource("useJdbc")
+  @MethodSource("useHoodieHiveClient")
   public void testReadSchemaForMOR(String hiveClientClass) throws Exception {
-    // HiveTestUtil.hiveSyncConfig.useJdbc = useJdbc;
     HiveTestUtil.hiveSyncConfig.hiveClientClass = hiveClientClass;
     String commitTime = "100";
     String snapshotTableName = HiveTestUtil.hiveSyncConfig.tableName + HiveSyncTool.SUFFIX_SNAPSHOT_TABLE;
