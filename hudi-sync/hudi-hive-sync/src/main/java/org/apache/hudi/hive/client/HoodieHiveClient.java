@@ -18,6 +18,9 @@
 
 package org.apache.hudi.hive.client;
 
+import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
+import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.fs.StorageSchemes;
 import org.apache.hudi.common.table.timeline.HoodieTimeline;
@@ -444,5 +447,32 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
       hiveJdbcUrl = hiveJdbcUrl + "/";
     }
     return hiveJdbcUrl + (urlAppend == null ? "" : urlAppend);
+  }
+
+  public void createHiveDatabase(String dbName) throws HiveException {
+    LOG.info("Creating database " + dbName);
+    try {
+      Hive.get(configuration).createDatabase(new Database(dbName, "", null, null), true);
+    } catch (AlreadyExistsException e) {
+      LOG.warn("Database " + dbName + " already exists");
+    }
+  }
+
+  public void dropHiveDatabase(String dbName) throws TException {
+    LOG.info("Dropping database " + dbName);
+    try {
+      client.dropDatabase(dbName);
+    } catch (NoSuchObjectException e) {
+      LOG.warn("Database " + dbName + " does not exist. No need to drop it");
+    }
+  }
+
+  public void dropHiveTable(String dbName, String tableName) throws TException {
+    LOG.info("Dropping table " + tableName);
+    try {
+      client.dropTable(dbName, tableName);
+    } catch (NoSuchObjectException e) {
+      LOG.warn("Table " + tableName + " does not exist. No need to drop it");
+    }
   }
 }

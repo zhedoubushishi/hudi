@@ -19,6 +19,7 @@
 package org.apache.hudi.utilities.testutils;
 
 import java.io.FileInputStream;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.model.HoodieTableType;
@@ -61,6 +62,7 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SparkSession;
+import org.apache.thrift.TException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -168,7 +170,7 @@ public class UtilitiesTestBase {
    * 
    * @throws IOException
    */
-  private static void clearHiveDb() throws IOException {
+  private static void clearHiveDb() throws IOException, TException, HiveException {
     HiveConf hiveConf = new HiveConf();
     // Create Dummy hive sync config
     HiveSyncConfig hiveSyncConfig = getHiveSyncConfig("/dummy", "dummy");
@@ -176,8 +178,10 @@ public class UtilitiesTestBase {
     HoodieTableMetaClient.initTableType(dfs.getConf(), hiveSyncConfig.basePath, HoodieTableType.COPY_ON_WRITE,
         hiveSyncConfig.tableName, null);
     HoodieHiveClient client = HiveSyncTool.loadHoodieHiveClient(hiveSyncConfig, hiveConf, dfs);
-    client.updateHiveSQL("drop database if exists " + hiveSyncConfig.databaseName);
-    client.updateHiveSQL("create database " + hiveSyncConfig.databaseName);
+    client.dropHiveDatabase(hiveSyncConfig.databaseName);
+    client.createHiveDatabase(hiveSyncConfig.databaseName);
+    // client.updateHiveSQL("drop database if exists " + hiveSyncConfig.databaseName);
+    // client.updateHiveSQL("create database " + hiveSyncConfig.databaseName);
     client.close();
   }
 

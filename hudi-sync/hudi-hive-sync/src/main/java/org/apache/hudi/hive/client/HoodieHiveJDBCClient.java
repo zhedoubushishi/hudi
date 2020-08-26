@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.apache.parquet.schema.MessageType;
 
 import java.io.IOException;
-//import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
