@@ -16,13 +16,16 @@
  * limitations under the License.
  */
 
-package org.apache.hudi.hive;
+package org.apache.hudi.hive.client;
 
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.fs.StorageSchemes;
 import org.apache.hudi.common.table.timeline.HoodieTimeline;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.common.util.ValidationUtils;
+import org.apache.hudi.hive.HiveSyncConfig;
+import org.apache.hudi.hive.HoodieHiveSyncException;
+import org.apache.hudi.hive.PartitionValueExtractor;
 import org.apache.hudi.hive.util.HiveSchemaUtil;
 
 import org.apache.hadoop.fs.FileSystem;
@@ -46,9 +49,7 @@ import org.apache.thrift.TException;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -73,14 +74,14 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     }
   }
 
-  private static final Logger LOG = LogManager.getLogger(HoodieHiveClient.class);
-  private final PartitionValueExtractor partitionValueExtractor;
-  private IMetaStoreClient client;
-  private HiveSyncConfig syncConfig;
-  private FileSystem fs;
-  private Connection connection;
-  private HoodieTimeline activeTimeline;
-  private HiveConf configuration;
+  protected static final Logger LOG = LogManager.getLogger(HoodieHiveClient.class);
+  protected final PartitionValueExtractor partitionValueExtractor;
+  protected IMetaStoreClient client;
+  protected HiveSyncConfig syncConfig;
+  protected FileSystem fs;
+  protected Connection connection;
+  protected HoodieTimeline activeTimeline;
+  protected HiveConf configuration;
 
   public HoodieHiveClient(HiveSyncConfig cfg, HiveConf configuration, FileSystem fs) {
     super(cfg.basePath, cfg.assumeDatePartitioning, fs);
@@ -88,9 +89,8 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     this.fs = fs;
 
     this.configuration = configuration;
-    // Support both JDBC and metastore based implementations for backwards compatiblity. Future users should
-    // disable jdbc and depend on metastore client for all hive registrations
-    if (cfg.useJdbc) {
+
+    if (cfg.hiveClientClass.equals(HoodieHiveJDBCClient.class.getName())) {
       LOG.info("Creating hive connection " + cfg.jdbcUrl);
       createHiveConnection();
     }
@@ -200,7 +200,8 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
    * Iterate over the storage partitions and find if there are any new partitions that need to be added or updated.
    * Generate a list of PartitionEvent based on the changes required.
    */
-  List<PartitionEvent> getPartitionEvents(List<Partition> tablePartitions, List<String> partitionStoragePartitions) {
+  public List<PartitionEvent> getPartitionEvents(List<Partition> tablePartitions,
+      List<String> partitionStoragePartitions) {
     Map<String, String> paths = new HashMap<>();
     for (Partition tablePartition : tablePartitions) {
       List<String> hivePartitionValues = tablePartition.getValues();
@@ -236,7 +237,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
     return client.listPartitions(syncConfig.databaseName, tableName, (short) -1);
   }
 
-  void updateTableDefinition(String tableName, MessageType newSchema) {
+  public void updateTableDefinition(String tableName, MessageType newSchema) {
     try {
       String newSchemaStr = HiveSchemaUtil.generateSchemaString(newSchema, syncConfig.partitionFields);
       // Cascade clause should not be present for non-partitioned tables
@@ -270,35 +271,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
    */
   @Override
   public Map<String, String> getTableSchema(String tableName) {
-    if (syncConfig.useJdbc) {
-      if (!doesTableExist(tableName)) {
-        throw new IllegalArgumentException(
-            "Failed to get schema for table " + tableName + " does not exist");
-      }
-      Map<String, String> schema = new HashMap<>();
-      ResultSet result = null;
-      try {
-        DatabaseMetaData databaseMetaData = connection.getMetaData();
-        result = databaseMetaData.getColumns(null, syncConfig.databaseName, tableName, null);
-        while (result.next()) {
-          String columnName = result.getString(4);
-          String columnType = result.getString(6);
-          if ("DECIMAL".equals(columnType)) {
-            int columnSize = result.getInt("COLUMN_SIZE");
-            int decimalDigits = result.getInt("DECIMAL_DIGITS");
-            columnType += String.format("(%s,%s)", columnSize, decimalDigits);
-          }
-          schema.put(columnName, columnType);
-        }
-        return schema;
-      } catch (SQLException e) {
-        throw new HoodieHiveSyncException("Failed to get table schema for " + tableName, e);
-      } finally {
-        closeQuietly(result, null);
-      }
-    } else {
-      return getTableSchemaUsingMetastoreClient(tableName);
-    }
+    return getTableSchemaUsingMetastoreClient(tableName);
   }
 
   public Map<String, String> getTableSchemaUsingMetastoreClient(String tableName) {
@@ -342,7 +315,7 @@ public class HoodieHiveClient extends AbstractSyncHoodieClient {
    * @param s SQL to execute
    */
   public void updateHiveSQL(String s) {
-    if (syncConfig.useJdbc) {
+    if (syncConfig.hiveClientClass.equals(HoodieHiveJDBCClient.class.getName())) {
       Statement stmt = null;
       try {
         stmt = connection.createStatement();
