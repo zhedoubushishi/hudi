@@ -91,7 +91,7 @@ public abstract class HoodieWriteHandle<T extends HoodieRecordPayload> extends H
    * @return
    */
   protected static Pair<Schema, Schema> getWriterSchemaIncludingAndExcludingMetadataPair(HoodieWriteConfig config) {
-    Schema originalSchema = new Schema.Parser().parse(config.getSchema());
+    Schema originalSchema = HoodieAvroUtils.removeMetadataFields(new Schema.Parser().parse(config.getSchema()));
     Schema hoodieSchema = HoodieAvroUtils.addMetadataFields(originalSchema);
     return Pair.of(originalSchema, hoodieSchema);
   }
