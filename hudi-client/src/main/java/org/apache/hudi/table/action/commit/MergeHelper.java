@@ -151,7 +151,7 @@ public class MergeHelper {
     if (externalSchemaTransformation) {
       bootstrapReadSchema = bootstrapReader.getSchema();
     } else {
-      bootstrapReadSchema = mergeHandle.getWriterSchema();
+      bootstrapReadSchema = HoodieAvroUtils.removeMetadataFields(mergeHandle.getWriterSchema());
     }
 
     return new MergingIterator<>(reader.getRecordIterator(readSchema), bootstrapReader.getRecordIterator(bootstrapReadSchema),
