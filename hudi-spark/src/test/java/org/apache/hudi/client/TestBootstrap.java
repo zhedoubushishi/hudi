@@ -19,6 +19,7 @@
 package org.apache.hudi.client;
 
 import org.apache.hudi.DataSourceWriteOptions;
+import org.apache.hudi.avro.HoodieAvroUtils;
 import org.apache.hudi.avro.model.HoodieFileStatus;
 import org.apache.hudi.client.bootstrap.BootstrapMode;
 import org.apache.hudi.client.bootstrap.FullRecordBootstrapDataProvider;
@@ -281,7 +282,7 @@ public class TestBootstrap extends HoodieClientTestBase {
     checkBootstrapResults(totalRecords, schema, bootstrapCommitInstantTs, checkNumRawFiles, numInstantsAfterBootstrap,
         numInstantsAfterBootstrap, timestamp, timestamp, deltaCommit, bootstrapInstants);
 
-    // Upsert case
+    // Upsert case with source data schema which does not contain Hudi metadata fields
     double updateTimestamp = new Double(Instant.now().toEpochMilli()).longValue();
     String updateSPath = tmpFolder.toAbsolutePath().toString() + "/data2";
     generateNewDataSetAndReturnSchema(updateTimestamp, totalRecords, partitions, updateSPath);
@@ -293,12 +294,24 @@ public class TestBootstrap extends HoodieClientTestBase {
     checkBootstrapResults(totalRecords, schema, newInstantTs, false, numInstantsAfterBootstrap + 1,
         updateTimestamp, deltaCommit ? timestamp : updateTimestamp, deltaCommit);
 
+    // Upsert case with schema including Hudi metadata fields
+    // this is the situation when read the dataframe from the written bootstrapped table
+    updateTimestamp = new Double(Instant.now().toEpochMilli()).longValue();
+    updateSPath = tmpFolder.toAbsolutePath().toString() + "/data3";
+    generateNewDataSetAndReturnSchema(updateTimestamp, totalRecords, partitions, updateSPath);
+    updateBatch = generateInputBatch(jsc, BootstrapUtils.getAllLeafFoldersWithFiles(metaClient, metaClient.getFs(), updateSPath, jsc),
+        HoodieAvroUtils.addMetadataFields(schema));
+    newInstantTs = client.startCommit();
+    client.upsert(updateBatch, newInstantTs);
+    checkBootstrapResults(totalRecords, schema, newInstantTs, false, numInstantsAfterBootstrap + 2,
+        updateTimestamp, deltaCommit ? timestamp : updateTimestamp, deltaCommit);
+
     if (deltaCommit) {
       Option<String> compactionInstant = client.scheduleCompaction(Option.empty());
       assertTrue(compactionInstant.isPresent());
       client.compact(compactionInstant.get());
       checkBootstrapResults(totalRecords, schema, compactionInstant.get(), checkNumRawFiles,
-          numInstantsAfterBootstrap + 2, 2, updateTimestamp, updateTimestamp, !deltaCommit,
+          numInstantsAfterBootstrap + 3, 2, updateTimestamp, updateTimestamp, !deltaCommit,
           Arrays.asList(compactionInstant.get()));
     }
   }
