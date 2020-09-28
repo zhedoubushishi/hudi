@@ -566,6 +566,20 @@ class TestDataSourceForBootstrap {
     val hoodieROViewDF1 = spark.read.format("hudi").load(basePath + "/*")
     assertEquals(numRecords, hoodieROViewDF1.count())
 
+    // Perform upsert based on written bootstrap table
+    val updateDf1 = hoodieROViewDF1.limit(1).withColumn("driver", lit("driver-update-99999"))
+    updateDf1.write
+      .format("hudi")
+      .options(commonOpts)
+      .option(HoodieWriteConfig.TABLE_NAME, "hoodie_test")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY, "_row_key")
+      .option(DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY, "timestamp")
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .mode(SaveMode.Append)
+      .save(basePath)
+
     // Perform upsert
     val updateTimestamp = Instant.now.toEpochMilli
     val numRecordsUpdate = 10

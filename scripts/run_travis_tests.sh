@@ -24,7 +24,7 @@ hadoopVersion=2.7
 if [ "$mode" = "unit" ]; then
   mvn clean install -DskipTests -q
   echo "Running Unit Tests"
-  mvn test -Punit-tests -pl "$modules" -B
+  mvn test -Punit-tests -Dtest=TestBootstrap -pl hudi-spark -B
 elif [ "$mode" = "functional" ]; then
   echo "Running Functional Tests"
   mvn test -Pfunctional-tests -B
