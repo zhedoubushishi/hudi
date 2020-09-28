@@ -23,7 +23,7 @@ jobs:
     - name: "Unit tests except hudi-client"
       env: MODE=unit MODULES='!hudi-client' HUDI_QUIETER_LOGGING=1
     - name: "Unit tests for hudi-client"
-      env: MODE=unit MODULES=hudi-client HUDI_QUIETER_LOGGING=1
+      env: MODE=unit MODULES=hudi-spark HUDI_QUIETER_LOGGING=1
     - name: "Functional tests"
       env: MODE=functional HUDI_QUIETER_LOGGING=1
     - name: "Integration tests"
