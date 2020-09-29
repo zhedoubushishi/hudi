@@ -149,9 +149,9 @@ public class MergeHelper {
     HoodieFileReader<GenericRecord> bootstrapReader = HoodieFileReaderFactory.<T, GenericRecord>getFileReader(bootstrapFileConfig, externalFilePath);
     Schema bootstrapReadSchema;
     if (externalSchemaTransformation) {
-      bootstrapReadSchema = bootstrapReader.getSchema();
+      bootstrapReadSchema = HoodieAvroUtils.removeMetadataFields(bootstrapReader.getSchema());
     } else {
-      bootstrapReadSchema = mergeHandle.getWriterSchema();
+      bootstrapReadSchema = HoodieAvroUtils.removeMetadataFields(mergeHandle.getWriterSchema());
     }
 
     return new MergingIterator<>(reader.getRecordIterator(readSchema), bootstrapReader.getRecordIterator(bootstrapReadSchema),
