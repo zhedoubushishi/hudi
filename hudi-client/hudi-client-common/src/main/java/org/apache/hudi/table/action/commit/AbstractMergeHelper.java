@@ -97,9 +97,9 @@ public abstract class AbstractMergeHelper<T extends HoodieRecordPayload, I, K, O
     HoodieFileReader<GenericRecord> bootstrapReader = HoodieFileReaderFactory.<GenericRecord>getFileReader(bootstrapFileConfig, externalFilePath);
     Schema bootstrapReadSchema;
     if (externalSchemaTransformation) {
-      bootstrapReadSchema = bootstrapReader.getSchema();
+      bootstrapReadSchema = HoodieAvroUtils.removeMetadataFields(bootstrapReader.getSchema());
     } else {
-      bootstrapReadSchema = mergeHandle.getWriterSchema();
+      bootstrapReadSchema = HoodieAvroUtils.removeMetadataFields(mergeHandle.getWriterSchema());
     }
 
     return new MergingIterator<>(reader.getRecordIterator(readSchema), bootstrapReader.getRecordIterator(bootstrapReadSchema),
