@@ -266,6 +266,7 @@ private[hudi] object HoodieSparkSqlWriter {
     val writeClient = DataSourceUtils.createHoodieClient(jsc, schema, path, tableName, mapAsJavaMap(parameters))
     writeClient.bootstrap(org.apache.hudi.common.util.Option.empty())
     val metaSyncSuccess = metaSync(parameters, basePath, jsc.hadoopConfiguration)
+    writeClient.close()
     metaSyncSuccess
   }
 
