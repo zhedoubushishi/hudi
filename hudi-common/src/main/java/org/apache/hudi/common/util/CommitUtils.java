@@ -18,6 +18,8 @@
 
 package org.apache.hudi.common.util;
 
+import org.apache.avro.Schema;
+import org.apache.hudi.avro.HoodieAvroUtils;
 import org.apache.hudi.common.model.HoodieCommitMetadata;
 import org.apache.hudi.common.model.HoodieReplaceCommitMetadata;
 import org.apache.hudi.common.model.HoodieTableType;
@@ -66,7 +68,12 @@ public class CommitUtils {
     if (extraMetadata.isPresent()) {
       extraMetadata.get().forEach(commitMetadata::addMetadata);
     }
-    commitMetadata.addMetadata(HoodieCommitMetadata.SCHEMA_KEY, schemaToStoreInCommit);
+    // only store the schema of non-metadata columns in the commit metadata file
+    String nonMetadataSchema = "";
+    if (!StringUtils.isNullOrEmpty(schemaToStoreInCommit)) {
+      nonMetadataSchema = HoodieAvroUtils.removeMetadataFields(new Schema.Parser().parse(schemaToStoreInCommit)).toString();
+    }
+    commitMetadata.addMetadata(HoodieCommitMetadata.SCHEMA_KEY, nonMetadataSchema);
     commitMetadata.setOperationType(operationType);
     return commitMetadata;
   }

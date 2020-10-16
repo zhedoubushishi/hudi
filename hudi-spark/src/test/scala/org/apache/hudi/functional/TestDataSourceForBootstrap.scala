@@ -59,6 +59,10 @@ class TestDataSourceForBootstrap {
   val partitionPaths: List[String] = List("2020-04-01", "2020-04-02", "2020-04-03")
   val numRecords: Int = 100
   val numRecordsUpdate: Int = 10
+  val verificationRowKey: String = "trip_0"
+  val verificationCol: String = "driver"
+  val originalVerificationVal: String = "driver_0"
+  val updatedVerificationVal: String = "driver_update"
 
   @BeforeEach def initialize(@TempDir tempDir: java.nio.file.Path) {
     spark = SparkSession.builder
@@ -204,7 +208,7 @@ class TestDataSourceForBootstrap {
     assertEquals(numRecords, hoodieROViewDF1.count())
 
     // Perform upsert based on the written bootstrap table
-    val updateDf1 = hoodieROViewDF1.filter(col("_row_key") === "trip_0").withColumn("driver", lit("driver_update"))
+    val updateDf1 = hoodieROViewDF1.filter(col("_row_key") === verificationRowKey).withColumn(verificationCol, lit(updatedVerificationVal))
     updateDf1.write
       .format("hudi")
       .options(commonOpts)
@@ -214,7 +218,11 @@ class TestDataSourceForBootstrap {
       .mode(SaveMode.Append)
       .save(basePath)
 
+    // Read table after upsert and verify the updated value
     assertEquals(1, HoodieDataSourceHelpers.listCommitsSince(fs, basePath, commitInstantTime1).size())
+    val hoodieROViewDF2 = spark.read.format("hudi").load(basePath + "/*")
+    hoodieROViewDF2.show()
+    assertEquals(updatedVerificationVal, hoodieROViewDF2.filter(col("_row_key") === verificationRowKey).select(verificationCol).first.getString(0))
 
     // Perform upsert based on the source data
     val updateTimestamp = Instant.now.toEpochMilli
@@ -234,9 +242,9 @@ class TestDataSourceForBootstrap {
     assertEquals(2, HoodieDataSourceHelpers.listCommitsSince(fs, basePath, commitInstantTime1).size())
 
     // Read table after upsert and verify count
-    val hoodieROViewDF2 = spark.read.format("hudi").load(basePath + "/*")
-    assertEquals(numRecords, hoodieROViewDF2.count())
-    assertEquals(numRecordsUpdate, hoodieROViewDF2.filter(s"timestamp == $updateTimestamp").count())
+    val hoodieROViewDF3 = spark.read.format("hudi").load(basePath + "/*")
+    assertEquals(numRecords, hoodieROViewDF3.count())
+    assertEquals(numRecordsUpdate, hoodieROViewDF3.filter(s"timestamp == $updateTimestamp").count())
 
     verifyIncrementalViewResult(commitInstantTime1, commitInstantTime3, isPartitioned = true, isHiveStylePartitioned = false)
   }
@@ -327,7 +335,7 @@ class TestDataSourceForBootstrap {
     assertEquals(numRecords, hoodieROViewDF1.count())
 
     // Perform upsert based on the written bootstrap table
-    val updateDf1 = hoodieROViewDF1.filter(col("_row_key") === "trip_0").withColumn("driver", lit("driver_update"))
+    val updateDf1 = hoodieROViewDF1.filter(col("_row_key") === verificationRowKey).withColumn(verificationCol, lit(updatedVerificationVal))
     updateDf1.write
       .format("hudi")
       .options(commonOpts)
@@ -337,7 +345,14 @@ class TestDataSourceForBootstrap {
       .mode(SaveMode.Append)
       .save(basePath)
 
+    // Read table after upsert and verify the value
     assertEquals(1, HoodieDataSourceHelpers.listCommitsSince(fs, basePath, commitInstantTime1).size())
+    val hoodieROViewDF2 = spark.read.format("hudi")
+                            .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY,
+                              DataSourceReadOptions.QUERY_TYPE_READ_OPTIMIZED_OPT_VAL)
+                            .load(basePath + "/*")
+    hoodieROViewDF2.show()
+    assertEquals(originalVerificationVal, hoodieROViewDF2.filter(col("_row_key") === verificationRowKey).select(verificationCol).first.getString(0))
 
     // Perform upsert based on the source data
     val updateTimestamp = Instant.now.toEpochMilli
@@ -358,12 +373,12 @@ class TestDataSourceForBootstrap {
 
     // Read table after upsert and verify count. Since we have inline compaction off the RO view will have
     // no updated rows.
-    val hoodieROViewDF2 = spark.read.format("hudi")
+    val hoodieROViewDF3 = spark.read.format("hudi")
                             .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY,
                               DataSourceReadOptions.QUERY_TYPE_READ_OPTIMIZED_OPT_VAL)
                             .load(basePath + "/*")
-    assertEquals(numRecords, hoodieROViewDF2.count())
-    assertEquals(0, hoodieROViewDF2.filter(s"timestamp == $updateTimestamp").count())
+    assertEquals(numRecords, hoodieROViewDF3.count())
+    assertEquals(0, hoodieROViewDF3.filter(s"timestamp == $updateTimestamp").count())
   }
 
   @Test def testFullBootstrapCOWPartitioned(): Unit = {
