@@ -199,6 +199,8 @@ public class TableSchemaResolver {
       Schema schema = new Schema.Parser().parse(existingSchemaStr);
       if (includeMetadataFields) {
         schema = HoodieAvroUtils.addMetadataFields(schema);
+      } else {
+        schema = HoodieAvroUtils.removeMetadataFields(schema);
       }
       return Option.of(schema);
     } catch (Exception e) {
