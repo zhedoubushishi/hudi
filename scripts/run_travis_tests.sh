@@ -18,7 +18,7 @@
 
 mode=$1
 modules=$2
-sparkVersion=2.4.4
+sparkVersion=2.4.2
 hadoopVersion=2.7
 
 if [ "$mode" = "unit" ]; then
