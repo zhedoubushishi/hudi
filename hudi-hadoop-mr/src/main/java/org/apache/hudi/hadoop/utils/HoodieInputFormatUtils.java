@@ -307,14 +307,13 @@ public class HoodieInputFormatUtils {
    */
   public static HoodieTableMetaClient getTableMetaClientForBasePath(FileSystem fs, Path dataPath) throws IOException {
     int levels = HoodieHiveUtils.DEFAULT_LEVELS_TO_BASEPATH;
-    System.out.println("wenningd => has partition metadata: " + HoodiePartitionMetadata.hasPartitionMetadata(fs, dataPath));
     if (HoodiePartitionMetadata.hasPartitionMetadata(fs, dataPath)) {
       HoodiePartitionMetadata metadata = new HoodiePartitionMetadata(fs, dataPath);
       metadata.readFromFS();
       levels = metadata.getPartitionDepth();
     }
     Path baseDir = HoodieHiveUtils.getNthParent(dataPath, levels);
-    LOG.info("Reading hoodie metadata from path " + baseDir.toString());
+    System.out.println("Reading hoodie metadata from path " + baseDir.toString());
     return new HoodieTableMetaClient(fs.getConf(), baseDir.toString());
   }
 

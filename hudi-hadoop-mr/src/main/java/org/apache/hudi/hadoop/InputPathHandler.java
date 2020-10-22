@@ -81,6 +81,14 @@ public class InputPathHandler {
    */
   private void parseInputPaths(Path[] inputPaths, List<String> incrementalTables)
       throws IOException {
+
+    System.out.println("wenningd => Printing stack trace:");
+    StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+    for (int i = 1; i < elements.length; i++) {
+      StackTraceElement s = elements[i];
+      System.out.println("\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":" + s.getLineNumber() + ")");
+    }
+
     for (Path inputPath : inputPaths) {
       boolean basePathKnown = false;
       for (HoodieTableMetaClient metaClient : tableMetaClientMap.values()) {
