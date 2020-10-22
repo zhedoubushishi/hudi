@@ -97,6 +97,7 @@ public class InputPathHandler {
         // This path is for a table that we dont know about yet.
         HoodieTableMetaClient metaClient;
         try {
+          System.out.println("wenningd => see what we get here for the file system: " + inputPath.getFileSystem(conf));
           metaClient = getTableMetaClientForBasePath(inputPath.getFileSystem(conf), inputPath);
           String tableName = metaClient.getTableConfig().getTableName();
           tableMetaClientMap.put(tableName, metaClient);
