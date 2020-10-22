@@ -233,6 +233,7 @@ public class TestHoodieMergeOnReadTable extends HoodieClientTestHarness {
   @Test
   public void testIncrementalReadsWithCompaction() throws Exception {
     System.out.println("wenningd => running test for testIncrementalReadsWithCompaction");
+    dfs.exists(new Path(basePath));
     String partitionPath = "2020/02/20"; // use only one partition for this test
     dataGen = new HoodieTestDataGenerator(new String[] { partitionPath });
     HoodieWriteConfig cfg = getConfig(true);
