@@ -488,12 +488,12 @@ public class TestHoodieMergeOnReadTable extends HoodieClientTestHarness {
     }
   }
 
-  @Test
+  //@Test
   public void testCOWToMORConvertedTableRollbackUsingFileList() throws Exception {
     testCOWToMORConvertedTableRollback(false);
   }
 
-  @Test
+  //@Test
   public void testCOWToMORConvertedTableRollbackUsingMarkers() throws Exception {
     testCOWToMORConvertedTableRollback(true);
   }

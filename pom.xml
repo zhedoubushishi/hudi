@@ -256,6 +256,7 @@
         <configuration>
           <argLine>@{argLine}</argLine>
           <trimStackTrace>false</trimStackTrace>
+          <reuseForks>false</reuseForks>
           <systemPropertyVariables>
             <log4j.configuration>
               ${surefire-log4j.file}

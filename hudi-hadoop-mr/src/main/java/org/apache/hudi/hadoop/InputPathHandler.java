@@ -84,7 +84,7 @@ public class InputPathHandler {
 
     System.out.println("wenningd => Printing stack trace:");
     StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-    for (int i = 1; i < elements.length; i++) {
+    for (int i = 1; i < 10; i++) {
       StackTraceElement s = elements[i];
       System.out.println("\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":" + s.getLineNumber() + ")");
     }
