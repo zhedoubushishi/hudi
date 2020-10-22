@@ -267,6 +267,7 @@ public abstract class HoodieClientTestHarness extends HoodieCommonTestHarness im
 
     // Create a temp folder as the base path
     dfs = dfsCluster.getFileSystem();
+    System.out.println("wenningd => fs is: " + dfs.toString());
     dfsBasePath = dfs.getWorkingDirectory().toString();
     this.basePath = dfsBasePath;
     this.hadoopConf = dfs.getConf();

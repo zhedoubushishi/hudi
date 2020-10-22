@@ -255,6 +255,7 @@
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <argLine>@{argLine}</argLine>
+          <trimStackTrace>false</trimStackTrace>
           <systemPropertyVariables>
             <log4j.configuration>
               ${surefire-log4j.file}
@@ -1017,6 +1018,7 @@
             </dependencies>
             <configuration combine.self="append">
               <skip>${skipUTs}</skip>
+              <trimStackTrace>false</trimStackTrace>
               <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
               <excludedGroups>functional</excludedGroups>
               <excludes>

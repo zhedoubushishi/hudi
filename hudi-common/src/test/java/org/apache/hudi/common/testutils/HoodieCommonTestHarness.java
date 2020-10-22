@@ -47,6 +47,7 @@ public class HoodieCommonTestHarness {
       java.nio.file.Path basePath = tempDir.resolve("dataset");
       java.nio.file.Files.createDirectories(basePath);
       this.basePath = basePath.toString();
+      System.out.println("wenningd => basePath is: " + this.basePath);
     } catch (IOException ioe) {
       throw new HoodieIOException(ioe.getMessage(), ioe);
     }

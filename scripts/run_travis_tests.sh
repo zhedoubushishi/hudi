@@ -24,7 +24,7 @@ hadoopVersion=2.7
 if [ "$mode" = "unit" ]; then
   mvn clean install -Pscala-2.12 -DskipTests -q
   echo "Running Unit Tests"
-  mvn test -Pscala-2.12 -Punit-tests -pl "$modules" -B
+  mvn test -Dtest=TestHoodieMergeOnReadTable -DfailIfNoTests=false -Pscala-2.12 -Punit-tests -pl "$modules" -B
 elif [ "$mode" = "functional" ]; then
   echo "Running Functional Tests"
   mvn test -Pscala-2.12 -Pfunctional-tests -B
