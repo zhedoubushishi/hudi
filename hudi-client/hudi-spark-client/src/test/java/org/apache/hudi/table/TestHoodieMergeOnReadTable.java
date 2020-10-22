@@ -1592,6 +1592,8 @@ public class TestHoodieMergeOnReadTable extends HoodieClientTestHarness {
                              int expectedRecords, String... expectedCommits) {
 
     assertEquals(expectedNumFiles, files.length);
+    System.out.println("wenningd => converted path: " + Paths.get(basePath, partitionPath).toString());
+    System.out.println("wenningd => origin basepath: " + basePath);
     Set<String> expectedCommitsSet = Arrays.stream(expectedCommits).collect(Collectors.toSet());
     List<GenericRecord> records = HoodieMergeOnReadTestUtils.getRecordsUsingInputFormat(hadoopConf,
         Collections.singletonList(Paths.get(basePath, partitionPath).toString()), basePath, jobConf, realtime);

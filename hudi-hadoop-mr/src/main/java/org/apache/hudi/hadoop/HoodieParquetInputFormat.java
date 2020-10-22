@@ -78,7 +78,7 @@ public class HoodieParquetInputFormat extends MapredParquetInputFormat implement
   public FileStatus[] listStatus(JobConf job) throws IOException {
     // Segregate inputPaths[] to incremental, snapshot and non hoodie paths
     List<String> incrementalTables = HoodieHiveUtils.getIncrementalTableNames(Job.getInstance(job));
-    System.out.println("wenningd => I am in");
+    System.out.println("wenningd => I am in the listStatus");
     InputPathHandler inputPathHandler = new InputPathHandler(conf, getInputPaths(job), incrementalTables);
     List<FileStatus> returns = new ArrayList<>();
 
