@@ -34,7 +34,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -74,7 +73,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends HoodieClientTestHarn
   }
 
   @Test
-  public void testDataInternalWriter() throws IOException {
+  public void testDataInternalWriter() throws Exception {
     // init config and table
     HoodieWriteConfig cfg = getConfigBuilder(basePath).build();
     HoodieTable table = HoodieSparkTable.create(cfg, context, metaClient);
@@ -119,7 +118,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends HoodieClientTestHarn
    * to throw Global Error. Verify global error is set appropriately and only first batch of records are written to disk.
    */
   @Test
-  public void testGlobalFailure() throws IOException {
+  public void testGlobalFailure() throws Exception {
     // init config and table
     HoodieWriteConfig cfg = getConfigBuilder(basePath).build();
     HoodieTable table = HoodieSparkTable.create(cfg, context, metaClient);
@@ -165,7 +164,8 @@ public class TestHoodieBulkInsertDataInternalWriter extends HoodieClientTestHarn
     assertOutput(inputRows, result, instantTime, fileNames);
   }
 
-  private void writeRows(Dataset<Row> inputRows, HoodieBulkInsertDataInternalWriter writer) throws IOException {
+  private void writeRows(Dataset<Row> inputRows, HoodieBulkInsertDataInternalWriter writer)
+      throws Exception {
     List<InternalRow> internalRows = toInternalRows(inputRows, ENCODER);
     // issue writes
     for (InternalRow internalRow : internalRows) {
