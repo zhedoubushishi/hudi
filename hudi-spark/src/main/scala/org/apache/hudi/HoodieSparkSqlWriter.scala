@@ -41,6 +41,7 @@ import org.apache.hudi.hive.{HiveSyncConfig, HiveSyncTool}
 import org.apache.hudi.internal.HoodieDataSourceInternalWriter
 import org.apache.hudi.sync.common.AbstractSyncTool
 import org.apache.log4j.LogManager
+import org.apache.spark.SPARK_VERSION
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.rdd.RDD
@@ -121,6 +122,9 @@ private[hudi] object HoodieSparkSqlWriter {
       // short-circuit if bulk_insert via row is enabled.
       // scalastyle:off
       if (parameters(ENABLE_ROW_WRITER_OPT_KEY).toBoolean) {
+        if (SPARK_VERSION.startsWith("3.")) {
+          throw new HoodieException("Bulk insert via row is not compatible with Spark 3, it is only compatible with Spark 2!")
+        }
         val (success, commitTime: common.util.Option[String]) = bulkInsertAsRow(sqlContext, parameters, df, tblName,
                                                                                 basePath, path, instantTime)
         return (success, commitTime, common.util.Option.empty(), hoodieWriteClient.orNull, tableConfig)
