@@ -34,7 +34,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -72,7 +71,7 @@ public class TestHoodieDataSourceInternalWriter extends HoodieClientTestHarness 
   }
 
   @Test
-  public void testDataSourceWriter() throws IOException {
+  public void testDataSourceWriter() throws Exception {
     // init config and table
     HoodieWriteConfig cfg = getConfigBuilder(basePath).build();
     String instantTime = "001";
@@ -114,7 +113,7 @@ public class TestHoodieDataSourceInternalWriter extends HoodieClientTestHarness 
   }
 
   @Test
-  public void testMultipleDataSourceWrites() throws IOException {
+  public void testMultipleDataSourceWrites() throws Exception {
     // init config and table
     HoodieWriteConfig cfg = getConfigBuilder(basePath).build();
     int partitionCounter = 0;
@@ -158,7 +157,7 @@ public class TestHoodieDataSourceInternalWriter extends HoodieClientTestHarness 
   }
 
   @Test
-  public void testLargeWrites() throws IOException {
+  public void testLargeWrites() throws Exception {
     // init config and table
     HoodieWriteConfig cfg = getConfigBuilder(basePath).build();
     int partitionCounter = 0;
@@ -208,7 +207,7 @@ public class TestHoodieDataSourceInternalWriter extends HoodieClientTestHarness 
    * verify only records from batch1 is available to read
    */
   @Test
-  public void testAbort() throws IOException {
+  public void testAbort() throws Exception {
     // init config and table
     HoodieWriteConfig cfg = getConfigBuilder(basePath).build();
 
@@ -274,7 +273,7 @@ public class TestHoodieDataSourceInternalWriter extends HoodieClientTestHarness 
     assertOutput(totalInputRows, result, instantTime0);
   }
 
-  private void writeRows(Dataset<Row> inputRows, DataWriter<InternalRow> writer) throws IOException {
+  private void writeRows(Dataset<Row> inputRows, DataWriter<InternalRow> writer) throws Exception {
     List<InternalRow> internalRows = toInternalRows(inputRows, ENCODER);
     // issue writes
     for (InternalRow internalRow : internalRows) {
