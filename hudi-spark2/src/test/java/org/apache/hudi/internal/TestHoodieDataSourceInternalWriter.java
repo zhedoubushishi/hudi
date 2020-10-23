@@ -26,6 +26,7 @@ import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.testutils.HoodieClientTestHarness;
 import org.apache.hudi.testutils.HoodieClientTestUtils;
 
+import org.apache.spark.package$;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.InternalRow;
@@ -48,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Unit tests {@link HoodieDataSourceInternalWriter}.
@@ -58,6 +60,8 @@ public class TestHoodieDataSourceInternalWriter extends HoodieClientTestHarness 
 
   @BeforeEach
   public void setUp() throws Exception {
+    // this test is only compatible with spark 2
+    assumeTrue(package$.MODULE$.SPARK_VERSION().startsWith("2."));
     initSparkContexts("TestHoodieDataSourceInternalWriter");
     initPath();
     initFileSystem();
