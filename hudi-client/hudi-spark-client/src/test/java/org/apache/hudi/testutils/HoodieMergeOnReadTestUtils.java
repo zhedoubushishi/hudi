@@ -85,7 +85,7 @@ public class HoodieMergeOnReadTestUtils {
         .collect(Collectors.toList()));
 
     return inputPaths.stream().map(path -> {
-      inputFormat.setInputPaths(jobConf, path);
+      FileInputFormat.setInputPaths(jobConf, path);
       // setInputPath(jobConf, path);
       List<GenericRecord> records = new ArrayList<>();
       try {
