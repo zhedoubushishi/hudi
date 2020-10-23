@@ -42,7 +42,8 @@ object AvroConversionUtils {
     // Use the Avro schema to derive the StructType which has the correct nullability information
     val dataType = SchemaConverters.toSqlType(avroSchema).dataType.asInstanceOf[StructType]
     val encoder = RowEncoder.apply(dataType).resolveAndBind()
-    df.queryExecution.toRdd.map(encoder.fromRow)
+    val deserializer = HoodieSparkUtils.createDeserializer(encoder)
+    df.queryExecution.toRdd.map(row => deserializer.deserializeRow(row))
       .mapPartitions { records =>
         if (records.isEmpty) Iterator.empty
         else {

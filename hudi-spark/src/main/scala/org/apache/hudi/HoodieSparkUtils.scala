@@ -19,10 +19,14 @@
 package org.apache.hudi
 
 import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hudi.client.utils.SparkRowDeserializer
 import org.apache.hudi.common.model.HoodieRecord
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.SPARK_VERSION
+import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.execution.datasources.{FileStatusCache, InMemoryFileIndex}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
+
 import scala.collection.JavaConverters._
 
 
@@ -79,5 +83,14 @@ object HoodieSparkUtils {
   def createInMemoryFileIndex(sparkSession: SparkSession, globbedPaths: Seq[Path]): InMemoryFileIndex = {
     val fileStatusCache = FileStatusCache.getOrCreate(sparkSession)
     new InMemoryFileIndex(sparkSession, globbedPaths, Map(), Option.empty, fileStatusCache)
+  }
+
+  def createDeserializer(encoder: ExpressionEncoder[Row]): SparkRowDeserializer = {
+    // TODO remove Spark2RowDeserializer if Spark 2.x support is dropped
+    if (SPARK_VERSION.startsWith("2.")) {
+      new Spark2RowDeserializer(encoder)
+    } else {
+      new Spark3RowDeserializer(encoder)
+    }
   }
 }
