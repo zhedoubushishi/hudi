@@ -85,7 +85,7 @@ public class HoodieMergeOnReadTestUtils {
         .collect(Collectors.toList()));
 
     return inputPaths.stream().map(path -> {
-      setInputPath(jobConf, path);
+      FileInputFormat.setInputPaths(jobConf, path);
       List<GenericRecord> records = new ArrayList<>();
       try {
         List<InputSplit> splits = Arrays.asList(inputFormat.getSplits(jobConf, 1));
@@ -155,11 +155,5 @@ public class HoodieMergeOnReadTestUtils {
     Configurable configurable = (Configurable)inputFormat;
     configurable.setConf(conf);
     jobConf.addResource(conf);
-  }
-
-  private static void setInputPath(JobConf jobConf, String inputPath) {
-    jobConf.set("mapreduce.input.fileinputformat.inputdir", inputPath);
-    jobConf.set("mapreduce.input.fileinputformat.inputdir", inputPath);
-    jobConf.set("map.input.dir", inputPath);
   }
 }
