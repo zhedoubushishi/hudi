@@ -127,6 +127,10 @@
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.hudi</groupId>
+          <artifactId>hudi-spark2_2.11</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -389,6 +393,12 @@
       <classifier>tests</classifier>
       <type>test-jar</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.hudi</groupId>
+          <artifactId>hudi-spark2_2.11</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Hive - Test -->

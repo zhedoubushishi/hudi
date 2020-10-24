@@ -34,6 +34,7 @@ import java.util.Map;
 
 /**
  * Utilities used throughout the data source.
+ *
  */
 public class DataSourceUtilsForSpark2 {
 
