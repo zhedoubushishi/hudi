@@ -34,11 +34,9 @@ import java.util.Map;
 
 /**
  * Utilities used throughout the data source.
- *
+ * This file is partially copied from org.apache.hudi.DataSourceUtils.
  */
 public class DataSourceUtilsForSpark2 {
-
-  private static final Logger LOG = LogManager.getLogger(DataSourceUtilsForSpark2.class);
 
   public static HoodieWriteConfig createHoodieConfig(String schemaStr, String basePath,
       String tblName, Map<String, String> parameters) {

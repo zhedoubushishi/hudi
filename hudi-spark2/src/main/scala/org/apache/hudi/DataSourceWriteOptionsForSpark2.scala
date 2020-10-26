@@ -22,6 +22,7 @@ import org.apache.hudi.common.model.OverwriteWithLatestAvroPayload
 
 /**
   * Options supported for writing hoodie tables.
+  * This file is partially copied from org.apache.hudi.DataSourceWriteOptions.
   */
 object DataSourceWriteOptionsForSpark2 {
   /**
