@@ -1330,6 +1330,8 @@
       <id>spark3</id>
       <properties>
         <spark.version>${spark3.version}</spark.version>
+        <scala.version>2.12.10</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
         <kafka.version>2.4.1</kafka.version>
         <fasterxml.version>2.10.0</fasterxml.version>
         <fasterxml.jackson.databind.version>2.10.0</fasterxml.jackson.databind.version>
