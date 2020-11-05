@@ -18,6 +18,8 @@
 
 package org.apache.hudi.common.util;
 
+import org.apache.avro.Schema;
+import org.apache.hudi.avro.HoodieAvroUtils;
 import org.apache.hudi.common.model.HoodieCommitMetadata;
 import org.apache.hudi.common.model.HoodieReplaceCommitMetadata;
 import org.apache.hudi.common.model.HoodieWriteStat;
@@ -46,18 +48,25 @@ public class TestCommitUtils {
     List<String> replacedFileIds = new ArrayList<>();
     replacedFileIds.add("f0");
     partitionToReplaceFileIds.put("p1", replacedFileIds);
-    HoodieCommitMetadata commitMetadata = CommitUtils.buildMetadata(writeStats, partitionToReplaceFileIds,
+    HoodieCommitMetadata commitMetadata1 = CommitUtils.buildMetadata(writeStats, partitionToReplaceFileIds,
         Option.empty(),
         WriteOperationType.INSERT,
         TRIP_SCHEMA,
         HoodieTimeline.DELTA_COMMIT_ACTION);
 
-    assertFalse(commitMetadata instanceof HoodieReplaceCommitMetadata);
-    assertEquals(2, commitMetadata.getPartitionToWriteStats().size());
-    assertEquals("f1", commitMetadata.getPartitionToWriteStats().get("p1").get(0).getFileId());
-    assertEquals("f2", commitMetadata.getPartitionToWriteStats().get("p2").get(0).getFileId());
-    assertEquals(WriteOperationType.INSERT, commitMetadata.getOperationType());
-    assertEquals(TRIP_SCHEMA, commitMetadata.getMetadata(HoodieCommitMetadata.SCHEMA_KEY));
+    assertFalse(commitMetadata1 instanceof HoodieReplaceCommitMetadata);
+    assertEquals(2, commitMetadata1.getPartitionToWriteStats().size());
+    assertEquals("f1", commitMetadata1.getPartitionToWriteStats().get("p1").get(0).getFileId());
+    assertEquals("f2", commitMetadata1.getPartitionToWriteStats().get("p2").get(0).getFileId());
+    assertEquals(WriteOperationType.INSERT, commitMetadata1.getOperationType());
+    assertEquals(TRIP_SCHEMA, commitMetadata1.getMetadata(HoodieCommitMetadata.SCHEMA_KEY));
+
+    HoodieCommitMetadata commitMetadata2 = CommitUtils.buildMetadata(writeStats, partitionToReplaceFileIds,
+        Option.empty(),
+        WriteOperationType.INSERT,
+        HoodieAvroUtils.addMetadataFields(new Schema.Parser().parse(TRIP_SCHEMA)).toString(),
+        HoodieTimeline.DELTA_COMMIT_ACTION);
+    assertEquals(TRIP_SCHEMA, commitMetadata2.getMetadata(HoodieCommitMetadata.SCHEMA_KEY));
   }
 
   @Test
