@@ -106,18 +106,18 @@ class TestCOWDataSource extends HoodieClientTestBase {
     assertEquals(100, snapshotDF2.count())
     assertEquals(updatedVerificationVal, snapshotDF2.filter(col("_row_key") === verificationRowKey).select(verificationCol).first.getString(0))
 
+    // Upsert Operation without Hudi metadata columns
     val records2 = recordsToStrings(dataGen.generateUpdates("001", 100)).toList
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(records2, 2))
     val uniqueKeyCnt = inputDF2.select("_row_key").distinct().count()
 
-    // Upsert Operation without Hudi metadata columns
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
       .mode(SaveMode.Append)
       .save(basePath)
 
     val commitInstantTime2 = HoodieDataSourceHelpers.latestCommit(fs, basePath)
-    assertEquals(2, HoodieDataSourceHelpers.listCommitsSince(fs, basePath, "000").size())
+    assertEquals(3, HoodieDataSourceHelpers.listCommitsSince(fs, basePath, "000").size())
 
     // Snapshot Query
     val snapshotDF3 = spark.read.format("org.apache.hudi")
