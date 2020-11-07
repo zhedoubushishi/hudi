@@ -24,7 +24,7 @@ import org.apache.hudi.config.HoodieWriteConfig
 import org.apache.hudi.testutils.HoodieClientTestBase
 import org.apache.hudi.{DataSourceReadOptions, DataSourceWriteOptions, HoodieDataSourceHelpers}
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, lit}
 import org.apache.spark.sql.types.{DataTypes, DateType, IntegerType, StringType, StructField, StructType, TimestampType}
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
 import org.junit.jupiter.api.{AfterEach, BeforeEach, Test}
@@ -45,6 +45,9 @@ class TestCOWDataSource extends HoodieClientTestBase {
     DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY -> "timestamp",
     HoodieWriteConfig.TABLE_NAME -> "hoodie_test"
   )
+
+  val verificationCol: String = "driver"
+  val updatedVerificationVal: String = "driver_update"
 
   @BeforeEach override def setUp() {
     initPath()
@@ -90,11 +93,24 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val snapshotDF1 = spark.read.format("org.apache.hudi").load(basePath + "/*/*/*/*")
     assertEquals(100, snapshotDF1.count())
 
+    // Upsert based on the written table with Hudi metadata columns
+    val verificationRowKey = snapshotDF1.limit(1).select("_row_key").first.getString(0)
+    val updateDf = snapshotDF1.filter(col("_row_key") === verificationRowKey).withColumn(verificationCol, lit(updatedVerificationVal))
+
+    updateDf.write.format("org.apache.hudi")
+      .options(commonOpts)
+      .mode(SaveMode.Append)
+      .save(basePath)
+
+    val snapshotDF2 = spark.read.format("hudi").load(basePath + "/*/*/*/*")
+    assertEquals(100, snapshotDF2.count())
+    assertEquals(updatedVerificationVal, snapshotDF2.filter(col("_row_key") === verificationRowKey).select(verificationCol).first.getString(0))
+
     val records2 = recordsToStrings(dataGen.generateUpdates("001", 100)).toList
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(records2, 2))
     val uniqueKeyCnt = inputDF2.select("_row_key").distinct().count()
 
-    // Upsert Operation
+    // Upsert Operation without Hudi metadata columns
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
       .mode(SaveMode.Append)
@@ -104,9 +120,9 @@ class TestCOWDataSource extends HoodieClientTestBase {
     assertEquals(2, HoodieDataSourceHelpers.listCommitsSince(fs, basePath, "000").size())
 
     // Snapshot Query
-    val snapshotDF2 = spark.read.format("org.apache.hudi")
+    val snapshotDF3 = spark.read.format("org.apache.hudi")
       .load(basePath + "/*/*/*/*")
-    assertEquals(100, snapshotDF2.count()) // still 100, since we only updated
+    assertEquals(100, snapshotDF3.count()) // still 100, since we only updated
 
     // Read Incremental Query
     // we have 2 commits, try pulling the first commit (which is not the latest)
@@ -136,7 +152,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
       .load(basePath)
 
     assertEquals(uniqueKeyCnt, hoodieIncViewDF2.count()) // 100 records must be pulled
-    countsPerCommit = hoodieIncViewDF2.groupBy("_hoodie_commit_time").count().collect()
+    hoodieIncViewDF2.groupBy("_hoodie_commit_time").count().sort().show(false)
+    countsPerCommit = hoodieIncViewDF2.groupBy("_hoodie_commit_time").count().sort().collect()
     assertEquals(1, countsPerCommit.length)
     assertEquals(commitInstantTime2, countsPerCommit(0).get(0))
 
