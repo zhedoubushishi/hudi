@@ -36,7 +36,7 @@ import org.apache.log4j.LogManager
   */
 object DataSourceReadOptions {
 
-  private val log = LogManager.getLogger(classOf[DefaultSource])
+  private val log = LogManager.getLogger(DataSourceReadOptions.getClass)
 
   /**
     * Whether data needs to be read, in
@@ -143,7 +143,7 @@ object DataSourceReadOptions {
   */
 object DataSourceWriteOptions {
 
-  private val log = LogManager.getLogger(classOf[DefaultSource])
+  private val log = LogManager.getLogger(DataSourceWriteOptions.getClass)
 
   /**
     * The write operation, that this write should do
