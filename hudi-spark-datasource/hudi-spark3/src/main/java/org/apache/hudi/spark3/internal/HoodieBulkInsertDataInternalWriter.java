@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.hudi.internal;
+package org.apache.hudi.spark3.internal;
 
 import org.apache.hudi.client.HoodieInternalWriteStatus;
 import org.apache.hudi.common.model.HoodieRecord;
@@ -27,8 +27,8 @@ import org.apache.hudi.table.HoodieTable;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.catalyst.InternalRow;
-import org.apache.spark.sql.sources.v2.writer.DataWriter;
-import org.apache.spark.sql.sources.v2.writer.WriterCommitMessage;
+import org.apache.spark.sql.connector.write.DataWriter;
+import org.apache.spark.sql.connector.write.WriterCommitMessage;
 import org.apache.spark.sql.types.StructType;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Hoodie's Implementation of {@link DataWriter<InternalRow>}. This is used in data source implementation for bulk insert.
+ * Hoodie's Implementation of {@link DataWriter<InternalRow>}. This is used in data source "hudi.spark3.internal" implementation for bulk insert.
  */
 public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRow> {
 
@@ -46,26 +46,23 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
   private final String instantTime;
   private final int taskPartitionId;
   private final long taskId;
-  private final long taskEpochId;
   private final HoodieTable hoodieTable;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
   private final List<HoodieInternalWriteStatus> writeStatusList = new ArrayList<>();
-  private String fileIdPrefix;
 
   private HoodieRowCreateHandle handle;
   private String lastKnownPartitionPath = null;
+  private String fileIdPrefix;
   private int numFilesWritten = 0;
 
   public HoodieBulkInsertDataInternalWriter(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
-      String instantTime, int taskPartitionId, long taskId, long taskEpochId,
-      StructType structType) {
+      String instantTime, int taskPartitionId, long taskId, StructType structType) {
     this.hoodieTable = hoodieTable;
     this.writeConfig = writeConfig;
     this.instantTime = instantTime;
     this.taskPartitionId = taskPartitionId;
     this.taskId = taskId;
-    this.taskEpochId = taskEpochId;
     this.structType = structType;
     this.fileIdPrefix = UUID.randomUUID().toString();
   }
@@ -103,7 +100,7 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
       close();
     }
     handle = new HoodieRowCreateHandle(hoodieTable, writeConfig, partitionPath, getNextFileId(),
-        instantTime, taskPartitionId, taskId, taskEpochId, structType);
+        instantTime, taskPartitionId, taskId, 0, structType);
   }
 
   public void close() throws IOException {
