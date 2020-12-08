@@ -158,6 +158,11 @@
       <artifactId>hudi-spark-client</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.hudi</groupId>
+      <artifactId>hudi-spark-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project> 
