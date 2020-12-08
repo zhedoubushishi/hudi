@@ -38,7 +38,7 @@ import org.apache.hudi.config.HoodieBootstrapConfig.{BOOTSTRAP_BASE_PATH_PROP, B
 import org.apache.hudi.config.HoodieWriteConfig
 import org.apache.hudi.exception.HoodieException
 import org.apache.hudi.hive.{HiveSyncConfig, HiveSyncTool}
-import org.apache.hudi.internal.HoodieDataSourceInternalWriter
+import org.apache.hudi.internal.{HoodieDataSourceInternalWriter, HoodieDataSourceInternalWriterHelper}
 import org.apache.hudi.sync.common.AbstractSyncTool
 import org.apache.log4j.LogManager
 import org.apache.spark.SPARK_VERSION
@@ -130,9 +130,6 @@ private[hudi] object HoodieSparkSqlWriter {
       // scalastyle:off
       if (parameters(ENABLE_ROW_WRITER_OPT_KEY).toBoolean &&
         operation == WriteOperationType.BULK_INSERT) {
-        if (!SPARK_VERSION.startsWith("2.")) {
-          throw new HoodieException("Bulk insert using row writer is not supported with Spark 3. To use row writer please switch to spark 2.")
-        }
         val (success, commitTime: common.util.Option[String]) = bulkInsertAsRow(sqlContext, parameters, df, tblName,
                                                                                 basePath, path, instantTime)
         return (success, commitTime, common.util.Option.empty(), hoodieWriteClient.orNull, tableConfig)
@@ -299,10 +296,19 @@ private[hudi] object HoodieSparkSqlWriter {
     val nameSpace = s"hoodie.${tblName}"
     val writeConfig = DataSourceUtils.createHoodieConfig(null, path.get, tblName, mapAsJavaMap(parameters))
     val hoodieDF = HoodieDatasetBulkInsertHelper.prepareHoodieDatasetForBulkInsert(sqlContext, writeConfig, df, structName, nameSpace)
-    hoodieDF.write.format("org.apache.hudi.internal")
-      .option(HoodieDataSourceInternalWriter.INSTANT_TIME_OPT_KEY, instantTime)
-      .options(parameters)
-      .save()
+    if (SPARK_VERSION.startsWith("2.")) {
+      hoodieDF.write.format("org.apache.hudi.internal")
+        .option(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
+        .options(parameters)
+        .save()
+    } else {
+      hoodieDF.write.format("org.apache.hudi.spark3.internal")
+        .option(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
+        .option(HoodieWriteConfig.BULKINSERT_INPUT_DATA_SCHEMA_DDL, hoodieDF.schema.toDDL)
+        .options(parameters)
+        .mode(SaveMode.Append)
+        .save()
+    }
     val hiveSyncEnabled = parameters.get(HIVE_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
     val metaSyncEnabled = parameters.get(META_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
     val syncHiveSucess = if (hiveSyncEnabled || metaSyncEnabled) {

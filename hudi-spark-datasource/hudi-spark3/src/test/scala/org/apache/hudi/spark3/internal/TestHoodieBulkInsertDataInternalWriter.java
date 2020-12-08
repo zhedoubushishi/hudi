@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package org.apache.hudi.internal;
+package org.apache.hudi.spark3.internal;
 
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator;
 import org.apache.hudi.config.HoodieWriteConfig;
+import org.apache.hudi.internal.HoodieBulkInsertDataInternalWriterTestBase;
 import org.apache.hudi.table.HoodieSparkTable;
 import org.apache.hudi.table.HoodieTable;
 
@@ -54,7 +55,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends
     for (int i = 0; i < 5; i++) {
       String instantTime = "00" + i;
       // init writer
-      HoodieBulkInsertDataInternalWriter writer = new HoodieBulkInsertDataInternalWriter(table, cfg, instantTime, RANDOM.nextInt(100000), RANDOM.nextLong(), RANDOM.nextLong(), STRUCT_TYPE);
+      HoodieBulkInsertDataInternalWriter writer = new HoodieBulkInsertDataInternalWriter(table, cfg, instantTime, RANDOM.nextInt(100000), RANDOM.nextLong(), STRUCT_TYPE);
 
       int size = 10 + RANDOM.nextInt(1000);
       // write N rows to partition1, N rows to partition2 and N rows to partition3 ... Each batch should create a new RowCreateHandle and a new file
@@ -72,7 +73,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends
         }
       }
 
-      BaseHoodieWriterCommitMessage commitMetadata = (BaseHoodieWriterCommitMessage) writer.commit();
+      HoodieWriterCommitMessage commitMetadata = (HoodieWriterCommitMessage) writer.commit();
       List<String> fileAbsPaths = new ArrayList<>();
       List<String> fileNames = new ArrayList<>();
 
@@ -98,7 +99,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends
     String partitionPath = HoodieTestDataGenerator.DEFAULT_PARTITION_PATHS[0];
 
     String instantTime = "001";
-    HoodieBulkInsertDataInternalWriter writer = new HoodieBulkInsertDataInternalWriter(table, cfg, instantTime, RANDOM.nextInt(100000), RANDOM.nextLong(), RANDOM.nextLong(), STRUCT_TYPE);
+    HoodieBulkInsertDataInternalWriter writer = new HoodieBulkInsertDataInternalWriter(table, cfg, instantTime, RANDOM.nextInt(100000), RANDOM.nextLong(), STRUCT_TYPE);
 
     int size = 10 + RANDOM.nextInt(100);
     int totalFailures = 5;
@@ -125,7 +126,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends
       // expected
     }
 
-    BaseHoodieWriterCommitMessage commitMetadata = (BaseHoodieWriterCommitMessage) writer.commit();
+    HoodieWriterCommitMessage commitMetadata = (HoodieWriterCommitMessage) writer.commit();
 
     List<String> fileAbsPaths = new ArrayList<>();
     List<String> fileNames = new ArrayList<>();
