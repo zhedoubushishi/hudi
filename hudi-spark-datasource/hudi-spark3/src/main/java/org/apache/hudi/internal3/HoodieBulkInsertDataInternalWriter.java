@@ -47,7 +47,6 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
   private final String instantTime;
   private final int taskPartitionId;
   private final long taskId;
-  private final long taskEpochId;
   private final HoodieTable hoodieTable;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
@@ -55,18 +54,16 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
 
   private HoodieRowCreateHandle handle;
   private String lastKnownPartitionPath = null;
-  private String fileIdPrefix = null;
+  private String fileIdPrefix;
   private int numFilesWritten = 0;
 
   public HoodieBulkInsertDataInternalWriter(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
-      String instantTime, int taskPartitionId, long taskId, long taskEpochId,
-      StructType structType) {
+      String instantTime, int taskPartitionId, long taskId, StructType structType) {
     this.hoodieTable = hoodieTable;
     this.writeConfig = writeConfig;
     this.instantTime = instantTime;
     this.taskPartitionId = taskPartitionId;
     this.taskId = taskId;
-    this.taskEpochId = taskEpochId;
     this.structType = structType;
     this.fileIdPrefix = UUID.randomUUID().toString();
   }
@@ -91,6 +88,7 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
 
   @Override
   public WriterCommitMessage commit() throws IOException {
+    LOG.info("wenningd => close handle inside commit");
     close();
     return new HoodieWriterCommitMessage(writeStatusList);
   }
@@ -101,19 +99,22 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
 
   private void createNewHandle(String partitionPath) throws IOException {
     if (null != handle) {
+      LOG.info("wenningd => handle is not null, close handle inside createNewHandle");
       close();
     }
     handle = new HoodieRowCreateHandle(hoodieTable, writeConfig, partitionPath, getNextFileId(),
-        instantTime, taskPartitionId, taskId, taskEpochId, structType);
+        instantTime, taskPartitionId, taskId, 0, structType);
   }
 
   public void close() throws IOException {
     if (null != handle) {
+      LOG.info("wenningd => closing handle for " + handle.getFileName());
       writeStatusList.add(handle.close());
+      handle = null;    // this is required
     }
   }
 
-  protected String getNextFileId() {
+  private String getNextFileId() {
     return String.format("%s-%d", fileIdPrefix, numFilesWritten++);
   }
 }

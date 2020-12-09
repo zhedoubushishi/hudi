@@ -292,20 +292,24 @@ private[hudi] object HoodieSparkSqlWriter {
                       basePath: Path,
                       path: Option[String],
                       instantTime: String): (Boolean, common.util.Option[String]) = {
+    log.info("wenningd => using bulk insert v2")
     val structName = s"${tblName}_record"
     val nameSpace = s"hoodie.${tblName}"
     val writeConfig = DataSourceUtils.createHoodieConfig(null, path.get, tblName, mapAsJavaMap(parameters))
     val hoodieDF = HoodieDatasetBulkInsertHelper.prepareHoodieDatasetForBulkInsert(sqlContext, writeConfig, df, structName, nameSpace)
     if (SPARK_VERSION.startsWith("2.")) {
+      log.info("wenningd => using bulk insert v2 with spark2")
       hoodieDF.write.format("org.apache.hudi.internal")
         .option(HoodieDataSourceInternalWriter.INSTANT_TIME_OPT_KEY, instantTime)
         .options(parameters)
         .save()
     } else {
+      log.info("wenningd => using bulk insert v2 with spark3")
       hoodieDF.write.format("org.apache.hudi.internal3")
         .option(HoodieDataSourceInternalWriter.INSTANT_TIME_OPT_KEY, instantTime)
-        .option("hoodie.bulk_insert.schema", hoodieDF.schema.toDDL)
+        .option("hoodie.bulk_insert.schema.ddl", hoodieDF.schema.toDDL)
         .options(parameters)
+        .mode(SaveMode.Append)
         .save()
     }
     val hiveSyncEnabled = parameters.get(HIVE_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)

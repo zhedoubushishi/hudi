@@ -18,12 +18,10 @@
 
 package org.apache.hudi.internal3;
 
-import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.table.HoodieTable;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.connector.write.BatchWrite;
 import org.apache.spark.sql.connector.write.WriteBuilder;
 import org.apache.spark.sql.types.StructType;
@@ -34,30 +32,26 @@ import org.apache.spark.sql.types.StructType;
  */
 public class HoodieDataSourceInternalBatchWriterBuilder implements WriteBuilder {
 
-  private static final long serialVersionUID = 1L;
-  private static final Logger LOG = LogManager.getLogger(HoodieDataSourceInternalBatchWriterBuilder.class);
-  public static final String INSTANT_TIME_OPT_KEY = "hoodie.instant.time";
-
   private final String instantTime;
   private final HoodieTableMetaClient metaClient;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
-  private final SparkRDDWriteClient writeClient;
+  private final SparkSession jss;
   private final HoodieTable hoodieTable;
 
   public HoodieDataSourceInternalBatchWriterBuilder(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
-      SparkRDDWriteClient writeClient, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
+      SparkSession jss, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
     this.structType = structType;
-    this.writeClient = writeClient;
+    this.jss = jss;
     this.metaClient = metaClient;
     this.hoodieTable = hoodieTable;
   }
 
   @Override
   public BatchWrite buildForBatch() {
-    return new HoodieDataSourceInternalBatchWriter(instantTime, writeConfig, structType, writeClient,
+    return new HoodieDataSourceInternalBatchWriter(instantTime, writeConfig, structType, jss,
         metaClient, hoodieTable);
   }
 }

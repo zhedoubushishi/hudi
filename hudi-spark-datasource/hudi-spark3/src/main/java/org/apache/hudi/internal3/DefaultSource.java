@@ -22,8 +22,6 @@ import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.config.HoodieWriteConfig;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.connector.catalog.Table;
 import org.apache.spark.sql.connector.catalog.TableProvider;
@@ -38,8 +36,6 @@ import java.util.Map;
  */
 public class DefaultSource implements TableProvider {
 
-  private static final Logger LOG = LogManager.getLogger(DefaultSource.class);
-
   private SparkSession sparkSession = null;
   private Configuration configuration = null;
 
@@ -47,7 +43,7 @@ public class DefaultSource implements TableProvider {
   public StructType inferSchema(CaseInsensitiveStringMap options) {
     // get schema from options
     // this requires you to put schema into options before call datasource api
-    return StructType.fromDDL(options.get("hoodie.bulk_insert.schema"));
+    return StructType.fromDDL(options.get("hoodie.bulk_insert.schema.ddl"));
   }
 
   @Override

@@ -46,8 +46,7 @@ public class HoodieBulkInsertDataInternalWriterFactory implements DataWriterFact
 
   @Override
   public DataWriter<InternalRow> createWriter(int partitionId, long taskId) {
-    // set epock id to 0
-    return new HoodieBulkInsertDataInternalWriter(hoodieTable, writeConfig, instantTime, partitionId, taskId, 0,
+    return new HoodieBulkInsertDataInternalWriter(hoodieTable, writeConfig, instantTime, partitionId, taskId,
         structType);
   }
 }

@@ -20,6 +20,7 @@ package org.apache.hudi.internal3;
 
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.client.SparkRDDWriteClient;
+import org.apache.hudi.client.common.HoodieSparkEngineContext;
 import org.apache.hudi.common.model.HoodieWriteStat;
 import org.apache.hudi.common.model.WriteOperationType;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
@@ -32,6 +33,8 @@ import org.apache.hudi.exception.HoodieException;
 import org.apache.hudi.table.HoodieTable;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.connector.write.DataWriterFactory;
 import org.apache.spark.sql.connector.write.WriterCommitMessage;
 import org.apache.spark.sql.connector.write.BatchWrite;
@@ -61,13 +64,15 @@ public class HoodieDataSourceInternalBatchWriter implements BatchWrite {
   private final WriteOperationType operationType = WriteOperationType.BULK_INSERT;
 
   public HoodieDataSourceInternalBatchWriter(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
-      SparkRDDWriteClient writeClient, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
+      SparkSession jss, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
     this.structType = structType;
-    this.writeClient = writeClient;
     this.metaClient = metaClient;
     this.hoodieTable = hoodieTable;
+    this.writeClient  = new SparkRDDWriteClient<>(new HoodieSparkEngineContext(new JavaSparkContext(jss.sparkContext())), writeConfig, true);
+    writeClient.setOperationType(operationType);
+    writeClient.startCommitWithTime(instantTime);
   }
 
   @Override

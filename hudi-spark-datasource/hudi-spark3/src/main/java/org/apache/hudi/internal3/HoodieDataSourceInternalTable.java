@@ -19,9 +19,7 @@
 package org.apache.hudi.internal3;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.client.common.HoodieSparkEngineContext;
-import org.apache.hudi.common.model.WriteOperationType;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.table.HoodieSparkTable;
@@ -44,19 +42,15 @@ class HoodieDataSourceInternalTable implements SupportsWrite {
   private final HoodieTableMetaClient metaClient;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
-  private final SparkRDDWriteClient writeClient;
+  private final SparkSession jss;
   private final HoodieTable hoodieTable;
-  private final WriteOperationType operationType;
 
   public HoodieDataSourceInternalTable(String instantTime, HoodieWriteConfig config,
       StructType schema, SparkSession jss, Configuration hadoopConfiguration) {
     this.instantTime = instantTime;
     this.writeConfig = config;
     this.structType = schema;
-    this.operationType = WriteOperationType.BULK_INSERT;
-    this.writeClient  = new SparkRDDWriteClient<>(new HoodieSparkEngineContext(new JavaSparkContext(jss.sparkContext())), writeConfig, true);
-    writeClient.setOperationType(operationType);
-    writeClient.startCommitWithTime(instantTime);
+    this.jss = jss;
     this.metaClient = new HoodieTableMetaClient(hadoopConfiguration, writeConfig.getBasePath());
     this.hoodieTable = HoodieSparkTable.create(writeConfig, new HoodieSparkEngineContext(new JavaSparkContext(jss.sparkContext())), metaClient);
   }
@@ -85,7 +79,7 @@ class HoodieDataSourceInternalTable implements SupportsWrite {
    */
   @Override
   public WriteBuilder newWriteBuilder(LogicalWriteInfo logicalWriteInfo) {
-    return new HoodieDataSourceInternalBatchWriterBuilder(instantTime, writeConfig, structType, writeClient,
+    return new HoodieDataSourceInternalBatchWriterBuilder(instantTime, writeConfig, structType, jss,
         metaClient, hoodieTable);
   }
 }
