@@ -41,7 +41,6 @@ import java.util.UUID;
  */
 public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRow> {
 
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LogManager.getLogger(HoodieBulkInsertDataInternalWriter.class);
 
   private final String instantTime;
@@ -52,10 +51,10 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
   private final List<HoodieInternalWriteStatus> writeStatusList = new ArrayList<>();
+  private String fileIdPrefix;
 
   private HoodieRowCreateHandle handle;
   private String lastKnownPartitionPath = null;
-  private String fileIdPrefix = null;
   private int numFilesWritten = 0;
 
   public HoodieBulkInsertDataInternalWriter(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
@@ -113,7 +112,7 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
     }
   }
 
-  protected String getNextFileId() {
+  private String getNextFileId() {
     return String.format("%s-%d", fileIdPrefix, numFilesWritten++);
   }
 }
