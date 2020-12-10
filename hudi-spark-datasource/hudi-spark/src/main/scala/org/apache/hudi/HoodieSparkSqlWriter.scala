@@ -297,6 +297,8 @@ private[hudi] object HoodieSparkSqlWriter {
     val nameSpace = s"hoodie.${tblName}"
     val writeConfig = DataSourceUtils.createHoodieConfig(null, path.get, tblName, mapAsJavaMap(parameters))
     val hoodieDF = HoodieDatasetBulkInsertHelper.prepareHoodieDatasetForBulkInsert(sqlContext, writeConfig, df, structName, nameSpace)
+    import org.apache.spark.sql.functions.spark_partition_id
+    hoodieDF.withColumn("partitionID", spark_partition_id).show(false)
     if (SPARK_VERSION.startsWith("2.")) {
       log.info("wenningd => using bulk insert v2 with spark2")
       hoodieDF.write.format("org.apache.hudi.internal")

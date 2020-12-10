@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of {@link BatchWrite} for datasource "hudi.internal" to be used in datasource implementation
+ * Implementation of {@link BatchWrite} for datasource "hudi.internal3" to be used in datasource implementation
  * of bulk insert.
  */
 public class HoodieDataSourceInternalBatchWriter implements BatchWrite {
