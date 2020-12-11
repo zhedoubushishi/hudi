@@ -42,9 +42,7 @@ public class DefaultSource implements TableProvider {
 
   @Override
   public StructType inferSchema(CaseInsensitiveStringMap options) {
-    // get schema from options
-    // this requires you to put schema into options before call datasource api
-    return StructType.fromDDL(options.get("hoodie.bulk_insert.schema.ddl"));
+    return StructType.fromDDL(options.get(HoodieWriteConfig.BULKINSERT_INPUT_DATA_SCHEMA_DDL));
   }
 
   @Override
