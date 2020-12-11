@@ -41,7 +41,6 @@ import java.util.UUID;
  */
 public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRow> {
 
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LogManager.getLogger(HoodieBulkInsertDataInternalWriter.class);
 
   private final String instantTime;
@@ -93,7 +92,7 @@ public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRo
   }
 
   @Override
-  public void abort() throws IOException {
+  public void abort() {
   }
 
   private void createNewHandle(String partitionPath) throws IOException {

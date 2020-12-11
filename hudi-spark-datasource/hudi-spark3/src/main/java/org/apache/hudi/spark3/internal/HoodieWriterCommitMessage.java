@@ -34,7 +34,7 @@ public class HoodieWriterCommitMessage implements WriterCommitMessage {
     this.writeStatuses = writeStatuses;
   }
 
-  public List<HoodieInternalWriteStatus> getWriteStatuses() {
+  List<HoodieInternalWriteStatus> getWriteStatuses() {
     return writeStatuses;
   }
 

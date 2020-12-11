@@ -19,6 +19,7 @@
 package org.apache.hudi.spark3.internal;
 
 import org.apache.hudi.DataSourceUtils;
+import org.apache.hudi.client.HoodieInternalWriteStatus;
 import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.client.common.HoodieSparkEngineContext;
 import org.apache.hudi.common.model.HoodieWriteStat;
@@ -51,7 +52,6 @@ import java.util.stream.Collectors;
  */
 public class HoodieDataSourceInternalBatchWriter implements BatchWrite {
 
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LogManager.getLogger(HoodieDataSourceInternalBatchWriter.class);
   public static final String INSTANT_TIME_OPT_KEY = "hoodie.instant.time";
 
@@ -99,7 +99,7 @@ public class HoodieDataSourceInternalBatchWriter implements BatchWrite {
   @Override
   public void commit(WriterCommitMessage[] messages) {
     List<HoodieWriteStat> writeStatList = Arrays.stream(messages).map(m -> (HoodieWriterCommitMessage) m)
-        .flatMap(m -> m.getWriteStatuses().stream().map(m2 -> m2.getStat())).collect(Collectors.toList());
+        .flatMap(m -> m.getWriteStatuses().stream().map(HoodieInternalWriteStatus::getStat)).collect(Collectors.toList());
 
     try {
       writeClient.commitStats(instantTime, writeStatList, Option.empty(),
