@@ -101,8 +101,7 @@ public class HoodieDatasetBulkInsertHelper {
     Dataset<Row> colOrderedDataset = rowDatasetWithHoodieColumns.select(
         JavaConverters.collectionAsScalaIterableConverter(orderedFields).asScala().toSeq());
 
-    return colOrderedDataset
-        .sort(functions.col(HoodieRecord.PARTITION_PATH_METADATA_FIELD), functions.col(HoodieRecord.RECORD_KEY_METADATA_FIELD))
-        .coalesce(config.getBulkInsertShuffleParallelism());
+    Column[] partitionCols = keyGenerator.getPartitionPathFields().stream().map(Column::new).toArray(Column[]::new);
+    return colOrderedDataset.repartition(config.getBulkInsertShuffleParallelism(), partitionCols);
   }
 }
