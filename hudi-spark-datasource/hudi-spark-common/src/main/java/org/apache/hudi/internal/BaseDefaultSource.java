@@ -26,17 +26,17 @@ import org.apache.spark.sql.SparkSession;
  */
 public class BaseDefaultSource {
 
-  private SparkSession sparkSession = null;
-  private Configuration configuration = null;
+  protected SparkSession sparkSession = null;
+  protected Configuration configuration = null;
 
-  private SparkSession getSparkSession() {
+  protected SparkSession getSparkSession() {
     if (sparkSession == null) {
       sparkSession = SparkSession.builder().getOrCreate();
     }
     return sparkSession;
   }
 
-  private Configuration getConfiguration() {
+  protected Configuration getConfiguration() {
     if (configuration == null) {
       this.configuration = getSparkSession().sparkContext().hadoopConfiguration();
     }

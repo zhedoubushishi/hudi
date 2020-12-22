@@ -20,10 +20,9 @@ package org.apache.hudi.spark3.internal;
 
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.config.HoodieWriteConfig;
+import org.apache.hudi.internal.BaseDefaultSource;
 import org.apache.hudi.internal.HoodieDataSourceInternalWriterHelper;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.connector.catalog.Table;
 import org.apache.spark.sql.connector.catalog.TableProvider;
 import org.apache.spark.sql.connector.expressions.Transform;
@@ -36,10 +35,7 @@ import java.util.Map;
  * DataSource V2 implementation for managing internal write logic. Only called internally.
  * This class is only compatible with datasource V2 API in Spark 3.
  */
-public class DefaultSource implements TableProvider {
-
-  private SparkSession sparkSession = null;
-  private Configuration configuration = null;
+public class DefaultSource extends BaseDefaultSource implements TableProvider {
 
   @Override
   public StructType inferSchema(CaseInsensitiveStringMap options) {
@@ -54,19 +50,5 @@ public class DefaultSource implements TableProvider {
     HoodieWriteConfig config = DataSourceUtils.createHoodieConfig(null, path, tblName, properties);
     return new HoodieDataSourceInternalTable(instantTime, config, schema, getSparkSession(),
         getConfiguration());
-  }
-
-  private SparkSession getSparkSession() {
-    if (sparkSession == null) {
-      sparkSession = SparkSession.builder().getOrCreate();
-    }
-    return sparkSession;
-  }
-
-  private Configuration getConfiguration() {
-    if (configuration == null) {
-      this.configuration = getSparkSession().sparkContext().hadoopConfiguration();
-    }
-    return configuration;
   }
 }

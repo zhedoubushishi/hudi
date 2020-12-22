@@ -21,11 +21,7 @@ package org.apache.hudi.internal;
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.config.HoodieWriteConfig;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.sources.DataSourceRegister;
 import org.apache.spark.sql.sources.v2.DataSourceOptions;
 import org.apache.spark.sql.sources.v2.DataSourceV2;
@@ -40,14 +36,8 @@ import java.util.Optional;
 /**
  * DataSource V2 implementation for managing internal write logic. Only called internally.
  */
-public class DefaultSource implements DataSourceV2, ReadSupport, WriteSupport,
-    DataSourceRegister {
-
-  private static final Logger LOG = LogManager
-      .getLogger(DefaultSource.class);
-
-  private SparkSession sparkSession = null;
-  private Configuration configuration = null;
+public class DefaultSource extends BaseDefaultSource implements DataSourceV2,
+    ReadSupport, WriteSupport, DataSourceRegister {
 
   @Override
   public String shortName() {
@@ -73,19 +63,5 @@ public class DefaultSource implements DataSourceV2, ReadSupport, WriteSupport,
     HoodieWriteConfig config = DataSourceUtils.createHoodieConfig(null, path, tblName, options.asMap());
     return Optional.of(new HoodieDataSourceInternalWriter(instantTime, config, schema, getSparkSession(),
             getConfiguration()));
-  }
-
-  private SparkSession getSparkSession() {
-    if (sparkSession == null) {
-      sparkSession = SparkSession.builder().getOrCreate();
-    }
-    return sparkSession;
-  }
-
-  private Configuration getConfiguration() {
-    if (configuration == null) {
-      this.configuration = getSparkSession().sparkContext().hadoopConfiguration();
-    }
-    return configuration;
   }
 }
