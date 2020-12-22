@@ -18,28 +18,28 @@
 
 package org.apache.hudi.internal;
 
-import org.apache.hudi.client.HoodieInternalWriteStatus;
-import org.apache.spark.sql.sources.v2.writer.WriterCommitMessage;
-
-import java.util.List;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.spark.sql.SparkSession;
 
 /**
- * Hoodie's {@link WriterCommitMessage} used in datasource implementation.
+ * Helper class for ???
  */
-public class HoodieWriterCommitMessage implements WriterCommitMessage {
+public class BaseDefaultSource {
 
-  private List<HoodieInternalWriteStatus> writeStatuses;
+  private SparkSession sparkSession = null;
+  private Configuration configuration = null;
 
-  public HoodieWriterCommitMessage(List<HoodieInternalWriteStatus> writeStatuses) {
-    this.writeStatuses = writeStatuses;
+  private SparkSession getSparkSession() {
+    if (sparkSession == null) {
+      sparkSession = SparkSession.builder().getOrCreate();
+    }
+    return sparkSession;
   }
 
-  public List<HoodieInternalWriteStatus> getWriteStatuses() {
-    return writeStatuses;
-  }
-
-  @Override
-  public String toString() {
-    return "HoodieWriterCommitMessage{" + "writeStatuses=" + writeStatuses + '}';
+  private Configuration getConfiguration() {
+    if (configuration == null) {
+      this.configuration = getSparkSession().sparkContext().hadoopConfiguration();
+    }
+    return configuration;
   }
 }

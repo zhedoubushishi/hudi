@@ -33,27 +33,27 @@ import java.io.IOException;
  */
 public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRow> {
 
-  private final HoodieBulkInsertDataInternalWriterHelper writerHelper;
+  private final HoodieBulkInsertDataInternalWriterHelper bulkInsertWriterHelper;
 
   public HoodieBulkInsertDataInternalWriter(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
       String instantTime, int taskPartitionId, long taskId, long taskEpochId,
       StructType structType) {
-    this.writerHelper = new HoodieBulkInsertDataInternalWriterHelper(hoodieTable,
+    this.bulkInsertWriterHelper = new HoodieBulkInsertDataInternalWriterHelper(hoodieTable,
         writeConfig, instantTime, taskPartitionId, taskId, taskEpochId, structType);
   }
 
   @Override
   public void write(InternalRow record) throws IOException {
-    writerHelper.write(record);
+    bulkInsertWriterHelper.write(record);
   }
 
   @Override
   public WriterCommitMessage commit() throws IOException {
-    return new HoodieWriterCommitMessage(writerHelper.getWriteStatuses());
+    return new HoodieWriterCommitMessage(bulkInsertWriterHelper.getWriteStatuses());
   }
 
   @Override
   public void abort() {
-    writerHelper.abort();
+    bulkInsertWriterHelper.abort();
   }
 }

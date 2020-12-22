@@ -18,23 +18,13 @@
 
 package org.apache.hudi.spark3.internal;
 
-import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.client.HoodieInternalWriteStatus;
-import org.apache.hudi.client.SparkRDDWriteClient;
-import org.apache.hudi.client.common.HoodieSparkEngineContext;
 import org.apache.hudi.common.model.HoodieWriteStat;
 import org.apache.hudi.common.model.WriteOperationType;
-import org.apache.hudi.common.table.HoodieTableMetaClient;
-import org.apache.hudi.common.table.timeline.HoodieInstant;
-import org.apache.hudi.common.table.timeline.HoodieInstant.State;
-import org.apache.hudi.common.table.timeline.HoodieTimeline;
-import org.apache.hudi.common.util.Option;
 import org.apache.hudi.config.HoodieWriteConfig;
-import org.apache.hudi.exception.HoodieException;
-import org.apache.hudi.table.HoodieTable;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.hudi.internal.HoodieDataSourceInternalWriterHelper;
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.connector.write.DataWriterFactory;
 import org.apache.spark.sql.connector.write.WriterCommitMessage;
@@ -52,69 +42,50 @@ import java.util.stream.Collectors;
  */
 public class HoodieDataSourceInternalBatchWrite implements BatchWrite {
 
-  private static final Logger LOG = LogManager.getLogger(HoodieDataSourceInternalBatchWrite.class);
-  public static final String INSTANT_TIME_OPT_KEY = "hoodie.instant.time";
-
   private final String instantTime;
-  private final HoodieTableMetaClient metaClient;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
-  private final SparkRDDWriteClient writeClient;
-  private final HoodieTable hoodieTable;
-  private final WriteOperationType operationType = WriteOperationType.BULK_INSERT;
+  private final HoodieDataSourceInternalWriterHelper dataSourceInternalWriterHelper;
 
   public HoodieDataSourceInternalBatchWrite(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
-      SparkSession jss, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
+      SparkSession jss, Configuration hadoopConfiguration) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
     this.structType = structType;
-    this.metaClient = metaClient;
-    this.hoodieTable = hoodieTable;
-    this.writeClient  = new SparkRDDWriteClient<>(new HoodieSparkEngineContext(new JavaSparkContext(jss.sparkContext())), writeConfig, true);
-    writeClient.setOperationType(operationType);
-    writeClient.startCommitWithTime(instantTime);
+    this.dataSourceInternalWriterHelper = new HoodieDataSourceInternalWriterHelper(instantTime, writeConfig, structType,
+        jss, hadoopConfiguration);
   }
 
   @Override
   public DataWriterFactory createBatchWriterFactory(PhysicalWriteInfo info) {
-    metaClient.getActiveTimeline().transitionRequestedToInflight(
-        new HoodieInstant(State.REQUESTED, HoodieTimeline.COMMIT_ACTION, instantTime), Option.empty());
-    if (WriteOperationType.BULK_INSERT == operationType) {
-      return new HoodieBulkInsertDataInternalWriterFactory(hoodieTable, writeConfig, instantTime, structType);
+    dataSourceInternalWriterHelper.createInflightCommit();
+    if (WriteOperationType.BULK_INSERT == dataSourceInternalWriterHelper.getWriteOperationType()) {
+      return new HoodieBulkInsertDataInternalWriterFactory(dataSourceInternalWriterHelper.getHoodieTable(),
+          writeConfig, instantTime, structType);
     } else {
-      throw new IllegalArgumentException("Write Operation Type + " + operationType + " not supported ");
+      throw new IllegalArgumentException("Write Operation Type + " + dataSourceInternalWriterHelper.getWriteOperationType() + " not supported ");
     }
   }
 
   @Override
   public boolean useCommitCoordinator() {
-    return true;
+    return dataSourceInternalWriterHelper.useCommitCoordinator();
   }
 
   @Override
   public void onDataWriterCommit(WriterCommitMessage message) {
-    LOG.info("Received commit of a data writer =" + message);
+    dataSourceInternalWriterHelper.onDataWriterCommit(message.toString());
   }
 
   @Override
   public void commit(WriterCommitMessage[] messages) {
     List<HoodieWriteStat> writeStatList = Arrays.stream(messages).map(m -> (HoodieWriterCommitMessage) m)
         .flatMap(m -> m.getWriteStatuses().stream().map(HoodieInternalWriteStatus::getStat)).collect(Collectors.toList());
-
-    try {
-      writeClient.commitStats(instantTime, writeStatList, Option.empty(),
-          DataSourceUtils.getCommitActionType(operationType, metaClient.getTableType()));
-    } catch (Exception ioe) {
-      throw new HoodieException(ioe.getMessage(), ioe);
-    } finally {
-      writeClient.close();
-    }
+    dataSourceInternalWriterHelper.commit(writeStatList);
   }
 
   @Override
   public void abort(WriterCommitMessage[] messages) {
-    LOG.error("Commit " + instantTime + " aborted ");
-    writeClient.rollback(instantTime);
-    writeClient.close();
+    dataSourceInternalWriterHelper.abort();
   }
 }

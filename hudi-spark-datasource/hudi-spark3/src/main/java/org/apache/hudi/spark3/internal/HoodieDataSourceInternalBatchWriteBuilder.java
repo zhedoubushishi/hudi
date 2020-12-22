@@ -18,9 +18,9 @@
 
 package org.apache.hudi.spark3.internal;
 
-import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.config.HoodieWriteConfig;
-import org.apache.hudi.table.HoodieTable;
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.connector.write.BatchWrite;
 import org.apache.spark.sql.connector.write.WriteBuilder;
@@ -33,25 +33,23 @@ import org.apache.spark.sql.types.StructType;
 public class HoodieDataSourceInternalBatchWriteBuilder implements WriteBuilder {
 
   private final String instantTime;
-  private final HoodieTableMetaClient metaClient;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
   private final SparkSession jss;
-  private final HoodieTable hoodieTable;
+  private final Configuration hadoopConfiguration;
 
   public HoodieDataSourceInternalBatchWriteBuilder(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
-      SparkSession jss, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
+      SparkSession jss, Configuration hadoopConfiguration) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
     this.structType = structType;
     this.jss = jss;
-    this.metaClient = metaClient;
-    this.hoodieTable = hoodieTable;
+    this.hadoopConfiguration = hadoopConfiguration;
   }
 
   @Override
   public BatchWrite buildForBatch() {
     return new HoodieDataSourceInternalBatchWrite(instantTime, writeConfig, structType, jss,
-        metaClient, hoodieTable);
+        hadoopConfiguration);
   }
 }
