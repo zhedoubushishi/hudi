@@ -19,6 +19,7 @@
 package org.apache.hudi.spark3.internal;
 
 import org.apache.hudi.client.HoodieInternalWriteStatus;
+import org.apache.hudi.internal.BaseHoodieWriterCommitMessage;
 import org.apache.spark.sql.connector.write.WriterCommitMessage;
 
 import java.util.List;
@@ -26,20 +27,10 @@ import java.util.List;
 /**
  * Hoodie's {@link WriterCommitMessage} used in datasource "hudi.spark3.internal" implementation.
  */
-public class HoodieWriterCommitMessage implements WriterCommitMessage {
-
-  private List<HoodieInternalWriteStatus> writeStatuses;
+public class HoodieWriterCommitMessage extends BaseHoodieWriterCommitMessage
+    implements WriterCommitMessage {
 
   public HoodieWriterCommitMessage(List<HoodieInternalWriteStatus> writeStatuses) {
-    this.writeStatuses = writeStatuses;
-  }
-
-  List<HoodieInternalWriteStatus> getWriteStatuses() {
-    return writeStatuses;
-  }
-
-  @Override
-  public String toString() {
-    return "HoodieWriterCommitMessage{" + "writeStatuses=" + writeStatuses + '}';
+    super(writeStatuses);
   }
 }
