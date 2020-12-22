@@ -30,7 +30,7 @@ import org.apache.spark.sql.types.StructType;
  * Implementation of {@link WriteBuilder} for datasource "hudi.spark3.internal" to be used in datasource implementation
  * of bulk insert.
  */
-public class HoodieDataSourceInternalBatchWriterBuilder implements WriteBuilder {
+public class HoodieDataSourceInternalBatchWriteBuilder implements WriteBuilder {
 
   private final String instantTime;
   private final HoodieTableMetaClient metaClient;
@@ -39,7 +39,7 @@ public class HoodieDataSourceInternalBatchWriterBuilder implements WriteBuilder 
   private final SparkSession jss;
   private final HoodieTable hoodieTable;
 
-  public HoodieDataSourceInternalBatchWriterBuilder(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
+  public HoodieDataSourceInternalBatchWriteBuilder(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
       SparkSession jss, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
@@ -51,7 +51,7 @@ public class HoodieDataSourceInternalBatchWriterBuilder implements WriteBuilder 
 
   @Override
   public BatchWrite buildForBatch() {
-    return new HoodieDataSourceInternalBatchWriter(instantTime, writeConfig, structType, jss,
+    return new HoodieDataSourceInternalBatchWrite(instantTime, writeConfig, structType, jss,
         metaClient, hoodieTable);
   }
 }

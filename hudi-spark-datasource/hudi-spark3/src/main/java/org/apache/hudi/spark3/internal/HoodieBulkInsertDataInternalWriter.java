@@ -18,99 +18,47 @@
 
 package org.apache.hudi.spark3.internal;
 
-import org.apache.hudi.client.HoodieInternalWriteStatus;
-import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.config.HoodieWriteConfig;
-import org.apache.hudi.io.HoodieRowCreateHandle;
+import org.apache.hudi.internal.HoodieBulkInsertDataInternalWriterHelper;
 import org.apache.hudi.table.HoodieTable;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.spark.sql.catalyst.InternalRow;
 import org.apache.spark.sql.connector.write.DataWriter;
 import org.apache.spark.sql.connector.write.WriterCommitMessage;
 import org.apache.spark.sql.types.StructType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Hoodie's Implementation of {@link DataWriter<InternalRow>}. This is used in data source "hudi.spark3.internal" implementation for bulk insert.
  */
 public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRow> {
 
-  private static final Logger LOG = LogManager.getLogger(HoodieBulkInsertDataInternalWriter.class);
-
-  private final String instantTime;
-  private final int taskPartitionId;
-  private final long taskId;
-  private final HoodieTable hoodieTable;
-  private final HoodieWriteConfig writeConfig;
-  private final StructType structType;
-  private final List<HoodieInternalWriteStatus> writeStatusList = new ArrayList<>();
-
-  private HoodieRowCreateHandle handle;
-  private String lastKnownPartitionPath = null;
-  private String fileIdPrefix;
-  private int numFilesWritten = 0;
+  private final HoodieBulkInsertDataInternalWriterHelper writerHelper;
 
   public HoodieBulkInsertDataInternalWriter(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
       String instantTime, int taskPartitionId, long taskId, StructType structType) {
-    this.hoodieTable = hoodieTable;
-    this.writeConfig = writeConfig;
-    this.instantTime = instantTime;
-    this.taskPartitionId = taskPartitionId;
-    this.taskId = taskId;
-    this.structType = structType;
-    this.fileIdPrefix = UUID.randomUUID().toString();
+    this.writerHelper = new HoodieBulkInsertDataInternalWriterHelper(hoodieTable,
+        writeConfig, instantTime, taskPartitionId, taskId, 0, structType);
   }
 
   @Override
   public void write(InternalRow record) throws IOException {
-    try {
-      String partitionPath = record.getUTF8String(
-          HoodieRecord.HOODIE_META_COLUMNS_NAME_TO_POS.get(HoodieRecord.PARTITION_PATH_METADATA_FIELD)).toString();
-
-      if ((lastKnownPartitionPath == null) || !lastKnownPartitionPath.equals(partitionPath) || !handle.canWrite()) {
-        LOG.info("Creating new file for partition path " + partitionPath);
-        createNewHandle(partitionPath);
-        lastKnownPartitionPath = partitionPath;
-      }
-      handle.write(record);
-    } catch (Throwable t) {
-      LOG.error("Global error thrown while trying to write records in HoodieRowCreateHandle ", t);
-      throw t;
-    }
+    writerHelper.write(record);
   }
 
   @Override
   public WriterCommitMessage commit() throws IOException {
-    close();
-    return new HoodieWriterCommitMessage(writeStatusList);
+    return new HoodieWriterCommitMessage(writerHelper.getWriteStatuses());
   }
 
   @Override
   public void abort() {
+    writerHelper.abort();
   }
 
-  private void createNewHandle(String partitionPath) throws IOException {
-    if (null != handle) {
-      close();
-    }
-    handle = new HoodieRowCreateHandle(hoodieTable, writeConfig, partitionPath, getNextFileId(),
-        instantTime, taskPartitionId, taskId, 0, structType);
-  }
-
+  @Override
   public void close() throws IOException {
-    if (null != handle) {
-      writeStatusList.add(handle.close());
-      handle = null;
-    }
-  }
-
-  private String getNextFileId() {
-    return String.format("%s-%d", fileIdPrefix, numFilesWritten++);
+    writerHelper.close();
   }
 }

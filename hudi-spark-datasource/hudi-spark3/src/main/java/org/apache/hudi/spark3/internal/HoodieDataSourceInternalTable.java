@@ -75,7 +75,7 @@ class HoodieDataSourceInternalTable implements SupportsWrite {
 
   @Override
   public WriteBuilder newWriteBuilder(LogicalWriteInfo logicalWriteInfo) {
-    return new HoodieDataSourceInternalBatchWriterBuilder(instantTime, writeConfig, structType, jss,
+    return new HoodieDataSourceInternalBatchWriteBuilder(instantTime, writeConfig, structType, jss,
         metaClient, hoodieTable);
   }
 }

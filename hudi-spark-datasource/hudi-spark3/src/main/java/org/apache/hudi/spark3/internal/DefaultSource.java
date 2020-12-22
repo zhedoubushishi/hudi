@@ -47,7 +47,7 @@ public class DefaultSource implements TableProvider {
 
   @Override
   public Table getTable(StructType schema, Transform[] partitioning, Map<String, String> properties) {
-    String instantTime = properties.get(HoodieDataSourceInternalBatchWriter.INSTANT_TIME_OPT_KEY);
+    String instantTime = properties.get(HoodieDataSourceInternalBatchWrite.INSTANT_TIME_OPT_KEY);
     String path = properties.get("path");
     String tblName = properties.get(HoodieWriteConfig.TABLE_NAME);
     HoodieWriteConfig config = DataSourceUtils.createHoodieConfig(null, path, tblName, properties);

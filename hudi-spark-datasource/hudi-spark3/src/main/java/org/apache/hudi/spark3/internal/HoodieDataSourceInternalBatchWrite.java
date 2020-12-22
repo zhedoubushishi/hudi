@@ -50,9 +50,9 @@ import java.util.stream.Collectors;
  * Implementation of {@link BatchWrite} for datasource "hudi.spark3.internal" to be used in datasource implementation
  * of bulk insert.
  */
-public class HoodieDataSourceInternalBatchWriter implements BatchWrite {
+public class HoodieDataSourceInternalBatchWrite implements BatchWrite {
 
-  private static final Logger LOG = LogManager.getLogger(HoodieDataSourceInternalBatchWriter.class);
+  private static final Logger LOG = LogManager.getLogger(HoodieDataSourceInternalBatchWrite.class);
   public static final String INSTANT_TIME_OPT_KEY = "hoodie.instant.time";
 
   private final String instantTime;
@@ -63,7 +63,7 @@ public class HoodieDataSourceInternalBatchWriter implements BatchWrite {
   private final HoodieTable hoodieTable;
   private final WriteOperationType operationType = WriteOperationType.BULK_INSERT;
 
-  public HoodieDataSourceInternalBatchWriter(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
+  public HoodieDataSourceInternalBatchWrite(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
       SparkSession jss, HoodieTableMetaClient metaClient, HoodieTable hoodieTable) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
