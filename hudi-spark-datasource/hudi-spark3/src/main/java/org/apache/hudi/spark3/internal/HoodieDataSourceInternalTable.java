@@ -31,6 +31,9 @@ import org.apache.spark.sql.types.StructType;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Hoodie's Implementation of {@link SupportsWrite}. This is used in data source "hudi.spark3.internal" implementation for bulk insert.
+ */
 class HoodieDataSourceInternalTable implements SupportsWrite {
 
   private final String instantTime;

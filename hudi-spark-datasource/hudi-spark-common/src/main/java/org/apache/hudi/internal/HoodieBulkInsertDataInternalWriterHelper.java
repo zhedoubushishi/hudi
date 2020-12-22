@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Helper class for ???
+ * Helper class for HoodieBulkInsertDataInternalWriter used by Spark datasource v2.
  */
 public class HoodieBulkInsertDataInternalWriterHelper {
 

@@ -23,7 +23,7 @@ import org.apache.hudi.client.HoodieInternalWriteStatus;
 import java.util.List;
 
 /**
- * Base class for ???
+ * Base class for HoodieWriterCommitMessage used by Spark datasource v2.
  */
 public class BaseHoodieWriterCommitMessage {
 

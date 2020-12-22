@@ -41,7 +41,8 @@ import static org.apache.hudi.testutils.SparkDatasetTestUtils.toInternalRows;
 /**
  * Unit tests {@link HoodieDataSourceInternalWriter}.
  */
-public class TestHoodieDataSourceInternalWriter extends HoodieDataSourceInternalWriterTestBase {
+public class TestHoodieDataSourceInternalWriter extends
+    HoodieDataSourceInternalWriterTestBase {
 
   @Test
   public void testDataSourceWriter() throws Exception {

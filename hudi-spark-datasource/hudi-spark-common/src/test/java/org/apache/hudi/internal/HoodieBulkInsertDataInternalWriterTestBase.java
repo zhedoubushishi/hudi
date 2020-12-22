@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Base class for ???
+ * Base class for TestHoodieBulkInsertDataInternalWriter.
  */
 public class HoodieBulkInsertDataInternalWriterTestBase extends HoodieClientTestHarness {
 

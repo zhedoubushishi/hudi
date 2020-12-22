@@ -22,7 +22,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.sql.SparkSession;
 
 /**
- * Helper class for ???
+ * Base class for DefaultSource used by Spark datasource v2.
  */
 public class BaseDefaultSource {
 

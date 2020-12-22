@@ -43,7 +43,7 @@ import org.apache.spark.sql.types.StructType;
 import java.util.List;
 
 /**
- * Helper class for ???
+ * Helper class for HoodieDataSourceInternalWriter used by Spark datasource v2.
  */
 public class HoodieDataSourceInternalWriterHelper {
 

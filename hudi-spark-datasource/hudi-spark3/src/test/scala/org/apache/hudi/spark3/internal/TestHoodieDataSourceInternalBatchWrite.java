@@ -44,7 +44,8 @@ import static org.apache.hudi.testutils.SparkDatasetTestUtils.toInternalRows;
 /**
  * Unit tests {@link HoodieDataSourceInternalBatchWrite}.
  */
-public class TestHoodieDataSourceInternalBatchWrite extends HoodieDataSourceInternalWriterTestBase {
+public class TestHoodieDataSourceInternalBatchWrite extends
+    HoodieDataSourceInternalWriterTestBase {
 
   @Test
   public void testDataSourceWriter() throws Exception {
