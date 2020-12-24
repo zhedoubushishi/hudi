@@ -301,13 +301,16 @@ private[hudi] object HoodieSparkSqlWriter {
         .option(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
         .options(parameters)
         .save()
-    } else {
+    } else if (SPARK_VERSION.startsWith("3.")) {
       hoodieDF.write.format("org.apache.hudi.spark3.internal")
         .option(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
         .option(HoodieWriteConfig.BULKINSERT_INPUT_DATA_SCHEMA_DDL, hoodieDF.schema.toDDL)
         .options(parameters)
         .mode(SaveMode.Append)
         .save()
+    } else {
+      throw new HoodieException("Bulk insert using row writer is not supported with current Spark version."
+        + " To use row writer please switch to spark 2 or spark 3")
     }
     val hiveSyncEnabled = parameters.get(HIVE_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
     val metaSyncEnabled = parameters.get(META_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
