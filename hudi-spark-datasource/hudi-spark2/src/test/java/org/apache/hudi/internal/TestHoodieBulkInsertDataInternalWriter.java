@@ -19,6 +19,7 @@
 package org.apache.hudi.internal;
 
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator;
+import org.apache.hudi.common.util.Option;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.table.HoodieSparkTable;
 import org.apache.hudi.table.HoodieTable;
@@ -73,14 +74,14 @@ public class TestHoodieBulkInsertDataInternalWriter extends
       }
 
       BaseHoodieWriterCommitMessage commitMetadata = (BaseHoodieWriterCommitMessage) writer.commit();
-      List<String> fileAbsPaths = new ArrayList<>();
-      List<String> fileNames = new ArrayList<>();
+      Option<List<String>> fileAbsPaths = Option.of(new ArrayList<>());
+      Option<List<String>> fileNames = Option.of(new ArrayList<>());
 
       // verify write statuses
       assertWriteStatuses(commitMetadata.getWriteStatuses(), batches, size, fileAbsPaths, fileNames);
 
       // verify rows
-      Dataset<Row> result = sqlContext.read().parquet(fileAbsPaths.toArray(new String[0]));
+      Dataset<Row> result = sqlContext.read().parquet(fileAbsPaths.get().toArray(new String[0]));
       assertOutput(totalInputRows, result, instantTime, fileNames);
     }
   }
@@ -127,13 +128,13 @@ public class TestHoodieBulkInsertDataInternalWriter extends
 
     BaseHoodieWriterCommitMessage commitMetadata = (BaseHoodieWriterCommitMessage) writer.commit();
 
-    List<String> fileAbsPaths = new ArrayList<>();
-    List<String> fileNames = new ArrayList<>();
+    Option<List<String>> fileAbsPaths = Option.of(new ArrayList<>());
+    Option<List<String>> fileNames = Option.of(new ArrayList<>());
     // verify write statuses
     assertWriteStatuses(commitMetadata.getWriteStatuses(), 1, size / 2, fileAbsPaths, fileNames);
 
     // verify rows
-    Dataset<Row> result = sqlContext.read().parquet(fileAbsPaths.toArray(new String[0]));
+    Dataset<Row> result = sqlContext.read().parquet(fileAbsPaths.get().toArray(new String[0]));
     assertOutput(inputRows, result, instantTime, fileNames);
   }
 

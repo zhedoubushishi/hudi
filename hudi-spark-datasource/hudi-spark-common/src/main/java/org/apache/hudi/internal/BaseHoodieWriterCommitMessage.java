@@ -20,6 +20,7 @@ package org.apache.hudi.internal;
 
 import org.apache.hudi.client.HoodieInternalWriteStatus;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,6 +40,6 @@ public class BaseHoodieWriterCommitMessage {
 
   @Override
   public String toString() {
-    return "HoodieWriterCommitMessage{" + "writeStatuses=" + writeStatuses + '}';
+    return "HoodieWriterCommitMessage{" + "writeStatuses=" + Arrays.toString(writeStatuses.toArray()) + '}';
   }
 }

@@ -19,6 +19,7 @@
 package org.apache.hudi.internal;
 
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator;
+import org.apache.hudi.common.util.Option;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.testutils.HoodieClientTestUtils;
 
@@ -42,7 +43,7 @@ import static org.apache.hudi.testutils.SparkDatasetTestUtils.toInternalRows;
  * Unit tests {@link HoodieDataSourceInternalWriter}.
  */
 public class TestHoodieDataSourceInternalWriter extends
-    HoodieDataSourceInternalWriterTestBase {
+    HoodieBulkInsertDataInternalWriterTestBase {
 
   @Test
   public void testDataSourceWriter() throws Exception {
@@ -82,8 +83,8 @@ public class TestHoodieDataSourceInternalWriter extends
     metaClient.reloadActiveTimeline();
     Dataset<Row> result = HoodieClientTestUtils.read(jsc, basePath, sqlContext, metaClient.getFs(), partitionPathsAbs.toArray(new String[0]));
     // verify output
-    assertOutput(totalInputRows, result, instantTime);
-    assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size);
+    assertOutput(totalInputRows, result, instantTime, Option.empty());
+    assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size, Option.empty(), Option.empty());
   }
 
   @Test
@@ -125,8 +126,8 @@ public class TestHoodieDataSourceInternalWriter extends
       Dataset<Row> result = HoodieClientTestUtils.readCommit(basePath, sqlContext, metaClient.getCommitTimeline(), instantTime);
 
       // verify output
-      assertOutput(totalInputRows, result, instantTime);
-      assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size);
+      assertOutput(totalInputRows, result, instantTime, Option.empty());
+      assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size, Option.empty(), Option.empty());
     }
   }
 
@@ -169,8 +170,8 @@ public class TestHoodieDataSourceInternalWriter extends
       Dataset<Row> result = HoodieClientTestUtils.readCommit(basePath, sqlContext, metaClient.getCommitTimeline(), instantTime);
 
       // verify output
-      assertOutput(totalInputRows, result, instantTime);
-      assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size);
+      assertOutput(totalInputRows, result, instantTime, Option.empty());
+      assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size, Option.empty(), Option.empty());
     }
   }
 
@@ -220,8 +221,8 @@ public class TestHoodieDataSourceInternalWriter extends
     metaClient.reloadActiveTimeline();
     Dataset<Row> result = HoodieClientTestUtils.read(jsc, basePath, sqlContext, metaClient.getFs(), partitionPathsAbs.toArray(new String[0]));
     // verify rows
-    assertOutput(totalInputRows, result, instantTime0);
-    assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size);
+    assertOutput(totalInputRows, result, instantTime0, Option.empty());
+    assertWriteStatuses(commitMessages.get(0).getWriteStatuses(), batches, size, Option.empty(), Option.empty());
 
     // 2nd batch. abort in the end
     String instantTime1 = "00" + 1;
@@ -244,7 +245,7 @@ public class TestHoodieDataSourceInternalWriter extends
     result = HoodieClientTestUtils.read(jsc, basePath, sqlContext, metaClient.getFs(), partitionPathsAbs.toArray(new String[0]));
     // verify rows
     // only rows from first batch should be present
-    assertOutput(totalInputRows, result, instantTime0);
+    assertOutput(totalInputRows, result, instantTime0, Option.empty());
   }
 
   private void writeRows(Dataset<Row> inputRows, DataWriter<InternalRow> writer) throws Exception {

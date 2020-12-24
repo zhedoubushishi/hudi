@@ -65,8 +65,8 @@ public class HoodieDataSourceInternalWriterTestBase extends HoodieClientTestHarn
       assertEquals(writeStatus.getPartitionPath(), HoodieTestDataGenerator.DEFAULT_PARTITION_PATHS[counter % 3]);
       assertEquals(writeStatus.getTotalRecords(), size);
       assertEquals(writeStatus.getFailedRowsSize(), 0);
-      assertEquals(writeStatus.getTotalErrorRecords(), 0);
-      assertFalse(writeStatus.hasErrors());
+      assertEquals(writeStatus.getTotalErrorRecords(), 0);  // ?
+      assertFalse(writeStatus.hasErrors());   // ?
       assertNull(writeStatus.getGlobalError());
       assertNotNull(writeStatus.getFileId());
       String fileId = writeStatus.getFileId();
