@@ -38,7 +38,7 @@ import org.apache.hudi.config.HoodieBootstrapConfig.{BOOTSTRAP_BASE_PATH_PROP, B
 import org.apache.hudi.config.HoodieWriteConfig
 import org.apache.hudi.exception.HoodieException
 import org.apache.hudi.hive.{HiveSyncConfig, HiveSyncTool}
-import org.apache.hudi.internal.{HoodieDataSourceInternalWriter, HoodieDataSourceInternalWriterHelper}
+import org.apache.hudi.internal.{HoodieDataSourceInternalWriter, DataSourceInternalWriterHelper}
 import org.apache.hudi.sync.common.AbstractSyncTool
 import org.apache.log4j.LogManager
 import org.apache.spark.SPARK_VERSION
@@ -298,12 +298,12 @@ private[hudi] object HoodieSparkSqlWriter {
     val hoodieDF = HoodieDatasetBulkInsertHelper.prepareHoodieDatasetForBulkInsert(sqlContext, writeConfig, df, structName, nameSpace)
     if (SPARK_VERSION.startsWith("2.")) {
       hoodieDF.write.format("org.apache.hudi.internal")
-        .option(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
+        .option(DataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
         .options(parameters)
         .save()
     } else if (SPARK_VERSION.startsWith("3.")) {
       hoodieDF.write.format("org.apache.hudi.spark3.internal")
-        .option(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
+        .option(DataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY, instantTime)
         .option(HoodieWriteConfig.BULKINSERT_INPUT_DATA_SCHEMA_DDL, hoodieDF.schema.toDDL)
         .options(parameters)
         .mode(SaveMode.Append)

@@ -21,7 +21,7 @@ package org.apache.hudi.spark3.internal;
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.config.HoodieWriteConfig;
-import org.apache.hudi.internal.HoodieBulkInsertDataInternalWriterTestBase;
+import org.apache.hudi.internal.HoodieBulkInsertInternalWriterTestBase;
 import org.apache.hudi.table.HoodieSparkTable;
 import org.apache.hudi.table.HoodieTable;
 import org.apache.hudi.testutils.HoodieClientTestUtils;
@@ -46,7 +46,7 @@ import static org.apache.hudi.testutils.SparkDatasetTestUtils.toInternalRows;
  * Unit tests {@link HoodieDataSourceInternalBatchWrite}.
  */
 public class TestHoodieDataSourceInternalBatchWrite extends
-    HoodieBulkInsertDataInternalWriterTestBase {
+    HoodieBulkInsertInternalWriterTestBase {
 
   @Test
   public void testDataSourceWriter() throws Exception {

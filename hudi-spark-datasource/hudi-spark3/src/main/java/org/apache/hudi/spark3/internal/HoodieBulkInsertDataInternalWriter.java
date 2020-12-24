@@ -19,7 +19,7 @@
 package org.apache.hudi.spark3.internal;
 
 import org.apache.hudi.config.HoodieWriteConfig;
-import org.apache.hudi.internal.HoodieBulkInsertDataInternalWriterHelper;
+import org.apache.hudi.internal.BulkInsertDataInternalWriterHelper;
 import org.apache.hudi.table.HoodieTable;
 
 import org.apache.spark.sql.catalyst.InternalRow;
@@ -34,11 +34,11 @@ import java.io.IOException;
  */
 public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRow> {
 
-  private final HoodieBulkInsertDataInternalWriterHelper bulkInsertWriterHelper;
+  private final BulkInsertDataInternalWriterHelper bulkInsertWriterHelper;
 
   public HoodieBulkInsertDataInternalWriter(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
       String instantTime, int taskPartitionId, long taskId, StructType structType) {
-    this.bulkInsertWriterHelper = new HoodieBulkInsertDataInternalWriterHelper(hoodieTable,
+    this.bulkInsertWriterHelper = new BulkInsertDataInternalWriterHelper(hoodieTable,
         writeConfig, instantTime, taskPartitionId, taskId, 0, structType);
   }
 

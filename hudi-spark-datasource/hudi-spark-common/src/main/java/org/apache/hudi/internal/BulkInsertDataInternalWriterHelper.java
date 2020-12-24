@@ -37,9 +37,9 @@ import java.util.UUID;
 /**
  * Helper class for HoodieBulkInsertDataInternalWriter used by Spark datasource v2.
  */
-public class HoodieBulkInsertDataInternalWriterHelper {
+public class BulkInsertDataInternalWriterHelper {
 
-  private static final Logger LOG = LogManager.getLogger(HoodieBulkInsertDataInternalWriterHelper.class);
+  private static final Logger LOG = LogManager.getLogger(BulkInsertDataInternalWriterHelper.class);
 
   private final String instantTime;
   private final int taskPartitionId;
@@ -55,7 +55,7 @@ public class HoodieBulkInsertDataInternalWriterHelper {
   private String fileIdPrefix;
   private int numFilesWritten = 0;
 
-  public HoodieBulkInsertDataInternalWriterHelper(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
+  public BulkInsertDataInternalWriterHelper(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
       String instantTime, int taskPartitionId, long taskId, long taskEpochId, StructType structType) {
     this.hoodieTable = hoodieTable;
     this.writeConfig = writeConfig;

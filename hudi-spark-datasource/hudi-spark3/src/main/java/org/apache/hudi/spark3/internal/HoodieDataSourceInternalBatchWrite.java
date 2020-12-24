@@ -22,7 +22,7 @@ import org.apache.hudi.client.HoodieInternalWriteStatus;
 import org.apache.hudi.common.model.HoodieWriteStat;
 import org.apache.hudi.common.model.WriteOperationType;
 import org.apache.hudi.config.HoodieWriteConfig;
-import org.apache.hudi.internal.HoodieDataSourceInternalWriterHelper;
+import org.apache.hudi.internal.DataSourceInternalWriterHelper;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.sql.SparkSession;
@@ -45,14 +45,14 @@ public class HoodieDataSourceInternalBatchWrite implements BatchWrite {
   private final String instantTime;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
-  private final HoodieDataSourceInternalWriterHelper dataSourceInternalWriterHelper;
+  private final DataSourceInternalWriterHelper dataSourceInternalWriterHelper;
 
   public HoodieDataSourceInternalBatchWrite(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
       SparkSession jss, Configuration hadoopConfiguration) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
     this.structType = structType;
-    this.dataSourceInternalWriterHelper = new HoodieDataSourceInternalWriterHelper(instantTime, writeConfig, structType,
+    this.dataSourceInternalWriterHelper = new DataSourceInternalWriterHelper(instantTime, writeConfig, structType,
         jss, hadoopConfiguration);
   }
 

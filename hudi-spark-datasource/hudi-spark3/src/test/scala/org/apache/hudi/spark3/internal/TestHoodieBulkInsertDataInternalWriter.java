@@ -21,7 +21,7 @@ package org.apache.hudi.spark3.internal;
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.config.HoodieWriteConfig;
-import org.apache.hudi.internal.HoodieBulkInsertDataInternalWriterTestBase;
+import org.apache.hudi.internal.HoodieBulkInsertInternalWriterTestBase;
 import org.apache.hudi.table.HoodieSparkTable;
 import org.apache.hudi.table.HoodieTable;
 
@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Unit tests {@link HoodieBulkInsertDataInternalWriter}.
  */
 public class TestHoodieBulkInsertDataInternalWriter extends
-    HoodieBulkInsertDataInternalWriterTestBase {
+    HoodieBulkInsertInternalWriterTestBase {
 
   @Test
   public void testDataInternalWriter() throws Exception {

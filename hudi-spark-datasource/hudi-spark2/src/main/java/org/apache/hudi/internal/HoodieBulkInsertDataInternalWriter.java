@@ -33,12 +33,12 @@ import java.io.IOException;
  */
 public class HoodieBulkInsertDataInternalWriter implements DataWriter<InternalRow> {
 
-  private final HoodieBulkInsertDataInternalWriterHelper bulkInsertWriterHelper;
+  private final BulkInsertDataInternalWriterHelper bulkInsertWriterHelper;
 
   public HoodieBulkInsertDataInternalWriter(HoodieTable hoodieTable, HoodieWriteConfig writeConfig,
       String instantTime, int taskPartitionId, long taskId, long taskEpochId,
       StructType structType) {
-    this.bulkInsertWriterHelper = new HoodieBulkInsertDataInternalWriterHelper(hoodieTable,
+    this.bulkInsertWriterHelper = new BulkInsertDataInternalWriterHelper(hoodieTable,
         writeConfig, instantTime, taskPartitionId, taskId, taskEpochId, structType);
   }
 

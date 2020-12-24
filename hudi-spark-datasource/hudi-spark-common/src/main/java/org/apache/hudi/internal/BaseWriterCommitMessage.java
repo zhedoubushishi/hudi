@@ -26,11 +26,11 @@ import java.util.List;
 /**
  * Base class for HoodieWriterCommitMessage used by Spark datasource v2.
  */
-public class BaseHoodieWriterCommitMessage {
+public class BaseWriterCommitMessage {
 
   private List<HoodieInternalWriteStatus> writeStatuses;
 
-  public BaseHoodieWriterCommitMessage(List<HoodieInternalWriteStatus> writeStatuses) {
+  public BaseWriterCommitMessage(List<HoodieInternalWriteStatus> writeStatuses) {
     this.writeStatuses = writeStatuses;
   }
 

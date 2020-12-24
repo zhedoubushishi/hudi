@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Hoodie's {@link WriterCommitMessage} used in datasource implementation.
  */
-public class HoodieWriterCommitMessage extends BaseHoodieWriterCommitMessage
+public class HoodieWriterCommitMessage extends BaseWriterCommitMessage
     implements WriterCommitMessage {
 
   public HoodieWriterCommitMessage(List<HoodieInternalWriteStatus> writeStatuses) {

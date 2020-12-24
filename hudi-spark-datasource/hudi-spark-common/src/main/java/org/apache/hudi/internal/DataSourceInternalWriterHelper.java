@@ -45,9 +45,9 @@ import java.util.List;
 /**
  * Helper class for HoodieDataSourceInternalWriter used by Spark datasource v2.
  */
-public class HoodieDataSourceInternalWriterHelper {
+public class DataSourceInternalWriterHelper {
 
-  private static final Logger LOG = LogManager.getLogger(HoodieDataSourceInternalWriterHelper.class);
+  private static final Logger LOG = LogManager.getLogger(DataSourceInternalWriterHelper.class);
   public static final String INSTANT_TIME_OPT_KEY = "hoodie.instant.time";
 
   private final String instantTime;
@@ -56,7 +56,7 @@ public class HoodieDataSourceInternalWriterHelper {
   private final HoodieTable hoodieTable;
   private final WriteOperationType operationType;
 
-  public HoodieDataSourceInternalWriterHelper(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
+  public DataSourceInternalWriterHelper(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
       SparkSession sparkSession, Configuration configuration) {
     this.instantTime = instantTime;
     this.operationType = WriteOperationType.BULK_INSERT;

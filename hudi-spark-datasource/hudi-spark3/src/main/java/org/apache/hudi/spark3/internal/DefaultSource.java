@@ -21,7 +21,7 @@ package org.apache.hudi.spark3.internal;
 import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.internal.BaseDefaultSource;
-import org.apache.hudi.internal.HoodieDataSourceInternalWriterHelper;
+import org.apache.hudi.internal.DataSourceInternalWriterHelper;
 
 import org.apache.spark.sql.connector.catalog.Table;
 import org.apache.spark.sql.connector.catalog.TableProvider;
@@ -44,7 +44,7 @@ public class DefaultSource extends BaseDefaultSource implements TableProvider {
 
   @Override
   public Table getTable(StructType schema, Transform[] partitioning, Map<String, String> properties) {
-    String instantTime = properties.get(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY);
+    String instantTime = properties.get(DataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY);
     String path = properties.get("path");
     String tblName = properties.get(HoodieWriteConfig.TABLE_NAME);
     HoodieWriteConfig config = DataSourceUtils.createHoodieConfig(null, path, tblName, properties);

@@ -57,7 +57,7 @@ public class DefaultSource extends BaseDefaultSource implements DataSourceV2,
   @Override
   public Optional<DataSourceWriter> createWriter(String writeUUID, StructType schema, SaveMode mode,
       DataSourceOptions options) {
-    String instantTime = options.get(HoodieDataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY).get();
+    String instantTime = options.get(DataSourceInternalWriterHelper.INSTANT_TIME_OPT_KEY).get();
     String path = options.get("path").get();
     String tblName = options.get(HoodieWriteConfig.TABLE_NAME).get();
     HoodieWriteConfig config = DataSourceUtils.createHoodieConfig(null, path, tblName, options.asMap());

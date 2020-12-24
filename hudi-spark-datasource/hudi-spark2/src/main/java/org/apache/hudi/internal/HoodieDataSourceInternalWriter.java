@@ -44,14 +44,14 @@ public class HoodieDataSourceInternalWriter implements DataSourceWriter {
   private final String instantTime;
   private final HoodieWriteConfig writeConfig;
   private final StructType structType;
-  private final HoodieDataSourceInternalWriterHelper dataSourceInternalWriterHelper;
+  private final DataSourceInternalWriterHelper dataSourceInternalWriterHelper;
 
   public HoodieDataSourceInternalWriter(String instantTime, HoodieWriteConfig writeConfig, StructType structType,
                                         SparkSession sparkSession, Configuration configuration) {
     this.instantTime = instantTime;
     this.writeConfig = writeConfig;
     this.structType = structType;
-    this.dataSourceInternalWriterHelper = new HoodieDataSourceInternalWriterHelper(instantTime, writeConfig, structType,
+    this.dataSourceInternalWriterHelper = new DataSourceInternalWriterHelper(instantTime, writeConfig, structType,
         sparkSession, configuration);
   }
 

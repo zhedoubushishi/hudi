@@ -22,6 +22,7 @@ import org.apache.hudi.client.HoodieInternalWriteStatus;
 import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.model.HoodieWriteStat;
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator;
+import org.apache.hudi.common.util.Option;
 import org.apache.hudi.testutils.HoodieClientTestHarness;
 
 import org.apache.spark.sql.Dataset;
@@ -36,17 +37,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Base class for TestHoodieDataSourceInternalWriter.
+ * Base class for TestHoodieBulkInsertDataInternalWriter.
  */
-public class HoodieDataSourceInternalWriterTestBase extends HoodieClientTestHarness {
+public class HoodieBulkInsertInternalWriterTestBase extends HoodieClientTestHarness {
 
   protected static final Random RANDOM = new Random();
 
   @BeforeEach
   public void setUp() throws Exception {
-    initSparkContexts("TestHoodieDataSourceInternalWriter");
+    initSparkContexts();
     initPath();
     initFileSystem();
     initTestDataGenerator();
@@ -58,18 +60,25 @@ public class HoodieDataSourceInternalWriterTestBase extends HoodieClientTestHarn
     cleanupResources();
   }
 
-  protected void assertWriteStatuses(List<HoodieInternalWriteStatus> writeStatuses, int batches, int size) {
+  protected void assertWriteStatuses(List<HoodieInternalWriteStatus> writeStatuses, int batches, int size,
+      Option<List<String>> fileAbsPaths, Option<List<String>> fileNames) {
     assertEquals(batches, writeStatuses.size());
     int counter = 0;
     for (HoodieInternalWriteStatus writeStatus : writeStatuses) {
-      assertEquals(writeStatus.getPartitionPath(), HoodieTestDataGenerator.DEFAULT_PARTITION_PATHS[counter % 3]);
+      // verify write status
+      assertEquals(HoodieTestDataGenerator.DEFAULT_PARTITION_PATHS[counter % 3], writeStatus.getPartitionPath());
       assertEquals(writeStatus.getTotalRecords(), size);
-      assertEquals(writeStatus.getFailedRowsSize(), 0);
-      assertEquals(writeStatus.getTotalErrorRecords(), 0);  // ?
-      assertFalse(writeStatus.hasErrors());   // ?
       assertNull(writeStatus.getGlobalError());
+      assertEquals(writeStatus.getFailedRowsSize(), 0);
       assertNotNull(writeStatus.getFileId());
       String fileId = writeStatus.getFileId();
+      if (fileAbsPaths.isPresent()) {
+        fileAbsPaths.get().add(basePath + "/" + writeStatus.getStat().getPath());
+      }
+      if (fileNames.isPresent()) {
+        fileNames.get().add(writeStatus.getStat().getPath()
+            .substring(writeStatus.getStat().getPath().lastIndexOf('/') + 1));
+      }
       HoodieWriteStat writeStat = writeStatus.getStat();
       assertEquals(size, writeStat.getNumInserts());
       assertEquals(size, writeStat.getNumWrites());
@@ -81,11 +90,15 @@ public class HoodieDataSourceInternalWriterTestBase extends HoodieClientTestHarn
     }
   }
 
-  protected void assertOutput(Dataset<Row> expectedRows, Dataset<Row> actualRows, String instantTime) {
+  protected void assertOutput(Dataset<Row> expectedRows, Dataset<Row> actualRows, String instantTime, Option<List<String>> fileNames) {
     // verify 3 meta fields that are filled in within create handle
     actualRows.collectAsList().forEach(entry -> {
       assertEquals(entry.get(HoodieRecord.HOODIE_META_COLUMNS_NAME_TO_POS.get(HoodieRecord.COMMIT_TIME_METADATA_FIELD)).toString(), instantTime);
       assertFalse(entry.isNullAt(HoodieRecord.HOODIE_META_COLUMNS_NAME_TO_POS.get(HoodieRecord.FILENAME_METADATA_FIELD)));
+      if (fileNames.isPresent()) {
+        assertTrue(fileNames.get().contains(entry.get(HoodieRecord.HOODIE_META_COLUMNS_NAME_TO_POS
+            .get(HoodieRecord.FILENAME_METADATA_FIELD))));
+      }
       assertFalse(entry.isNullAt(HoodieRecord.HOODIE_META_COLUMNS_NAME_TO_POS.get(HoodieRecord.COMMIT_SEQNO_METADATA_FIELD)));
     });
 

@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Unit tests {@link HoodieBulkInsertDataInternalWriter}.
  */
 public class TestHoodieBulkInsertDataInternalWriter extends
-    HoodieBulkInsertDataInternalWriterTestBase {
+    HoodieBulkInsertInternalWriterTestBase {
 
   @Test
   public void testDataInternalWriter() throws Exception {
@@ -73,7 +73,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends
         }
       }
 
-      BaseHoodieWriterCommitMessage commitMetadata = (BaseHoodieWriterCommitMessage) writer.commit();
+      BaseWriterCommitMessage commitMetadata = (BaseWriterCommitMessage) writer.commit();
       Option<List<String>> fileAbsPaths = Option.of(new ArrayList<>());
       Option<List<String>> fileNames = Option.of(new ArrayList<>());
 
@@ -126,7 +126,7 @@ public class TestHoodieBulkInsertDataInternalWriter extends
       // expected
     }
 
-    BaseHoodieWriterCommitMessage commitMetadata = (BaseHoodieWriterCommitMessage) writer.commit();
+    BaseWriterCommitMessage commitMetadata = (BaseWriterCommitMessage) writer.commit();
 
     Option<List<String>> fileAbsPaths = Option.of(new ArrayList<>());
     Option<List<String>> fileNames = Option.of(new ArrayList<>());
