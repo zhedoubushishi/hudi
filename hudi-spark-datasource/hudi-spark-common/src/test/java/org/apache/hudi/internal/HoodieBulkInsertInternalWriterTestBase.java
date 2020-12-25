@@ -70,6 +70,8 @@ public class HoodieBulkInsertInternalWriterTestBase extends HoodieClientTestHarn
       assertEquals(writeStatus.getTotalRecords(), size);
       assertNull(writeStatus.getGlobalError());
       assertEquals(writeStatus.getFailedRowsSize(), 0);
+      assertEquals(writeStatus.getTotalErrorRecords(), 0);
+      assertFalse(writeStatus.hasErrors());
       assertNotNull(writeStatus.getFileId());
       String fileId = writeStatus.getFileId();
       if (fileAbsPaths.isPresent()) {
