@@ -207,16 +207,16 @@
     <!-- HBase -->
     <dependency>
       <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-client</artifactId>
+      <artifactId>hbase-shaded-client</artifactId>
       <version>${hbase.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-server</artifactId>
+      <artifactId>hbase-shaded-server</artifactId>
       <version>${hbase.version}</version>
-      <!-- Unfortunately, HFile is packaged ONLY under hbase-server --> 
+      <!-- Unfortunately, HFile is packaged ONLY under hbase-server -->
       <scope>compile</scope>
       <exclusions>
         <exclusion>
