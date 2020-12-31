@@ -109,10 +109,10 @@
                   <include>com.101tec:zkclient</include>
                   <include>org.apache.kafka:kafka-clients</include>
 
-                  <include>org.apache.hbase:hbase-client</include>
+                  <include>org.apache.hbase:hbase-shaded-client</include>
                   <include>org.apache.hbase:hbase-common</include>
                   <include>org.apache.hbase:hbase-protocol</include>
-                  <include>org.apache.hbase:hbase-server</include>
+                  <include>org.apache.hbase:hbase-shaded-server</include>
                   <include>org.apache.htrace:htrace-core</include>
                 </includes>
               </artifactSet>
@@ -238,12 +238,7 @@
     <!-- Hbase -->
     <dependency>
       <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-common</artifactId>
-      <version>${hbase.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-server</artifactId>
+      <artifactId>hbase-shaded-server</artifactId>
       <version>${hbase.version}</version>
       <scope>compile</scope>
       <exclusions>
@@ -267,12 +262,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-client</artifactId>
-      <version>${hbase.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-protocol</artifactId>
+      <artifactId>hbase-shaded-client</artifactId>
       <version>${hbase.version}</version>
     </dependency>
   </dependencies>
