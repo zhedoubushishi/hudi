@@ -210,6 +210,12 @@
       <artifactId>hbase-shaded-client</artifactId>
       <version>${hbase.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -229,6 +235,10 @@
         </exclusion>
         <exclusion>
           <groupId>tomcat</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
