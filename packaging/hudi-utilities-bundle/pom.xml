@@ -323,10 +323,6 @@
           <artifactId>*</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>tomcat</groupId>
           <artifactId>*</artifactId>
         </exclusion>

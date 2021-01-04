@@ -331,6 +331,10 @@
           <groupId>javax.servlet.jsp</groupId>
           <artifactId>*</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.hbase</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -344,6 +348,10 @@
         </exclusion>
         <exclusion>
           <groupId>javax.servlet.jsp</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.hbase</groupId>
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
