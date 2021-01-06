@@ -18,16 +18,16 @@
 
 mode=$1
 modules=$2
-sparkVersion=2.4.4
+sparkVersion=3.0.0
 hadoopVersion=2.7
 
 if [ "$mode" = "unit" ]; then
-  mvn clean install -DskipTests -q
+  mvn clean install -Dspark3 -DskipTests -q
   echo "Running Unit Tests"
-  mvn test -Punit-tests -pl "$modules" -B
+  mvn test -Punit-tests -Dspark3 -pl "$modules" -B
 elif [ "$mode" = "functional" ]; then
   echo "Running Functional Tests"
-  mvn test -Pfunctional-tests -B
+  mvn test -Pfunctional-tests -Dspark3 -B
 elif [ "$mode" = "integration" ]; then
   echo "Downloading Apache Spark-${sparkVersion}-bin-hadoop${hadoopVersion}"
   wget http://archive.apache.org/dist/spark/spark-${sparkVersion}/spark-${sparkVersion}-bin-hadoop${hadoopVersion}.tgz -O /tmp/spark-${sparkVersion}.tgz
