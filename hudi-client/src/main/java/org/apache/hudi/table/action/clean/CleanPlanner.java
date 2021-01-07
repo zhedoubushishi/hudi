@@ -18,8 +18,12 @@
 
 package org.apache.hudi.table.action.clean;
 
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hudi.avro.model.HoodieCleanMetadata;
 import org.apache.hudi.avro.model.HoodieSavepointMetadata;
+import org.apache.hudi.common.config.SerializableConfiguration;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.model.CleanFileInfo;
 import org.apache.hudi.common.model.CompactionOperation;
@@ -29,8 +33,10 @@ import org.apache.hudi.common.model.HoodieCleaningPolicy;
 import org.apache.hudi.common.model.HoodieCommitMetadata;
 import org.apache.hudi.common.model.HoodieFileGroup;
 import org.apache.hudi.common.model.HoodieFileGroupId;
+import org.apache.hudi.common.model.HoodiePartitionMetadata;
 import org.apache.hudi.common.model.HoodieRecordPayload;
 import org.apache.hudi.common.model.HoodieTableType;
+import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.apache.hudi.common.table.timeline.HoodieInstant;
 import org.apache.hudi.common.table.timeline.HoodieTimeline;
 import org.apache.hudi.common.table.timeline.TimelineMetadataUtils;
@@ -45,12 +51,15 @@ import org.apache.hudi.exception.HoodieSavepointException;
 import org.apache.hudi.table.HoodieTable;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaSparkContext;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,6 +85,7 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
   private final Map<HoodieFileGroupId, CompactionOperation> fgIdToPendingCompactionOperations;
   private HoodieTable<T> hoodieTable;
   private HoodieWriteConfig config;
+  private transient JavaSparkContext jsc;
 
   public CleanPlanner(HoodieTable<T> hoodieTable, HoodieWriteConfig config) {
     this.hoodieTable = hoodieTable;
@@ -88,6 +98,11 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
                 new HoodieFileGroupId(entry.getValue().getPartitionPath(), entry.getValue().getFileId()),
                 entry.getValue()))
             .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+  }
+
+  public CleanPlanner(HoodieTable<T> hoodieTable, HoodieWriteConfig config, JavaSparkContext jsc) {
+    this(hoodieTable, config);
+    this.jsc = jsc;
   }
 
   /**
@@ -186,8 +201,48 @@ public class CleanPlanner<T extends HoodieRecordPayload<T>> implements Serializa
    */
   private List<String> getPartitionPathsForFullCleaning() throws IOException {
     // Go to brute force mode of scanning all partitions
-    return FSUtils.getAllPartitionPaths(hoodieTable.getMetaClient().getFs(), hoodieTable.getMetaClient().getBasePath(),
-        config.shouldAssumeDatePartitioning());
+    if (config.shouldAssumeDatePartitioning()) {
+      return FSUtils.getAllPartitionFoldersThreeLevelsDown(hoodieTable.getMetaClient().getFs(), hoodieTable.getMetaClient().getBasePath());
+    }
+
+    Path tableBasePath = new Path(config.getBasePath());
+    List<String> allPartitionPaths = new ArrayList<>();
+    List<Path> pathsToList = new LinkedList<>();
+    pathsToList.add(tableBasePath);
+
+    final int fileListingParallelism = config.getFileListingParallelism();
+    SerializableConfiguration conf = new SerializableConfiguration(hoodieTable.getHadoopConf());
+
+    while (!pathsToList.isEmpty()) {
+      int listingParallelism = Math.min(fileListingParallelism, pathsToList.size());
+      // List all directories in parallel
+      List<Pair<Path, FileStatus[]>> dirToFileListing = jsc.parallelize(pathsToList, listingParallelism)
+          .map(path -> {
+            FileSystem fs = path.getFileSystem(conf.get());
+            return Pair.of(path, fs.listStatus(path));
+          }).collect();
+      pathsToList.clear();
+
+      // If the listing reveals a directory, add it to queue. If the listing reveals a hoodie partition, add it to
+      // the results.
+      dirToFileListing.forEach(p -> {
+        List<FileStatus> filesInDir = Arrays.stream(p.getRight()).parallel()
+            .filter(fs -> !fs.getPath().getName().equals(HoodiePartitionMetadata.HOODIE_PARTITION_METAFILE))
+            .collect(Collectors.toList());
+
+        if (p.getRight().length > filesInDir.size()) {
+          // Is a partition. Add all data files to result.
+          allPartitionPaths.add(FSUtils.getRelativePartitionPath(tableBasePath, p.getLeft()));
+        } else {
+          // Add sub-dirs to the queue
+          pathsToList.addAll(Arrays.stream(p.getRight())
+              .filter(fs -> fs.isDirectory() && !fs.getPath().getName().equals(HoodieTableMetaClient.METAFOLDER_NAME))
+              .map(fs -> fs.getPath())
+              .collect(Collectors.toList()));
+        }
+      });
+    }
+    return allPartitionPaths;
   }
 
   /**

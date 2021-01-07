@@ -71,7 +71,7 @@ public class CleanActionExecutor extends BaseActionExecutor<HoodieCleanMetadata>
    */
   HoodieCleanerPlan requestClean(JavaSparkContext jsc) {
     try {
-      CleanPlanner<?> planner = new CleanPlanner<>(table, config);
+      CleanPlanner<?> planner = new CleanPlanner<>(table, config, jsc);
       Option<HoodieInstant> earliestInstant = planner.getEarliestCommitToRetain();
       List<String> partitionsToClean = planner.getPartitionPathsToClean(earliestInstant);
 
