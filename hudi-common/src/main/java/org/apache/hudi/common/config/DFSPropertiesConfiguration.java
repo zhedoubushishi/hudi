@@ -18,12 +18,14 @@
 
 package org.apache.hudi.common.config;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
@@ -43,73 +45,92 @@ public class DFSPropertiesConfiguration {
 
   private static final Logger LOG = LogManager.getLogger(DFSPropertiesConfiguration.class);
 
-  private final FileSystem fs;
+  private static final String DEFAULT_PROPERTIES_FILE = "hudi-defaults.conf";
 
-  private final Path rootFile;
+  public static final String CONF_FILE_DIR_ENV_NAME = "HUDI_CONF_DIR";
 
-  private final TypedProperties props;
+  // props read from hudi-defaults.conf
+  private static final TypedProperties GLOBAL_PROPS = loadGlobalProps();
+
+  // props read from user defined configuration file or input stream
+  private final TypedProperties externalProps;
 
   // Keep track of files visited, to detect loops
-  private final Set<String> visitedFiles;
+  private final Set<String> visitedFilePaths;
 
-  public DFSPropertiesConfiguration(FileSystem fs, Path rootFile, TypedProperties defaults) {
+  private FileSystem fs;
+
+  private Path currentFilePath;
+
+  public DFSPropertiesConfiguration(FileSystem fs, Path filePath) {
+    this.externalProps = new TypedProperties();
+    this.visitedFilePaths = new HashSet<>();
     this.fs = fs;
-    this.rootFile = rootFile;
-    this.props = defaults;
-    this.visitedFiles = new HashSet<>();
-    visitFile(rootFile);
-  }
-
-  public DFSPropertiesConfiguration(FileSystem fs, Path rootFile) {
-    this(fs, rootFile, new TypedProperties());
+    this.currentFilePath = filePath;
+    addPropsFromFile(filePath);
   }
 
   public DFSPropertiesConfiguration() {
+    this.externalProps = new TypedProperties();
+    this.visitedFilePaths = new HashSet<>();
     this.fs = null;
-    this.rootFile = null;
-    this.props = new TypedProperties();
-    this.visitedFiles = new HashSet<>();
+    this.currentFilePath = null;
   }
 
-  private String[] splitProperty(String line) {
-    int ind = line.indexOf('=');
-    String k = line.substring(0, ind).trim();
-    String v = line.substring(ind + 1).trim();
-    return new String[] {k, v};
+  /**
+   * Load global props from hudi-defaults.conf which is under CONF_FILE_DIR_ENV_NAME.
+   * @return TypedProperties
+   */
+  public static TypedProperties loadGlobalProps() {
+    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
+    Path defaultConfPath = getDefaultConfPath();
+    if (defaultConfPath != null) {
+      conf.addPropsFromFile(defaultConfPath);
+    }
+    return conf.getConfig();
   }
 
-  private void visitFile(Path file) {
+  /**
+   * Add properties from external configuration files.
+   *
+   * @param filePath File path for configuration file
+   */
+  public void addPropsFromFile(Path filePath) {
     try {
-      if (visitedFiles.contains(file.getName())) {
-        throw new IllegalStateException("Loop detected; file " + file + " already referenced");
+      if (visitedFilePaths.contains(filePath.toString())) {
+        throw new IllegalStateException("Loop detected; file " + filePath + " already referenced");
       }
-      visitedFiles.add(file.getName());
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(file)));
-      addProperties(reader);
+      visitedFilePaths.add(filePath.toString());
+      currentFilePath = filePath;
+      FileSystem fileSystem = fs != null ? fs : filePath.getFileSystem(new Configuration());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(filePath)));
+      addPropsFromInputStream(reader);
     } catch (IOException ioe) {
-      LOG.error("Error reading in properies from dfs", ioe);
+      LOG.error("Error reading in properties from dfs", ioe);
       throw new IllegalArgumentException("Cannot read properties from dfs", ioe);
     }
   }
 
   /**
    * Add properties from input stream.
-   * 
+   *
    * @param reader Buffered Reader
    * @throws IOException
    */
-  public void addProperties(BufferedReader reader) throws IOException {
+  public void addPropsFromInputStream(BufferedReader reader) throws IOException {
     try {
       String line;
       while ((line = reader.readLine()) != null) {
-        if (line.startsWith("#") || line.equals("") || !line.contains("=")) {
+        if (!isValidLine(line)) {
           continue;
         }
+        // System.out.println("wenningd => " + line);
         String[] split = splitProperty(line);
         if (line.startsWith("include=") || line.startsWith("include =")) {
-          visitFile(new Path(rootFile.getParent(), split[1]));
+          Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
+          addPropsFromFile(includeFilePath);
         } else {
-          props.setProperty(split[0], split[1]);
+          externalProps.setProperty(split[0], split[1]);
         }
       }
     } finally {
@@ -117,7 +138,51 @@ public class DFSPropertiesConfiguration {
     }
   }
 
+  /**
+   * Return user specific configs(external config files/input stream).
+   * Also includes global configs if they are not included in the user specific configs
+   * @return Typed Properties
+   */
+  public TypedProperties getGlobalAndExternalConfig() {
+    if (GLOBAL_PROPS.isEmpty()) {
+      return externalProps;
+    }
+    TypedProperties mergedProps = new TypedProperties();
+    mergedProps.putAll(GLOBAL_PROPS);
+    mergedProps.putAll(externalProps);
+    return mergedProps;
+  }
+
+  public static TypedProperties getGlobalConfig() {
+    return GLOBAL_PROPS;
+  }
+
   public TypedProperties getConfig() {
-    return props;
+    return externalProps;
+  }
+
+  private static Path getDefaultConfPath() {
+    String confDir = System.getenv(CONF_FILE_DIR_ENV_NAME);
+    if (confDir == null) {
+      LOG.warn("Cannot find " + CONF_FILE_DIR_ENV_NAME + ", please set it as the dir of " + DEFAULT_PROPERTIES_FILE);
+      return null;
+    }
+    return new Path(confDir + File.separator + DEFAULT_PROPERTIES_FILE);
+  }
+
+  private String[] splitProperty(String line) {
+    line = line.replaceAll("\\s+"," ");
+    String delimiter = line.contains("=") ? "=" : " ";
+    int ind = line.indexOf(delimiter);
+    String k = line.substring(0, ind).trim();
+    String v = line.substring(ind + 1).trim();
+    return new String[] {k, v};
+  }
+
+  private boolean isValidLine(String line) {
+    if (line.startsWith("#") || line.equals("")) {
+      return false;
+    }
+    return line.contains("=") || line.matches(".*\\s.*");
   }
 }
