@@ -19,6 +19,7 @@
 package org.apache.hudi.streamer;
 
 import org.apache.hudi.client.WriteStatus;
+import org.apache.hudi.common.config.DFSPropertiesConfiguration;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.config.HoodieWriteConfig;
@@ -73,7 +74,9 @@ public class HoodieFlinkStreamer {
     Configuration conf = FlinkOptions.fromStreamerConfig(cfg);
     int numWriteTask = conf.getInteger(FlinkOptions.WRITE_TASKS);
 
-    TypedProperties props = StreamerUtil.appendKafkaProps(cfg);
+    TypedProperties props = new TypedProperties();
+    props.putAll(DFSPropertiesConfiguration.getGlobalConfig());
+    props.putAll(StreamerUtil.appendKafkaProps(cfg));
 
     // add data source config
     props.put(HoodieWriteConfig.WRITE_PAYLOAD_CLASS, cfg.payloadClassName);
