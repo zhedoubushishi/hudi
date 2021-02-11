@@ -47,5 +47,4 @@ public class DefaultHoodieConfig implements Serializable {
   public Properties getProps() {
     return props;
   }
-
 }

@@ -22,6 +22,7 @@ import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.client.WriteStatus;
 import org.apache.hudi.client.common.HoodieSparkEngineContext;
 import org.apache.hudi.common.HoodieJsonPayload;
+import org.apache.hudi.common.config.DFSPropertiesConfiguration;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.engine.HoodieEngineContext;
 import org.apache.hudi.common.fs.FSUtils;
@@ -81,6 +82,7 @@ public class HDFSParquetImporter implements Serializable {
 
   public HDFSParquetImporter(Config cfg) {
     this.cfg = cfg;
+    this.props = DFSPropertiesConfiguration.getGlobalConfig();
   }
 
   public static void main(String[] args) {
@@ -107,8 +109,11 @@ public class HDFSParquetImporter implements Serializable {
 
   public int dataImport(JavaSparkContext jsc, int retry) {
     this.fs = FSUtils.getFs(cfg.targetPath, jsc.hadoopConfiguration());
-    this.props = cfg.propsFilePath == null ? UtilHelpers.buildProperties(cfg.configs)
-        : UtilHelpers.readConfig(fs, new Path(cfg.propsFilePath), cfg.configs).getConfig();
+    if (cfg.propsFilePath == null) {
+      this.props.putAll(UtilHelpers.buildProperties(cfg.configs));
+    } else {
+      this.props.putAll(UtilHelpers.readConfig(fs, new Path(cfg.propsFilePath), cfg.configs).getConfig());
+    }
     LOG.info("Starting data import with configs : " + props.toString());
     int ret = -1;
     try {

@@ -22,6 +22,7 @@ import org.apache.hudi.DataSourceUtils;
 import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.client.common.HoodieSparkEngineContext;
+import org.apache.hudi.common.config.DFSPropertiesConfiguration;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.table.HoodieTableConfig;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
@@ -107,7 +108,8 @@ public class BootstrapExecutor  implements Serializable {
     this.jssc = jssc;
     this.fs = fs;
     this.configuration = conf;
-    this.props = properties;
+    this.props = DFSPropertiesConfiguration.getGlobalConfig();
+    this.props.putAll(properties);
 
     ValidationUtils.checkArgument(properties.containsKey(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH),
         HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH + " must be specified.");
