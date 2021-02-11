@@ -293,6 +293,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
+          <trimStackTrace>false</trimStackTrace>
           <argLine>@{argLine}</argLine>
           <systemPropertyVariables>
             <log4j.configuration>
@@ -1068,6 +1069,7 @@
             </dependencies>
             <configuration combine.self="append">
               <skip>${skipUTs}</skip>
+              <trimStackTrace>false</trimStackTrace>
               <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
               <excludedGroups>functional</excludedGroups>
               <excludes>
@@ -1121,6 +1123,7 @@
               </dependency>
             </dependencies>
             <configuration combine.self="append">
+              <trimStackTrace>false</trimStackTrace>
               <skip>${skipFTs}</skip>
               <forkCount>1</forkCount>
               <reuseForks>true</reuseForks>
@@ -1173,6 +1176,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration combine.self="override">
+              <trimStackTrace>false</trimStackTrace>
               <skip>${skipITs}</skip>
               <includes>
                 <include>**/IT*.java</include>

@@ -156,18 +156,17 @@ public class UtilHelpers {
    *
    */
   public static DFSPropertiesConfiguration readConfig(FileSystem fs, Path cfgPath, List<String> overriddenProps) {
-    DFSPropertiesConfiguration conf;
+    DFSPropertiesConfiguration conf = DFSPropertiesConfiguration.getInstance();
     try {
-      conf = new DFSPropertiesConfiguration(cfgPath.getFileSystem(fs.getConf()), cfgPath);
+      conf.addPropsFromFile(cfgPath.getFileSystem(fs.getConf()), cfgPath);
     } catch (Exception e) {
-      conf = new DFSPropertiesConfiguration();
       LOG.warn("Unexpected error read props file at :" + cfgPath, e);
     }
 
     try {
       if (!overriddenProps.isEmpty()) {
         LOG.info("Adding overridden properties to file properties.");
-        conf.addProperties(new BufferedReader(new StringReader(String.join("\n", overriddenProps))));
+        conf.addPropsFromInputStream(new BufferedReader(new StringReader(String.join("\n", overriddenProps))));
       }
     } catch (IOException ioe) {
       throw new HoodieIOException("Unexpected error adding config overrides", ioe);
@@ -177,11 +176,11 @@ public class UtilHelpers {
   }
 
   public static DFSPropertiesConfiguration getConfig(List<String> overriddenProps) {
-    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
+    DFSPropertiesConfiguration conf = DFSPropertiesConfiguration.getInstance();
     try {
       if (!overriddenProps.isEmpty()) {
         LOG.info("Adding overridden properties to file properties.");
-        conf.addProperties(new BufferedReader(new StringReader(String.join("\n", overriddenProps))));
+        conf.addPropsFromInputStream(new BufferedReader(new StringReader(String.join("\n", overriddenProps))));
       }
     } catch (IOException ioe) {
       throw new HoodieIOException("Unexpected error adding config overrides", ioe);
