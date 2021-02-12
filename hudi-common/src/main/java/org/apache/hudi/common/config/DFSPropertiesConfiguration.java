@@ -18,6 +18,7 @@
 
 package org.apache.hudi.common.config;
 
+import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -48,25 +49,31 @@ public class DFSPropertiesConfiguration {
   private static final String DEFAULT_PROPERTIES_FILE = "hudi-defaults.conf";
 
   // singleton mode
-  private static final DFSPropertiesConfiguration INSTANCE = new DFSPropertiesConfiguration();
-
-  private TypedProperties externalProps;
+  // private static final DFSPropertiesConfiguration INSTANCE = new DFSPropertiesConfiguration();
+  private static TypedProperties defaultFileProps = null;
+  private static boolean loadDefaultFileProps = false;
+  private TypedProperties externalProps = null;
 
   // Keep track of files visited, to detect loops
   private Set<String> visitedFiles;
 
   private Path currentFilePath;  // TODO get last element of visitedFiles
 
-  private DFSPropertiesConfiguration() {
+  public DFSPropertiesConfiguration() {
     this.externalProps = new TypedProperties();
     this.visitedFiles = new HashSet<>();
     this.currentFilePath = null;
-    addPropsFromDefaultConfigFile();
+    if (!loadDefaultFileProps) {
+      addPropsFromDefaultConfigFile();
+      loadDefaultFileProps = true;
+    }
   }
 
+  /*
   public static DFSPropertiesConfiguration getInstance() {
     return INSTANCE;
   }
+   */
 
   private String[] splitProperty(String line) {
     line = line.trim();
@@ -84,12 +91,31 @@ public class DFSPropertiesConfiguration {
     }
   }
 
+  public void addPropsFromFile(FileSystem fs, Path filePath, Properties props) {
+    try {
+      if (visitedFiles.contains(filePath.getName())) {   // TODO name is not enough
+        LOG.info(filePath + " already referenced, skipped");
+        return;
+        // throw new IllegalStateException("Loop detected; file " + file + " already referenced");
+      }
+      currentFilePath = filePath;
+      visitedFiles.add(filePath.getName());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(filePath)));
+      addPropsFromInputStream(reader, props);
+    } catch (IOException ioe) {
+      LOG.error("Error reading in properties from dfs", ioe);
+      throw new IllegalArgumentException("Cannot read properties from dfs", ioe);
+    }
+  }
+
   /**
    * Add properties from external configuration files.
    *
    * @param filePath File path for configuration file
    */
   public void addPropsFromFile(FileSystem fs, Path filePath) {
+    addPropsFromFile(fs, filePath, externalProps);
+    /*
     try {
       if (visitedFiles.contains(filePath.getName())) {   // TODO name is not enough
         LOG.info(filePath + " already referenced, skipped");
@@ -104,15 +130,39 @@ public class DFSPropertiesConfiguration {
       LOG.error("Error reading in properties from dfs", ioe);
       throw new IllegalArgumentException("Cannot read properties from dfs", ioe);
     }
+     */
+  }
+
+  public void addPropsFromInputStream(BufferedReader reader, Properties props) throws IOException {
+    try {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        if (!isValidLine(line)) {
+          continue;
+        }
+        System.out.println("wenningd => " + line);
+        String[] split = splitProperty(line);
+        if (line.startsWith("include=") || line.startsWith("include =")) {
+          Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
+          addPropsFromFile(includeFilePath.getFileSystem(new Configuration()), includeFilePath);
+        } else {
+          props.setProperty(split[0], split[1]);
+        }
+      }
+    } finally {
+      reader.close();
+    }
   }
 
   /**
    * Add properties from input stream.
-   * 
+   *
    * @param reader Buffered Reader
    * @throws IOException
    */
   public void addPropsFromInputStream(BufferedReader reader) throws IOException {
+    addPropsFromInputStream(reader, externalProps);
+    /*
     try {
       String line;
       while ((line = reader.readLine()) != null) {
@@ -131,10 +181,17 @@ public class DFSPropertiesConfiguration {
     } finally {
       reader.close();
     }
+     */
   }
 
   public TypedProperties getConfig() {
-    return externalProps;
+    if (defaultFileProps == null) {
+      return externalProps;
+    }
+    TypedProperties merged = new TypedProperties();
+    merged.putAll(defaultFileProps);
+    merged.putAll(externalProps);
+    return merged;
   }
 
   private Path getDefaultConfPath() throws IOException {
@@ -146,11 +203,13 @@ public class DFSPropertiesConfiguration {
     return new Path(confDir + File.separator + DEFAULT_PROPERTIES_FILE);
   }
 
+  /*
   public void clean() {
     externalProps = new TypedProperties();
     visitedFiles = new HashSet<>();
     currentFilePath = null;
   }
+   */
 
   private boolean isValidLine(String line) {
     if (line.startsWith("#") || line.equals("")) {

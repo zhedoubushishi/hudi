@@ -91,7 +91,7 @@ public class StreamerUtil {
    * Read config from properties file (`--props` option) and cmd line (`--hoodie-conf` option).
    */
   public static DFSPropertiesConfiguration readConfig(FileSystem fs, Path cfgPath, List<String> overriddenProps) {
-    DFSPropertiesConfiguration conf = DFSPropertiesConfiguration.getInstance();
+    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
     try {
       conf.addPropsFromFile(cfgPath.getFileSystem(fs.getConf()), cfgPath);
     } catch (Exception e) {

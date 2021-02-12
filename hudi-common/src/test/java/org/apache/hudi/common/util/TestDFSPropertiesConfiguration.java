@@ -46,7 +46,6 @@ public class TestDFSPropertiesConfiguration {
   private static HdfsTestService hdfsTestService;
   private static MiniDFSCluster dfsCluster;
   private static DistributedFileSystem dfs;
-  private static DFSPropertiesConfiguration cfg;
 
   @BeforeAll
   public static void initClass() throws Exception {
@@ -78,7 +77,6 @@ public class TestDFSPropertiesConfiguration {
     if (hdfsTestService != null) {
       hdfsTestService.stop();
     }
-    cfg.clean();
   }
 
   private static void writePropertiesFile(Path path, String[] lines) throws IOException {
@@ -92,7 +90,7 @@ public class TestDFSPropertiesConfiguration {
 
   @Test
   public void testParsing() {
-    cfg = DFSPropertiesConfiguration.getInstance();
+    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
     cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t1.props"));
     TypedProperties props = cfg.getConfig();
     assertEquals(5, props.size());
@@ -121,7 +119,7 @@ public class TestDFSPropertiesConfiguration {
 
   @Test
   public void testIncludes() {
-    cfg = DFSPropertiesConfiguration.getInstance();
+    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
     cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t3.props"));
     TypedProperties props = cfg.getConfig();
 

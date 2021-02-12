@@ -156,7 +156,7 @@ public class UtilHelpers {
    *
    */
   public static DFSPropertiesConfiguration readConfig(FileSystem fs, Path cfgPath, List<String> overriddenProps) {
-    DFSPropertiesConfiguration conf = DFSPropertiesConfiguration.getInstance();
+    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
     try {
       conf.addPropsFromFile(cfgPath.getFileSystem(fs.getConf()), cfgPath);
     } catch (Exception e) {
@@ -176,7 +176,7 @@ public class UtilHelpers {
   }
 
   public static DFSPropertiesConfiguration getConfig(List<String> overriddenProps) {
-    DFSPropertiesConfiguration conf = DFSPropertiesConfiguration.getInstance();
+    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
     try {
       if (!overriddenProps.isEmpty()) {
         LOG.info("Adding overridden properties to file properties.");
