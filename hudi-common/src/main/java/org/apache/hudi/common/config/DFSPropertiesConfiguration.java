@@ -119,6 +119,7 @@ public class DFSPropertiesConfiguration {
         if (!isValidLine(line)) {
           continue;
         }
+        System.out.println("wenningd => " + line);
         String[] split = splitProperty(line);
         if (line.startsWith("include=") || line.startsWith("include =")) {
           Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
