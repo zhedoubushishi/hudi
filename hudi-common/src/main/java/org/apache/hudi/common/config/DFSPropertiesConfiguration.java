@@ -18,7 +18,6 @@
 
 package org.apache.hudi.common.config;
 
-import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -30,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -50,10 +50,11 @@ public class DFSPropertiesConfiguration {
 
   // singleton mode
   // private static final DFSPropertiesConfiguration INSTANCE = new DFSPropertiesConfiguration();
-  private static TypedProperties defaultFileProps = null;
-  private static boolean loadDefaultFileProps = false;
-  private TypedProperties externalProps = null;
+  private static TypedProperties defaultFileProps = new TypedProperties();
 
+  private static boolean loadDefaultFileProps = false;
+
+  private TypedProperties externalProps;
   // Keep track of files visited, to detect loops
   private Set<String> visitedFiles;
 
@@ -78,14 +79,18 @@ public class DFSPropertiesConfiguration {
   private String[] splitProperty(String line) {
     line = line.trim();
     String delimiter = line.contains("=") ? "=" : "\\s+";
-    return new String[] { line.split(delimiter)[0].trim(), line.split(delimiter)[1].trim()};
+    int ind = line.indexOf(delimiter);
+    String k = line.substring(0, ind).trim();
+    String v = line.substring(ind + 1).trim();
+    return new String[] {k, v};
+    // return new String[] { line.split(delimiter)[0].trim(), line.split(delimiter)[1].trim()};
   }
 
-  public void addPropsFromDefaultConfigFile() {
+  private void addPropsFromDefaultConfigFile() {
     try {
       Path defaultConfPath = getDefaultConfPath();
       FileSystem fs = defaultConfPath.getFileSystem(new Configuration());
-      addPropsFromFile(fs, defaultConfPath);
+      addPropsFromFile(fs, defaultConfPath, defaultFileProps);
     } catch (IOException e) {
       LOG.warn("Failed to load properties from " + DEFAULT_PROPERTIES_FILE);
     }
@@ -140,7 +145,7 @@ public class DFSPropertiesConfiguration {
         if (!isValidLine(line)) {
           continue;
         }
-        System.out.println("wenningd => " + line);
+        // System.out.println("wenningd => " + line);
         String[] split = splitProperty(line);
         if (line.startsWith("include=") || line.startsWith("include =")) {
           Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
@@ -185,7 +190,7 @@ public class DFSPropertiesConfiguration {
   }
 
   public TypedProperties getConfig() {
-    if (defaultFileProps == null) {
+    if (defaultFileProps.isEmpty()) {
       return externalProps;
     }
     TypedProperties merged = new TypedProperties();

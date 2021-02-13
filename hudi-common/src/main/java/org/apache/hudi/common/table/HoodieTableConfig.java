@@ -19,6 +19,7 @@
 package org.apache.hudi.common.table;
 
 import org.apache.hudi.common.bootstrap.index.HFileBootstrapIndex;
+import org.apache.hudi.common.config.DFSPropertiesConfiguration;
 import org.apache.hudi.common.model.HoodieFileFormat;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.model.OverwriteWithLatestAvroPayload;
@@ -27,7 +28,7 @@ import org.apache.hudi.common.util.Option;
 import org.apache.hudi.common.util.ValidationUtils;
 import org.apache.hudi.exception.HoodieIOException;
 
-import org.apache.hadoop.fs.FSDataInputStream;
+//import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -81,13 +82,18 @@ public class HoodieTableConfig implements Serializable {
   private Properties props;
 
   public HoodieTableConfig(FileSystem fs, String metaPath, String payloadClassName) {
-    Properties props = new Properties();
+    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
+    // Properties props = new Properties();
     Path propertyPath = new Path(metaPath, HOODIE_PROPERTIES_FILE);
     LOG.info("Loading table properties from " + propertyPath);
+    cfg.addPropsFromFile(fs, propertyPath);
+    Properties props = cfg.getConfig();
     try {
+      /*
       try (FSDataInputStream inputStream = fs.open(propertyPath)) {
         props.load(inputStream);
       }
+       */
       if (props.containsKey(HOODIE_PAYLOAD_CLASS_PROP_NAME) && payloadClassName != null
           && !props.getProperty(HOODIE_PAYLOAD_CLASS_PROP_NAME).equals(payloadClassName)) {
         props.setProperty(HOODIE_PAYLOAD_CLASS_PROP_NAME, payloadClassName);
