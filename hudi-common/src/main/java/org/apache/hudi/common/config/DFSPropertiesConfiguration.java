@@ -48,7 +48,7 @@ public class DFSPropertiesConfiguration {
 
   private static final String DEFAULT_PROPERTIES_FILE = "hudi-defaults.conf";
 
-  private static final String CONF_FILE_DIR_ENV_NAME = ""
+  public static final String CONF_FILE_DIR_ENV_NAME = "HUDI_CONF_DIR";
 
   // singleton mode
   // private static final DFSPropertiesConfiguration INSTANCE = new DFSPropertiesConfiguration();
@@ -87,7 +87,7 @@ public class DFSPropertiesConfiguration {
     return new String[] {k, v};
   }
 
-  private void addPropsFromDefaultConfigFile() {
+  public void addPropsFromDefaultConfigFile() {
     try {
       Path defaultConfPath = getDefaultConfPath();
       FileSystem fs = defaultConfPath.getFileSystem(new Configuration());
@@ -99,13 +99,14 @@ public class DFSPropertiesConfiguration {
 
   public void addPropsFromFile(FileSystem fs, Path filePath, Properties props) {
     try {
-      if (visitedFiles.contains(filePath.getName())) {   // TODO name is not enough
+      if (visitedFiles.contains(filePath.toString())) {   // TODO name is not enough
         LOG.info(filePath + " already referenced, skipped");
         return;
         // throw new IllegalStateException("Loop detected; file " + file + " already referenced");
       }
       currentFilePath = filePath;
-      visitedFiles.add(filePath.getName());
+      // filePath.toUri().getRawPath()
+      visitedFiles.add(filePath.toString());
       BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(filePath)));
       addPropsFromInputStream(reader, props);
     } catch (IOException ioe) {
@@ -121,22 +122,6 @@ public class DFSPropertiesConfiguration {
    */
   public void addPropsFromFile(FileSystem fs, Path filePath) {
     addPropsFromFile(fs, filePath, externalProps);
-    /*
-    try {
-      if (visitedFiles.contains(filePath.getName())) {   // TODO name is not enough
-        LOG.info(filePath + " already referenced, skipped");
-        return;
-        // throw new IllegalStateException("Loop detected; file " + file + " already referenced");
-      }
-      currentFilePath = filePath;
-      visitedFiles.add(filePath.getName());
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(filePath)));
-      addPropsFromInputStream(reader);
-    } catch (IOException ioe) {
-      LOG.error("Error reading in properties from dfs", ioe);
-      throw new IllegalArgumentException("Cannot read properties from dfs", ioe);
-    }
-     */
   }
 
   public void addPropsFromInputStream(BufferedReader reader, Properties props) throws IOException {
@@ -168,26 +153,6 @@ public class DFSPropertiesConfiguration {
    */
   public void addPropsFromInputStream(BufferedReader reader) throws IOException {
     addPropsFromInputStream(reader, externalProps);
-    /*
-    try {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (!isValidLine(line)) {
-          continue;
-        }
-        System.out.println("wenningd => " + line);
-        String[] split = splitProperty(line);
-        if (line.startsWith("include=") || line.startsWith("include =")) {
-          Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
-          addPropsFromFile(includeFilePath.getFileSystem(new Configuration()), includeFilePath);
-        } else {
-          externalProps.setProperty(split[0], split[1]);
-        }
-      }
-    } finally {
-      reader.close();
-    }
-     */
   }
 
   public TypedProperties getConfig() {
@@ -201,21 +166,13 @@ public class DFSPropertiesConfiguration {
   }
 
   private Path getDefaultConfPath() throws IOException {
-    String confDir = System.getenv("HUDI_CONF_DIR");
+    String confDir = System.getenv(CONF_FILE_DIR_ENV_NAME);
     if (confDir == null) {
-      LOG.warn("Cannot find HUDI_CONF_DIR, please set it as the dir of " + DEFAULT_PROPERTIES_FILE);
-      throw new IOException("HUDI_CONF_DIR is not set");
+      LOG.warn("Cannot find " + CONF_FILE_DIR_ENV_NAME + ", please set it as the dir of " + DEFAULT_PROPERTIES_FILE);
+      throw new IOException(CONF_FILE_DIR_ENV_NAME + " is not set");
     }
     return new Path(confDir + File.separator + DEFAULT_PROPERTIES_FILE);
   }
-
-  /*
-  public void clean() {
-    externalProps = new TypedProperties();
-    visitedFiles = new HashSet<>();
-    currentFilePath = null;
-  }
-   */
 
   private boolean isValidLine(String line) {
     if (line.startsWith("#") || line.equals("")) {
