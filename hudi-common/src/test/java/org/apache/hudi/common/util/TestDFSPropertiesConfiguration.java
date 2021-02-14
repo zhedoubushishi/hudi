@@ -25,10 +25,13 @@ import org.apache.hudi.common.testutils.minicluster.HdfsTestService;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.junit.Rule;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -46,6 +49,10 @@ public class TestDFSPropertiesConfiguration {
   private static HdfsTestService hdfsTestService;
   private static MiniDFSCluster dfsCluster;
   private static DistributedFileSystem dfs;
+
+  @Rule
+  public static final EnvironmentVariables ENVIRONMENT_VARIABLES
+      = new EnvironmentVariables();
 
   @BeforeAll
   public static void initClass() throws Exception {
@@ -70,6 +77,10 @@ public class TestDFSPropertiesConfiguration {
 
     filePath = new Path(dfsBasePath + "/t4.props");
     writePropertiesFile(filePath, new String[] {"double.prop=838.3", "include = t4.props"});
+
+    // String testPropsFilePath = TestDFSPropertiesConfiguration.class.getClassLoader().getResource("hudi-defaults.conf").getPath();
+    String testPropsFilePath = new File("src/test/resources").getAbsolutePath();
+    ENVIRONMENT_VARIABLES.set("HUDI_CONF_DIR", testPropsFilePath);
   }
 
   @AfterAll
@@ -135,5 +146,13 @@ public class TestDFSPropertiesConfiguration {
       cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t4.props"));
     }, "Should error out on a self-included file.");
      */
+  }
+
+  @Test
+  public void testLoadDefaultConfFile() {
+    // String testPropsFilePath = getClass().getClassLoader().getResource("hudi-defaults.conf").getPath();
+    // environmentVariables.set("HUDI_CONF_DIR", testPropsFilePath);
+    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
+    assertEquals(conf.getConfig().get("hoodie.index.type"), "BLOOM");
   }
 }

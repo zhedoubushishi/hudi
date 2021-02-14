@@ -48,6 +48,8 @@ public class DFSPropertiesConfiguration {
 
   private static final String DEFAULT_PROPERTIES_FILE = "hudi-defaults.conf";
 
+  private static final String CONF_FILE_DIR_ENV_NAME = ""
+
   // singleton mode
   // private static final DFSPropertiesConfiguration INSTANCE = new DFSPropertiesConfiguration();
   private static TypedProperties defaultFileProps = new TypedProperties();
@@ -77,13 +79,12 @@ public class DFSPropertiesConfiguration {
    */
 
   private String[] splitProperty(String line) {
-    line = line.trim();
-    String delimiter = line.contains("=") ? "=" : "\\s+";
+    line = line.replaceAll("\\s+"," ");
+    String delimiter = line.contains("=") ? "=" : " ";
     int ind = line.indexOf(delimiter);
     String k = line.substring(0, ind).trim();
     String v = line.substring(ind + 1).trim();
     return new String[] {k, v};
-    // return new String[] { line.split(delimiter)[0].trim(), line.split(delimiter)[1].trim()};
   }
 
   private void addPropsFromDefaultConfigFile() {
