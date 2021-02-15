@@ -52,6 +52,7 @@ public class DFSPropertiesConfiguration {
 
   // singleton mode
   // private static final DFSPropertiesConfiguration INSTANCE = new DFSPropertiesConfiguration();
+  // private static TypedProperties defaultFileProps = new TypedProperties();
   private static TypedProperties defaultFileProps = new TypedProperties();
 
   private static boolean loadDefaultFileProps = false;
@@ -163,6 +164,10 @@ public class DFSPropertiesConfiguration {
     merged.putAll(defaultFileProps);
     merged.putAll(externalProps);
     return merged;
+  }
+
+  public TypedProperties getDefaultConfig() {
+    return defaultFileProps;
   }
 
   private Path getDefaultConfPath() throws IOException {

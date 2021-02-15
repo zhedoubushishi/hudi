@@ -28,8 +28,13 @@ public class DefaultHoodieConfig implements Serializable {
 
   protected final Properties props;
 
+  private static TypedProperties defaultProps = new DFSPropertiesConfiguration().getDefaultConfig();
+
   public DefaultHoodieConfig(Properties props) {
-    this.props = props;
+    Properties merged = new Properties();
+    merged.putAll(defaultProps);
+    merged.putAll(props);
+    this.props = merged;
   }
 
   public static void setDefaultOnCondition(Properties props, boolean condition, String propName, String defaultValue) {
