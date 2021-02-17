@@ -18,11 +18,10 @@
 package org.apache.hudi
 
 import org.apache.hudi.DataSourceWriteOptions._
-import org.apache.hudi.common.config.TypedProperties
+import org.apache.hudi.common.config.{DefaultHoodieConfig, TypedProperties}
 
 import scala.collection.JavaConversions.mapAsJavaMap
 import scala.collection.JavaConverters.mapAsScalaMapConverter
-
 import org.apache.hudi.common.config.HoodieMetadataConfig.DEFAULT_METADATA_ENABLE
 import org.apache.hudi.common.config.HoodieMetadataConfig.DEFAULT_METADATA_VALIDATE
 import org.apache.hudi.common.config.HoodieMetadataConfig.METADATA_ENABLE_PROP
@@ -44,6 +43,7 @@ object HoodieWriterUtils {
     * @return
     */
   def parametersWithWriteDefaults(parameters: Map[String, String]): Map[String, String] = {
+    val defaultProps = DefaultHoodieConfig.defaultProps.asInstanceOf[Map[String, String]]
     Map(OPERATION_OPT_KEY -> DEFAULT_OPERATION_OPT_VAL,
       TABLE_TYPE_OPT_KEY -> DEFAULT_TABLE_TYPE_OPT_VAL,
       PRECOMBINE_FIELD_OPT_KEY -> DEFAULT_PRECOMBINE_FIELD_OPT_VAL,
@@ -73,7 +73,7 @@ object HoodieWriterUtils {
       HIVE_USE_JDBC_OPT_KEY -> DEFAULT_HIVE_USE_JDBC_OPT_VAL,
       ASYNC_COMPACT_ENABLE_OPT_KEY -> DEFAULT_ASYNC_COMPACT_ENABLE_OPT_VAL,
       ENABLE_ROW_WRITER_OPT_KEY -> DEFAULT_ENABLE_ROW_WRITER_OPT_VAL
-    ) ++ translateStorageTypeToTableType(parameters)
+    ) ++ defaultProps ++ translateStorageTypeToTableType(parameters)
   }
 
   def toProperties(params: Map[String, String]): TypedProperties = {
