@@ -50,12 +50,7 @@ public class DFSPropertiesConfiguration {
 
   public static final String CONF_FILE_DIR_ENV_NAME = "HUDI_CONF_DIR";
 
-  // singleton mode
-  // private static final DFSPropertiesConfiguration INSTANCE = new DFSPropertiesConfiguration();
-  // private static TypedProperties defaultFileProps = new TypedProperties();
   private static TypedProperties defaultFileProps = addPropsFromDefaultConfigFile();
-
-  // private static boolean loadDefaultFileProps = false;
 
   private TypedProperties externalProps;
   // Keep track of files visited, to detect loops
@@ -67,10 +62,6 @@ public class DFSPropertiesConfiguration {
     this.externalProps = new TypedProperties();
     this.visitedFiles = new HashSet<>();
     this.currentFilePath = null;
-    // if (!loadDefaultFileProps) {
-    //   addPropsFromDefaultConfigFile();
-    //   loadDefaultFileProps = true;
-    // }
   }
 
   private static String[] splitProperty(String line) {
@@ -84,14 +75,17 @@ public class DFSPropertiesConfiguration {
 
   public static TypedProperties addPropsFromDefaultConfigFile() {
     TypedProperties defaultFileProps = new TypedProperties();
-    try {
-      Path defaultConfPath = getDefaultConfPath();
-      FileSystem fs = defaultConfPath.getFileSystem(new Configuration());
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(defaultConfPath)));
-      addPropsFromInputStream(reader, defaultFileProps, defaultConfPath);
-      // addPropsFromFile(fs, defaultConfPath, defaultFileProps);
-    } catch (IOException e) {
-      LOG.warn("Failed to load properties from " + DEFAULT_PROPERTIES_FILE);
+    Path defaultConfPath = getDefaultConfPath();
+    if (defaultConfPath != null) {
+      try {
+        FileSystem fs = defaultConfPath.getFileSystem(new Configuration());
+        BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(defaultConfPath)));
+        addPropsFromInputStream(reader, defaultFileProps, defaultConfPath);
+        // addPropsFromFile(fs, defaultConfPath, defaultFileProps);
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to load properties from " + DEFAULT_PROPERTIES_FILE);
+        // LOG.warn("Failed to load properties from " + DEFAULT_PROPERTIES_FILE);
+      }
     }
     return defaultFileProps;
   }
@@ -167,11 +161,11 @@ public class DFSPropertiesConfiguration {
     return defaultFileProps;
   }
 
-  private static Path getDefaultConfPath() throws IOException {
+  private static Path getDefaultConfPath() {
     String confDir = System.getenv(CONF_FILE_DIR_ENV_NAME);
     if (confDir == null) {
       LOG.warn("Cannot find " + CONF_FILE_DIR_ENV_NAME + ", please set it as the dir of " + DEFAULT_PROPERTIES_FILE);
-      throw new IOException(CONF_FILE_DIR_ENV_NAME + " is not set");
+      return null;
     }
     return new Path(confDir + File.separator + DEFAULT_PROPERTIES_FILE);
   }

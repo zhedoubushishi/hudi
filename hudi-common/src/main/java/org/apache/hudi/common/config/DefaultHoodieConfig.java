@@ -31,10 +31,7 @@ public class DefaultHoodieConfig implements Serializable {
   public static TypedProperties defaultProps = DFSPropertiesConfiguration.getDefaultConfig();
 
   public DefaultHoodieConfig(Properties props) {
-    // Properties merged = new Properties();
-    // merged.putAll(defaultProps);
-    // merged.putAll(props);
-    // this.props = merged;
+    // stream?
     for (String key : defaultProps.stringPropertyNames()) {
       props.putIfAbsent(key, defaultProps.getProperty(key));
     }
