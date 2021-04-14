@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -50,61 +49,45 @@ public class DFSPropertiesConfiguration {
 
   public static final String CONF_FILE_DIR_ENV_NAME = "HUDI_CONF_DIR";
 
-  private static TypedProperties defaultFileProps = addPropsFromDefaultConfigFile();
+  // props read from hudi-defaults.conf
+  private static final TypedProperties GLOBAL_PROPS = addGlobalProps();
 
-  private TypedProperties externalProps;
+  // props read from user defined configuration file or input stream
+  private final TypedProperties externalProps;
+
   // Keep track of files visited, to detect loops
-  private Set<String> visitedFiles;
+  private final Set<String> visitedFilePaths;
 
-  private Path currentFilePath;  // TODO get last element of visitedFiles
+  private FileSystem fs;
+
+  private Path currentFilePath;
+
+  public DFSPropertiesConfiguration(FileSystem fs, Path filePath) {
+    this.externalProps = new TypedProperties();
+    this.visitedFilePaths = new HashSet<>();
+    this.fs = fs;
+    this.currentFilePath = filePath;
+    addPropsFromFile(filePath);
+  }
 
   public DFSPropertiesConfiguration() {
     this.externalProps = new TypedProperties();
-    this.visitedFiles = new HashSet<>();
+    this.visitedFilePaths = new HashSet<>();
+    this.fs = null;
     this.currentFilePath = null;
   }
 
-  private static String[] splitProperty(String line) {
-    line = line.replaceAll("\\s+"," ");
-    String delimiter = line.contains("=") ? "=" : " ";
-    int ind = line.indexOf(delimiter);
-    String k = line.substring(0, ind).trim();
-    String v = line.substring(ind + 1).trim();
-    return new String[] {k, v};
-  }
-
-  public static TypedProperties addPropsFromDefaultConfigFile() {
-    TypedProperties defaultFileProps = new TypedProperties();
+  /**
+   * Load global props from hudi-defaults.conf which is under CONF_FILE_DIR_ENV_NAME.
+   * @return TypedProperties
+   */
+  private static TypedProperties addGlobalProps() {
+    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
     Path defaultConfPath = getDefaultConfPath();
     if (defaultConfPath != null) {
-      try {
-        FileSystem fs = defaultConfPath.getFileSystem(new Configuration());
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(defaultConfPath)));
-        addPropsFromInputStream(reader, defaultFileProps, defaultConfPath);
-        // addPropsFromFile(fs, defaultConfPath, defaultFileProps);
-      } catch (IOException e) {
-        throw new RuntimeException("Failed to load properties from " + DEFAULT_PROPERTIES_FILE);
-        // LOG.warn("Failed to load properties from " + DEFAULT_PROPERTIES_FILE);
-      }
+      conf.addPropsFromFile(defaultConfPath);
     }
-    return defaultFileProps;
-  }
-
-  public static void addPropsFromFile(FileSystem fs, Path filePath, Properties props, Set<String> visitedFiles) {
-    try {
-      if (visitedFiles.contains(filePath.toString())) {   // TODO name is not enough
-        LOG.info(filePath + " already referenced, skipped");
-        return;
-        // throw new IllegalStateException("Loop detected; file " + file + " already referenced");
-      }
-      // filePath.toUri().getRawPath()
-      visitedFiles.add(filePath.toString());
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(filePath)));
-      addPropsFromInputStream(reader, props, filePath);
-    } catch (IOException ioe) {
-      LOG.error("Error reading in properties from dfs", ioe);
-      throw new IllegalArgumentException("Cannot read properties from dfs", ioe);
-    }
+    return conf.getExternalProps();
   }
 
   /**
@@ -112,11 +95,42 @@ public class DFSPropertiesConfiguration {
    *
    * @param filePath File path for configuration file
    */
-  public void addPropsFromFile(FileSystem fs, Path filePath) {
-    addPropsFromFile(fs, filePath, externalProps, visitedFiles);
+  public void addPropsFromFile(Path filePath) {
+    try {
+      if (visitedFilePaths.contains(filePath.toString())) {
+        LOG.info(filePath + " already referenced, skipped");
+        return;
+        // throw new IllegalStateException("Loop detected; file " + file + " already referenced");
+      }
+      visitedFilePaths.add(filePath.toString());
+      currentFilePath = filePath;
+      FileSystem ff = fs != null ? fs : filePath.getFileSystem(new Configuration());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(ff.open(filePath)));
+      addPropsFromInputStream(reader);
+    } catch (IOException ioe) {
+      LOG.error("Error reading in properties from dfs", ioe);
+      throw new IllegalArgumentException("Cannot read properties from dfs", ioe);
+    }
   }
 
-  public static void addPropsFromInputStream(BufferedReader reader, Properties props, Path currentFilePath) throws IOException {
+  /*
+  /**
+   * Add properties from external configuration files.
+   *
+   * @param filePath File path for configuration file
+
+  public void addPropsFromFile(Path filePath) throws IOException {
+    addPropsFromFile(filePath.getFileSystem(new Configuration()), filePath);
+  }
+   */
+
+  /**
+   * Add properties from input stream.
+   *
+   * @param reader Buffered Reader
+   * @throws IOException
+   */
+  public void addPropsFromInputStream(BufferedReader reader) throws IOException {
     try {
       String line;
       while ((line = reader.readLine()) != null) {
@@ -127,9 +141,9 @@ public class DFSPropertiesConfiguration {
         String[] split = splitProperty(line);
         if (line.startsWith("include=") || line.startsWith("include =")) {
           Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
-          addPropsFromFile(includeFilePath.getFileSystem(new Configuration()), includeFilePath, props, new HashSet<>());
+          addPropsFromFile(includeFilePath);
         } else {
-          props.setProperty(split[0], split[1]);
+          externalProps.setProperty(split[0], split[1]);
         }
       }
     } finally {
@@ -138,27 +152,26 @@ public class DFSPropertiesConfiguration {
   }
 
   /**
-   * Add properties from input stream.
-   *
-   * @param reader Buffered Reader
-   * @throws IOException
+   * Return user specific configs(external config files/input stream).
+   * Add global
+   * @return Typed Properties
    */
-  public void addPropsFromInputStream(BufferedReader reader) throws IOException {
-    addPropsFromInputStream(reader, externalProps, currentFilePath);
-  }
-
   public TypedProperties getConfig() {
-    if (defaultFileProps.isEmpty()) {
+    if (GLOBAL_PROPS.isEmpty()) {
       return externalProps;
     }
-    TypedProperties merged = new TypedProperties();
-    merged.putAll(defaultFileProps);
-    merged.putAll(externalProps);
-    return merged;
+    TypedProperties mergedProps = new TypedProperties();
+    mergedProps.putAll(GLOBAL_PROPS);
+    mergedProps.putAll(externalProps);
+    return mergedProps;
   }
 
-  public static TypedProperties getDefaultConfig() {
-    return defaultFileProps;
+  public static TypedProperties getGlobalConfig() {
+    return GLOBAL_PROPS;
+  }
+
+  private TypedProperties getExternalProps() {
+    return externalProps;
   }
 
   private static Path getDefaultConfPath() {
@@ -170,7 +183,16 @@ public class DFSPropertiesConfiguration {
     return new Path(confDir + File.separator + DEFAULT_PROPERTIES_FILE);
   }
 
-  private static boolean isValidLine(String line) {
+  private String[] splitProperty(String line) {
+    line = line.replaceAll("\\s+"," ");
+    String delimiter = line.contains("=") ? "=" : " ";
+    int ind = line.indexOf(delimiter);
+    String k = line.substring(0, ind).trim();
+    String v = line.substring(ind + 1).trim();
+    return new String[] {k, v};
+  }
+
+  private boolean isValidLine(String line) {
     if (line.startsWith("#") || line.equals("")) {
       return false;
     }

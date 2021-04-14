@@ -418,8 +418,8 @@ public class TestHoodieDeltaStreamer extends UtilitiesTestBase {
 
   @Test
   public void testProps() {
-    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
-    cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/" + PROPS_FILENAME_TEST_SOURCE));
+    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration(dfs, new Path(dfsBasePath + "/" + PROPS_FILENAME_TEST_SOURCE));
+    // cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/" + PROPS_FILENAME_TEST_SOURCE));
     TypedProperties props = cfg.getConfig();
     assertEquals(2, props.getInteger("hoodie.upsert.shuffle.parallelism"));
     assertEquals("_row_key", props.getString("hoodie.datasource.write.recordkey.field"));
@@ -522,8 +522,8 @@ public class TestHoodieDeltaStreamer extends UtilitiesTestBase {
     String filePath = partitionPath + "/kafka_topic1+0+100+200.parquet";
     String checkpointProviderClass = "org.apache.hudi.utilities.checkpointing.KafkaConnectHdfsProvider";
     HoodieDeltaStreamer.Config cfg = TestHelpers.makeDropAllConfig(tableBasePath, WriteOperationType.UPSERT);
-    DFSPropertiesConfiguration dfsCfg = new DFSPropertiesConfiguration();
-    dfsCfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/" + PROPS_FILENAME_TEST_SOURCE));
+    DFSPropertiesConfiguration dfsCfg = new DFSPropertiesConfiguration(dfs, new Path(dfsBasePath + "/" + PROPS_FILENAME_TEST_SOURCE));
+    // dfsCfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/" + PROPS_FILENAME_TEST_SOURCE));
     TypedProperties props = dfsCfg.getConfig();
     props.put("hoodie.deltastreamer.checkpoint.provider.path", bootstrapPath);
     cfg.initialCheckpointProvider = checkpointProviderClass;

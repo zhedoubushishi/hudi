@@ -101,8 +101,8 @@ public class TestDFSPropertiesConfiguration {
 
   @Test
   public void testParsing() {
-    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
-    cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t1.props"));
+    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration(dfs, new Path(dfsBasePath + "/t1.props"));
+    // cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t1.props"));
     TypedProperties props = cfg.getConfig();
     // assertEquals(5, props.size());
     assertThrows(IllegalArgumentException.class, () -> {
@@ -130,8 +130,8 @@ public class TestDFSPropertiesConfiguration {
 
   @Test
   public void testIncludes() {
-    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
-    cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t3.props"));
+    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration(dfs, new Path(dfsBasePath + "/t3.props"));
+    // cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t3.props"));
     TypedProperties props = cfg.getConfig();
 
     assertEquals(123, props.getInteger("int.prop"));
@@ -140,18 +140,18 @@ public class TestDFSPropertiesConfiguration {
     assertEquals("t3.value", props.getString("string.prop"));
     assertEquals(1354354354, props.getLong("long.prop"));
     // test self-included file
-    cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t4.props"));
+    cfg.addPropsFromFile(new Path(dfsBasePath + "/t4.props"));
     /*
     assertThrows(IllegalStateException.class, () -> {
       cfg.addPropsFromFile(dfs, new Path(dfsBasePath + "/t4.props"));
     }, "Should error out on a self-included file.");
-     */
+    */
   }
 
   @Test
   public void testLoadDefaultConfFile() {
     DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
-    conf.addPropsFromDefaultConfigFile();
+    // conf.addPropsFromDefaultConfigFile();
     assertEquals("BLOOM", conf.getConfig().get("hoodie.index.type"));
   }
 }

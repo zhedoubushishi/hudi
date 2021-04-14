@@ -43,7 +43,7 @@ object HoodieWriterUtils {
     * @return
     */
   def parametersWithWriteDefaults(parameters: Map[String, String]): Map[String, String] = {
-    val defaultProps = DefaultHoodieConfig.defaultProps.asInstanceOf[Map[String, String]]
+    val defaultProps = DefaultHoodieConfig.globalConfig.asInstanceOf[Map[String, String]]
     Map(OPERATION_OPT_KEY -> DEFAULT_OPERATION_OPT_VAL,
       TABLE_TYPE_OPT_KEY -> DEFAULT_TABLE_TYPE_OPT_VAL,
       PRECOMBINE_FIELD_OPT_KEY -> DEFAULT_PRECOMBINE_FIELD_OPT_VAL,

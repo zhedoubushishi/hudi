@@ -93,7 +93,8 @@ public class StreamerUtil {
   public static DFSPropertiesConfiguration readConfig(FileSystem fs, Path cfgPath, List<String> overriddenProps) {
     DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
     try {
-      conf.addPropsFromFile(cfgPath.getFileSystem(fs.getConf()), cfgPath);
+      // conf.addPropsFromFile(cfgPath.getFileSystem(fs.getConf()), cfgPath);
+      conf = new DFSPropertiesConfiguration(cfgPath.getFileSystem(fs.getConf()), cfgPath);
     } catch (Exception e) {
       LOG.warn("Unexpected error read props file at :" + cfgPath, e);
     }

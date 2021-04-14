@@ -28,12 +28,12 @@ public class DefaultHoodieConfig implements Serializable {
 
   protected final Properties props;
 
-  public static TypedProperties defaultProps = DFSPropertiesConfiguration.getDefaultConfig();
+  public static TypedProperties globalConfig = DFSPropertiesConfiguration.getGlobalConfig();
 
   public DefaultHoodieConfig(Properties props) {
     // stream?
-    for (String key : defaultProps.stringPropertyNames()) {
-      props.putIfAbsent(key, defaultProps.getProperty(key));
+    for (String key : globalConfig.stringPropertyNames()) {
+      props.putIfAbsent(key, globalConfig.getProperty(key));
     }
     this.props = props;
   }

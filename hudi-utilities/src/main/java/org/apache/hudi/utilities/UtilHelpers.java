@@ -156,12 +156,13 @@ public class UtilHelpers {
    *
    */
   public static DFSPropertiesConfiguration readConfig(FileSystem fs, Path cfgPath, List<String> overriddenProps) {
-    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
+    FileSystem fileSystem = null;
     try {
-      conf.addPropsFromFile(cfgPath.getFileSystem(fs.getConf()), cfgPath);
-    } catch (Exception e) {
-      LOG.warn("Unexpected error read props file at :" + cfgPath, e);
+      fileSystem = cfgPath.getFileSystem(fs.getConf());
+    } catch (IOException ioe) {
+      LOG.warn("Unexpected error read props file at :" + cfgPath, ioe);
     }
+    DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration(fileSystem, cfgPath);
 
     try {
       if (!overriddenProps.isEmpty()) {

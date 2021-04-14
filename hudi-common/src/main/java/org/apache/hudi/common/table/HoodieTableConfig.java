@@ -82,11 +82,12 @@ public class HoodieTableConfig implements Serializable {
   private Properties props;
 
   public HoodieTableConfig(FileSystem fs, String metaPath, String payloadClassName) {
-    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
+    // DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration();
     // Properties props = new Properties();
     Path propertyPath = new Path(metaPath, HOODIE_PROPERTIES_FILE);
     LOG.info("Loading table properties from " + propertyPath);
-    cfg.addPropsFromFile(fs, propertyPath);
+    DFSPropertiesConfiguration cfg = new DFSPropertiesConfiguration(fs, propertyPath);
+    // cfg.addPropsFromFile(fs, propertyPath);
     Properties props = cfg.getConfig();
     try {
       /*
