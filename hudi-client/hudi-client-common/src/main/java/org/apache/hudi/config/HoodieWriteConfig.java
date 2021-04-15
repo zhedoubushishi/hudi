@@ -917,35 +917,35 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getBootstrapSourceBasePath() {
-    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP);
+    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP.key());
   }
 
   public String getBootstrapModeSelectorClass() {
-    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR);
+    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR.key());
   }
 
   public String getFullBootstrapInputProvider() {
-    return props.getProperty(HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER);
+    return props.getProperty(HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER.key());
   }
 
   public String getBootstrapKeyGeneratorClass() {
-    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS);
+    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS.key());
   }
 
   public String getBootstrapModeSelectorRegex() {
-    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX);
+    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX.key());
   }
 
   public BootstrapMode getBootstrapModeForRegexMatch() {
-    return BootstrapMode.valueOf(props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX_MODE));
+    return BootstrapMode.valueOf(props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX_MODE.key()));
   }
 
   public String getBootstrapPartitionPathTranslatorClass() {
-    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
+    return props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS.key());
   }
 
   public int getBootstrapParallelism() {
-    return Integer.parseInt(props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM));
+    return Integer.parseInt(props.getProperty(HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM.key()));
   }
 
   public Long getMaxMemoryPerPartitionMerge() {

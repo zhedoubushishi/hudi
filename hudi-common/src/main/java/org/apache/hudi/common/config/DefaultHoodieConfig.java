@@ -44,6 +44,16 @@ public class DefaultHoodieConfig implements Serializable {
     }
   }
 
+  public static void setDefaultValue(Properties props, ConfigOption configOption) {
+    if (!props.containsKey(configOption.key())) {
+      String inferValue = null;
+      if (configOption.getInferFunc() != null) {
+        inferValue = (String) configOption.getInferFunc().apply(props);
+      }
+      props.setProperty(configOption.key(), inferValue != null ? inferValue : (String) configOption.defaultValue());
+    }
+  }
+
   public Properties getProps() {
     return props;
   }
