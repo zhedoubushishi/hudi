@@ -365,14 +365,14 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
             .save(srcPath.toAbsolutePath.toString)
 
           val fooTableModifier = Map("path" -> path.toAbsolutePath.toString,
-            HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP -> srcPath.toAbsolutePath.toString,
+            "hoodie.bootstrap.base.path" -> srcPath.toAbsolutePath.toString,
             HoodieWriteConfig.TABLE_NAME -> hoodieFooTableName,
             DataSourceWriteOptions.TABLE_TYPE_OPT_KEY -> tableType,
-            HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM -> "4",
+            "hoodie.bootstrap.parallelism" -> "4",
             DataSourceWriteOptions.OPERATION_OPT_KEY -> DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL,
             DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
             DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
-            HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS -> classOf[NonpartitionedKeyGenerator].getCanonicalName)
+            "hoodie.bootstrap.keygen.class" -> classOf[NonpartitionedKeyGenerator].getCanonicalName)
           val fooTableParams = HoodieWriterUtils.parametersWithWriteDefaults(fooTableModifier)
 
           val client = spy(DataSourceUtils.createHoodieClient(
