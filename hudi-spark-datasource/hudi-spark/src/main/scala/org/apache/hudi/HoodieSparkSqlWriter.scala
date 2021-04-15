@@ -33,7 +33,7 @@ import org.apache.hudi.common.model.{HoodieRecordPayload, HoodieTableType, Write
 import org.apache.hudi.common.table.{HoodieTableConfig, HoodieTableMetaClient}
 import org.apache.hudi.common.table.timeline.HoodieActiveTimeline
 import org.apache.hudi.common.util.{CommitUtils, ReflectionUtils}
-import org.apache.hudi.config.HoodieBootstrapConfig.{BOOTSTRAP_BASE_PATH_PROP, BOOTSTRAP_INDEX_CLASS_PROP, DEFAULT_BOOTSTRAP_INDEX_CLASS}
+import org.apache.hudi.config.HoodieBootstrapConfig.{BOOTSTRAP_BASE_PATH_PROP, BOOTSTRAP_INDEX_CLASS_PROP}
 import org.apache.hudi.config.HoodieWriteConfig
 import org.apache.hudi.exception.HoodieException
 import org.apache.hudi.hive.util.ConfigUtils
@@ -260,10 +260,10 @@ private[hudi] object HoodieSparkSqlWriter {
     val tableName = parameters.getOrElse(HoodieWriteConfig.TABLE_NAME,
       throw new HoodieException(s"'${HoodieWriteConfig.TABLE_NAME}' must be set."))
     val tableType = parameters(TABLE_TYPE_OPT_KEY)
-    val bootstrapBasePath = parameters.getOrElse(BOOTSTRAP_BASE_PATH_PROP,
-      throw new HoodieException(s"'${BOOTSTRAP_BASE_PATH_PROP}' is required for '${BOOTSTRAP_OPERATION_OPT_VAL}'" +
+    val bootstrapBasePath = parameters.getOrElse(BOOTSTRAP_BASE_PATH_PROP.key(),
+      throw new HoodieException(s"'${BOOTSTRAP_BASE_PATH_PROP.key()}' is required for '${BOOTSTRAP_OPERATION_OPT_VAL}'" +
         " operation'"))
-    val bootstrapIndexClass = parameters.getOrDefault(BOOTSTRAP_INDEX_CLASS_PROP, DEFAULT_BOOTSTRAP_INDEX_CLASS)
+    val bootstrapIndexClass = parameters.getOrDefault(BOOTSTRAP_INDEX_CLASS_PROP.key(), BOOTSTRAP_INDEX_CLASS_PROP.defaultValue())
 
     var schema: String = null
     if (df.schema.nonEmpty) {
