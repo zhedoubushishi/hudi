@@ -20,6 +20,7 @@ package org.apache.hudi.cli.commands;
 
 import org.apache.hudi.cli.HoodieCLI;
 import org.apache.hudi.cli.testutils.AbstractShellIntegrationTest;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.model.IOType;
 import org.apache.hudi.common.table.HoodieTableConfig;
@@ -112,6 +113,7 @@ public class TestUpgradeDowngradeCommand extends AbstractShellIntegrationTest {
     Properties prop = new Properties();
     prop.load(fsDataInputStream);
     fsDataInputStream.close();
-    assertEquals(Integer.toString(HoodieTableVersion.ZERO.versionCode()), prop.getProperty(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
+    assertEquals(Integer.toString(HoodieTableVersion.ZERO.versionCode()), HoodieConfig
+        .getString(prop, HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
   }
 }

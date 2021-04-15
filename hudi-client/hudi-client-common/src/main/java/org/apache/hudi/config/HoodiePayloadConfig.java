@@ -18,22 +18,20 @@
 
 package org.apache.hudi.config;
 
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import static org.apache.hudi.common.model.HoodiePayloadProps.DEFAULT_PAYLOAD_EVENT_TIME_FIELD_VAL;
-import static org.apache.hudi.common.model.HoodiePayloadProps.DEFAULT_PAYLOAD_ORDERING_FIELD_VAL;
 import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP;
 import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP;
 
 /**
  * Hoodie payload related configs.
  */
-public class HoodiePayloadConfig extends DefaultHoodieConfig {
+public class HoodiePayloadConfig extends HoodieConfig {
 
   public HoodiePayloadConfig(Properties props) {
     super(props);
@@ -60,21 +58,19 @@ public class HoodiePayloadConfig extends DefaultHoodieConfig {
     }
 
     public Builder withPayloadOrderingField(String payloadOrderingField) {
-      props.setProperty(PAYLOAD_ORDERING_FIELD_PROP, String.valueOf(payloadOrderingField));
+      set(props, PAYLOAD_ORDERING_FIELD_PROP, String.valueOf(payloadOrderingField));
       return this;
     }
 
     public Builder withPayloadEventTimeField(String payloadEventTimeField) {
-      props.setProperty(PAYLOAD_EVENT_TIME_FIELD_PROP, String.valueOf(payloadEventTimeField));
+      set(props, PAYLOAD_EVENT_TIME_FIELD_PROP, String.valueOf(payloadEventTimeField));
       return this;
     }
 
     public HoodiePayloadConfig build() {
       HoodiePayloadConfig config = new HoodiePayloadConfig(props);
-      setDefaultOnCondition(props, !props.containsKey(PAYLOAD_ORDERING_FIELD_PROP), PAYLOAD_ORDERING_FIELD_PROP,
-          String.valueOf(DEFAULT_PAYLOAD_ORDERING_FIELD_VAL));
-      setDefaultOnCondition(props, !props.containsKey(PAYLOAD_EVENT_TIME_FIELD_PROP), PAYLOAD_EVENT_TIME_FIELD_PROP,
-              String.valueOf(DEFAULT_PAYLOAD_EVENT_TIME_FIELD_VAL));
+      setDefaultValue(props, PAYLOAD_ORDERING_FIELD_PROP);
+      setDefaultValue(props, PAYLOAD_EVENT_TIME_FIELD_PROP);
       return config;
     }
   }

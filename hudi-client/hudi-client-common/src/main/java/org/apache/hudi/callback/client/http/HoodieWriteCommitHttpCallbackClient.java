@@ -26,6 +26,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.config.HoodieWriteCommitCallbackConfig;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.log4j.LogManager;
@@ -80,11 +81,11 @@ public class HoodieWriteCommitHttpCallbackClient implements Closeable {
   }
 
   private String getApiKey() {
-    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_API_KEY);
+    return HoodieConfig.getString(props, HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_API_KEY);
   }
 
   private String getUrl() {
-    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_URL_PROP);
+    return HoodieConfig.getString(props, HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_URL_PROP);
   }
 
   private CloseableHttpClient getClient() {
@@ -98,7 +99,7 @@ public class HoodieWriteCommitHttpCallbackClient implements Closeable {
   }
 
   private Integer getHttpTimeoutSeconds() {
-    return Integer.parseInt(props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_TIMEOUT_SECONDS));
+    return HoodieConfig.getInt(props, HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_TIMEOUT_SECONDS);
   }
 
   @Override
