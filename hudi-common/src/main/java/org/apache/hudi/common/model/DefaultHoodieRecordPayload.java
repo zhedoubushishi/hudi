@@ -18,6 +18,7 @@
 
 package org.apache.hudi.common.model;
 
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.util.Option;
 
 import org.apache.avro.Schema;
@@ -55,6 +56,7 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
     if (recordBytes.length == 0) {
       return Option.empty();
     }
+    HoodieConfig hoodieConfig = new HoodieConfig(properties);
     GenericRecord incomingRecord = bytesToAvro(recordBytes, schema);
     /*
      * Combining strategy here returns currentValue on disk if incoming record is older.
@@ -65,8 +67,10 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
      * NOTE: Deletes sent via EmptyHoodieRecordPayload and/or Delete operation type do not hit this code path
      * and need to be dealt with separately.
      */
-    Object persistedOrderingVal = getNestedFieldVal((GenericRecord) currentValue, properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), true);
-    Comparable incomingOrderingVal = (Comparable) getNestedFieldVal(incomingRecord, properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), false);
+    Object persistedOrderingVal = getNestedFieldVal((GenericRecord) currentValue,
+        hoodieConfig.getString(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP_KEY), true);
+    Comparable incomingOrderingVal = (Comparable) getNestedFieldVal(incomingRecord, hoodieConfig
+        .getString(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP_KEY), false);
 
     // Null check is needed here to support schema evolution. The record in storage may be from old schema where
     // the new ordering column might not be present and hence returns null.
@@ -77,7 +81,8 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
     /*
      * We reached a point where the value is disk is older than the incoming record.
      */
-    eventTime = Option.ofNullable(getNestedFieldVal(incomingRecord, properties.getProperty(HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP), true));
+    eventTime = Option.ofNullable(getNestedFieldVal(incomingRecord, hoodieConfig
+        .getString(HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP_KEY), true));
 
     /*
      * Now check if the incoming record is a delete record.
