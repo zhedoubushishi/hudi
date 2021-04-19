@@ -112,6 +112,6 @@ public class TestUpgradeDowngradeCommand extends AbstractShellIntegrationTest {
     Properties prop = new Properties();
     prop.load(fsDataInputStream);
     fsDataInputStream.close();
-    assertEquals(Integer.toString(HoodieTableVersion.ZERO.versionCode()), prop.getProperty(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
+    assertEquals(Integer.toString(HoodieTableVersion.ZERO.versionCode()), prop.getProperty(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME.key()));
   }
 }

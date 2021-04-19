@@ -19,6 +19,7 @@
 package org.apache.hudi.common.config;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -45,13 +46,20 @@ public class DefaultHoodieConfig implements Serializable {
   }
 
   public static void setDefaultValue(Properties props, ConfigOption configOption) {
-    if (!props.containsKey(configOption.key())) {
+    if (!containsKey(props, configOption)) {
       String inferValue = null;
       if (configOption.getInferFunc() != null) {
         inferValue = (String) configOption.getInferFunc().apply(props);
       }
       props.setProperty(configOption.key(), inferValue != null ? inferValue : (String) configOption.defaultValue());
     }
+  }
+
+  public static boolean containsKey(Properties props, ConfigOption configOption) {
+    if (props.containsKey(configOption.key())) {
+      return true;
+    }
+    return Arrays.stream(configOption.getDeprecatedNames()).anyMatch(props::containsKey);
   }
 
   public Properties getProps() {

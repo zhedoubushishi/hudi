@@ -109,9 +109,9 @@ public class BootstrapExecutor  implements Serializable {
     this.configuration = conf;
     this.props = properties;
 
-    ValidationUtils.checkArgument(properties.containsKey(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH),
-        HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH + " must be specified.");
-    this.bootstrapBasePath = properties.getString(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH);
+    ValidationUtils.checkArgument(properties.containsKey(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH.key()),
+        HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH.key() + " must be specified.");
+    this.bootstrapBasePath = properties.getString(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH.key());
 
     // Add more defaults if full bootstrap requested
     this.props.putIfAbsent(DataSourceWriteOptions.PAYLOAD_CLASS_OPT_KEY(),

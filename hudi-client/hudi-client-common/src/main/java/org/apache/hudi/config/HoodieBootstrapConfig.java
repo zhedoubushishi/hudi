@@ -155,7 +155,7 @@ public class HoodieBootstrapConfig extends DefaultHoodieConfig {
       setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR_REGEX);
       setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR_REGEX_MODE);
       setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_INDEX_CLASS_PROP.key()), BOOTSTRAP_INDEX_CLASS_PROP.key(),
-        HoodieTableConfig.getDefaultBootstrapIndexClass(props));
+          HoodieTableConfig.getDefaultBootstrapIndexClass(props));
       setDefaultValue(props, FULL_BOOTSTRAP_INPUT_PROVIDER);
       return config;
     }
