@@ -64,6 +64,10 @@ public class ConfigOption<T> implements Serializable {
     return inferFunction;
   }
 
+  public String[] getDeprecatedNames() {
+    return deprecatedNames;
+  }
+
   public ConfigOption<T> withDescription(String description) {
     return new ConfigOption<>(key, defaultValue, description, inferFunction, deprecatedNames);
   }
@@ -100,11 +104,11 @@ public class ConfigOption<T> implements Serializable {
 
     public <T> ConfigOption<T> defaultValue(T value) {
       Objects.requireNonNull(value);
-      return new ConfigOption<>(key, value, "", null, "");
+      return new ConfigOption<>(key, value, "", null);
     }
 
     public ConfigOption<String> noDefaultValue() {
-      return new ConfigOption<>(key, null, "", null, "");
+      return new ConfigOption<>(key, null, "", null);
     }
   }
 }
