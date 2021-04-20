@@ -125,13 +125,6 @@ public class HoodieTableConfig implements Serializable {
       .noDefaultValue()
       .withDescription("");
 
-  // TODO remove these deprecated configs
-  @Deprecated
-  public static final String HOODIE_RO_FILE_FORMAT_PROP_NAME = "hoodie.table.ro.file.format";
-  @Deprecated
-  public static final String HOODIE_RT_FILE_FORMAT_PROP_NAME = "hoodie.table.rt.file.format";
-
-  public static final HoodieFileFormat DEFAULT_BASE_FILE_FORMAT = HoodieFileFormat.PARQUET;
   public static final String NO_OP_BOOTSTRAP_INDEX_CLASS = NoOpBootstrapIndex.class.getName();
 
   private Properties props;
@@ -181,24 +174,24 @@ public class HoodieTableConfig implements Serializable {
     }
     Path propertyPath = new Path(metadataFolder, HOODIE_PROPERTIES_FILE);
     try (FSDataOutputStream outputStream = fs.create(propertyPath)) {
-      if (!DefaultHoodieConfig.containsKey(properties, HOODIE_TABLE_NAME_PROP_NAME)) {
+      if (!DefaultHoodieConfig.contains(properties, HOODIE_TABLE_NAME_PROP_NAME)) {
         throw new IllegalArgumentException(HOODIE_TABLE_NAME_PROP_NAME.key() + " property needs to be specified");
       }
-      if (!DefaultHoodieConfig.containsKey(properties, HOODIE_TABLE_TYPE_PROP_NAME)) {
+      if (!DefaultHoodieConfig.contains(properties, HOODIE_TABLE_TYPE_PROP_NAME)) {
         properties.setProperty(HOODIE_TABLE_TYPE_PROP_NAME.key(), HOODIE_TABLE_TYPE_PROP_NAME.defaultValue().name());
       }
       if (properties.getProperty(HOODIE_TABLE_TYPE_PROP_NAME.key()).equals(HoodieTableType.MERGE_ON_READ.name())
-          && !DefaultHoodieConfig.containsKey(properties, HOODIE_PAYLOAD_CLASS_PROP_NAME)) {
+          && !DefaultHoodieConfig.contains(properties, HOODIE_PAYLOAD_CLASS_PROP_NAME)) {
         properties.setProperty(HOODIE_PAYLOAD_CLASS_PROP_NAME.key(), HOODIE_PAYLOAD_CLASS_PROP_NAME.defaultValue());
       }
-      if (!DefaultHoodieConfig.containsKey(properties, HOODIE_ARCHIVELOG_FOLDER_PROP_NAME)) {
+      if (!DefaultHoodieConfig.contains(properties, HOODIE_ARCHIVELOG_FOLDER_PROP_NAME)) {
         properties.setProperty(HOODIE_ARCHIVELOG_FOLDER_PROP_NAME.key(), HOODIE_ARCHIVELOG_FOLDER_PROP_NAME.defaultValue());
       }
-      if (!DefaultHoodieConfig.containsKey(properties, HOODIE_TIMELINE_LAYOUT_VERSION)) {
+      if (!DefaultHoodieConfig.contains(properties, HOODIE_TIMELINE_LAYOUT_VERSION)) {
         // Use latest Version as default unless forced by client
         properties.setProperty(HOODIE_TIMELINE_LAYOUT_VERSION.key(), TimelineLayoutVersion.CURR_VERSION.toString());
       }
-      if (DefaultHoodieConfig.containsKey(properties, HOODIE_BOOTSTRAP_BASE_PATH) && !DefaultHoodieConfig.containsKey(properties, HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME)) {
+      if (DefaultHoodieConfig.contains(properties, HOODIE_BOOTSTRAP_BASE_PATH) && !DefaultHoodieConfig.contains(properties, HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME)) {
         // Use the default bootstrap index class.
         properties.setProperty(HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME.key(), getDefaultBootstrapIndexClass(properties));
       }
@@ -290,15 +283,8 @@ public class HoodieTableConfig implements Serializable {
    *
    * @return HoodieFileFormat for the base file Storage format
    */
-  // TODO
   public HoodieFileFormat getBaseFileFormat() {
-    if (props.containsKey(HOODIE_BASE_FILE_FORMAT_PROP_NAME.key())) {
-      return HoodieFileFormat.valueOf(props.getProperty(HOODIE_BASE_FILE_FORMAT_PROP_NAME.key()));
-    }
-    if (props.containsKey(HOODIE_RO_FILE_FORMAT_PROP_NAME)) {
-      return HoodieFileFormat.valueOf(props.getProperty(HOODIE_RO_FILE_FORMAT_PROP_NAME));
-    }
-    return HOODIE_BASE_FILE_FORMAT_PROP_NAME.defaultValue();
+    return HoodieFileFormat.valueOf(DefaultHoodieConfig.getString(props, HOODIE_BASE_FILE_FORMAT_PROP_NAME));
   }
 
   /**
@@ -306,22 +292,15 @@ public class HoodieTableConfig implements Serializable {
    *
    * @return HoodieFileFormat for the log Storage format
    */
-  // TODO
   public HoodieFileFormat getLogFileFormat() {
-    if (props.containsKey(HOODIE_LOG_FILE_FORMAT_PROP_NAME.key())) {
-      return HoodieFileFormat.valueOf(props.getProperty(HOODIE_LOG_FILE_FORMAT_PROP_NAME.key()));
-    }
-    if (props.containsKey(HOODIE_RT_FILE_FORMAT_PROP_NAME)) {
-      return HoodieFileFormat.valueOf(props.getProperty(HOODIE_RT_FILE_FORMAT_PROP_NAME));
-    }
-    return HOODIE_LOG_FILE_FORMAT_PROP_NAME.defaultValue();
+    return HoodieFileFormat.valueOf(DefaultHoodieConfig.getString(props, HOODIE_LOG_FILE_FORMAT_PROP_NAME));
   }
 
   /**
    * Get the relative path of archive log folder under metafolder, for this table.
    */
   public String getArchivelogFolder() {
-    return props.getProperty(HOODIE_ARCHIVELOG_FOLDER_PROP_NAME.key(), HOODIE_ARCHIVELOG_FOLDER_PROP_NAME.defaultValue());
+    return DefaultHoodieConfig.getString(props, HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
   }
 
   public Map<String, String> getProps() {
