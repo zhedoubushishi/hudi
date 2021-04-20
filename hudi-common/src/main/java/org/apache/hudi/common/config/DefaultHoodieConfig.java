@@ -29,7 +29,11 @@ import java.util.Properties;
  */
 public class DefaultHoodieConfig implements Serializable {
 
-  protected final Properties props;
+  protected Properties props;
+
+  public DefaultHoodieConfig() {
+    this.props = new Properties();
+  }
 
   public DefaultHoodieConfig(Properties props) {
     this.props = props;
@@ -51,9 +55,9 @@ public class DefaultHoodieConfig implements Serializable {
     if (!contains(props, configOption)) {
       String inferValue = null;
       if (configOption.getInferFunc() != null) {
-        inferValue = (String) configOption.getInferFunc().apply(props);
+        inferValue = configOption.getInferFunc().apply(props).toString();
       }
-      props.setProperty(configOption.key(), inferValue != null ? inferValue : (String) configOption.defaultValue());
+      props.setProperty(configOption.key(), inferValue != null ? inferValue : configOption.defaultValue().toString());
     }
   }
 
