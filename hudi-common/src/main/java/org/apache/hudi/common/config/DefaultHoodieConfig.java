@@ -18,6 +18,8 @@
 
 package org.apache.hudi.common.config;
 
+import org.apache.hudi.common.util.Option;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Properties;
@@ -46,7 +48,7 @@ public class DefaultHoodieConfig implements Serializable {
   }
 
   public static void setDefaultValue(Properties props, ConfigOption configOption) {
-    if (!containsKey(props, configOption)) {
+    if (!contains(props, configOption)) {
       String inferValue = null;
       if (configOption.getInferFunc() != null) {
         inferValue = (String) configOption.getInferFunc().apply(props);
@@ -55,11 +57,31 @@ public class DefaultHoodieConfig implements Serializable {
     }
   }
 
-  public static boolean containsKey(Properties props, ConfigOption configOption) {
+  public static boolean contains(Properties props, ConfigOption configOption) {
     if (props.containsKey(configOption.key())) {
       return true;
     }
     return Arrays.stream(configOption.getDeprecatedNames()).anyMatch(props::containsKey);
+  }
+
+  public static Option<Object> getRawValue(Properties props, ConfigOption configOption) {
+    if (props.containsKey(configOption.key())) {
+      return Option.of(props.get(configOption.key()));
+    }
+    for (String deprecateName : configOption.getDeprecatedNames()) {
+      if (props.containsKey(deprecateName)) {
+        return Option.of(props.get(deprecateName));
+      }
+    }
+    return Option.empty();
+  }
+
+  public static String getString(Properties props, ConfigOption configOption) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    if (rawValue.isPresent()) {
+      return rawValue.get().toString();
+    }
+    return configOption.defaultValue().toString();
   }
 
   public Properties getProps() {

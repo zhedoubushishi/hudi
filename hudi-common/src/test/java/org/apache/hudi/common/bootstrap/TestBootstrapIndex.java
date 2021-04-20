@@ -187,7 +187,7 @@ public class TestBootstrapIndex extends HoodieCommonTestHarness {
     return Arrays.stream(partitions).map(partition -> {
       return Pair.of(partition, IntStream.range(0, numEntriesPerPartition).mapToObj(idx -> {
         String hudiFileId = UUID.randomUUID().toString();
-        String sourceFileName = idx + HoodieTableConfig.DEFAULT_BASE_FILE_FORMAT.getFileExtension();
+        String sourceFileName = idx + HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME.defaultValue().getFileExtension();
         HoodieFileStatus sourceFileStatus = HoodieFileStatus.newBuilder()
             .setPath(HoodiePath.newBuilder().setUri(sourceBasePath + "/" + partition + "/" + sourceFileName).build())
             .setLength(256 * 1024 * 1024L)
