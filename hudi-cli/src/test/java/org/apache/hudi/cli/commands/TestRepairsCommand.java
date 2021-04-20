@@ -155,10 +155,10 @@ public class TestRepairsCommand extends AbstractShellIntegrationTest {
     CommandResult cr = getShell().executeCommand("repair overwrite-hoodie-props --new-props-file " + newProps.getPath());
     assertTrue(cr.isSuccess());
 
-    Map<String, String> oldProps = HoodieCLI.getTableMetaClient().getTableConfig().getProps();
+    Map<String, String> oldProps = HoodieCLI.getTableMetaClient().getTableConfig().getMapProps();
 
     // after overwrite, the stored value in .hoodie is equals to which read from properties.
-    Map<String, String> result = HoodieTableMetaClient.reload(HoodieCLI.getTableMetaClient()).getTableConfig().getProps();
+    Map<String, String> result = HoodieTableMetaClient.reload(HoodieCLI.getTableMetaClient()).getTableConfig().getMapProps();
     Properties expectProps = new Properties();
     expectProps.load(new FileInputStream(new File(newProps.getPath())));
 
