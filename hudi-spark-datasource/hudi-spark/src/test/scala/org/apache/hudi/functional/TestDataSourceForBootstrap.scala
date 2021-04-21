@@ -298,8 +298,8 @@ class TestDataSourceForBootstrap {
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
       .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
       .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
-      .option(HoodieCompactionConfig.INLINE_COMPACT_PROP, "true")
-      .option(HoodieCompactionConfig.INLINE_COMPACT_NUM_DELTA_COMMITS_PROP, "1")
+      .option(HoodieCompactionConfig.INLINE_COMPACT_PROP.key, "true")
+      .option(HoodieCompactionConfig.INLINE_COMPACT_NUM_DELTA_COMMITS_PROP.key, "1")
       .mode(SaveMode.Append)
       .save(basePath)
 

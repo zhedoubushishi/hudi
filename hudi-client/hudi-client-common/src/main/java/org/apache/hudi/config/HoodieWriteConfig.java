@@ -385,91 +385,91 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * compaction properties.
    */
   public HoodieCleaningPolicy getCleanerPolicy() {
-    return HoodieCleaningPolicy.valueOf(props.getProperty(HoodieCompactionConfig.CLEANER_POLICY_PROP));
+    return HoodieCleaningPolicy.valueOf(props.getProperty(HoodieCompactionConfig.CLEANER_POLICY_PROP.key()));
   }
 
   public int getCleanerFileVersionsRetained() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.CLEANER_FILE_VERSIONS_RETAINED_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.CLEANER_FILE_VERSIONS_RETAINED_PROP.key()));
   }
 
   public int getCleanerCommitsRetained() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP.key()));
   }
 
   public int getMaxCommitsToKeep() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP.key()));
   }
 
   public int getMinCommitsToKeep() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP.key()));
   }
 
   public int getParquetSmallFileLimit() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.PARQUET_SMALL_FILE_LIMIT_BYTES));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.PARQUET_SMALL_FILE_LIMIT_BYTES.key()));
   }
 
   public double getRecordSizeEstimationThreshold() {
-    return Double.parseDouble(props.getProperty(HoodieCompactionConfig.RECORD_SIZE_ESTIMATION_THRESHOLD_PROP));
+    return Double.parseDouble(props.getProperty(HoodieCompactionConfig.RECORD_SIZE_ESTIMATION_THRESHOLD_PROP.key()));
   }
 
   public int getCopyOnWriteInsertSplitSize() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE.key()));
   }
 
   public int getCopyOnWriteRecordSizeEstimate() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE.key()));
   }
 
   public boolean shouldAutoTuneInsertSplits() {
-    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS));
+    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS.key()));
   }
 
   public int getCleanerParallelism() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.CLEANER_PARALLELISM));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.CLEANER_PARALLELISM.key()));
   }
 
   public boolean isAutoClean() {
-    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.AUTO_CLEAN_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.AUTO_CLEAN_PROP.key()));
   }
 
   public boolean isAsyncClean() {
-    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.ASYNC_CLEAN_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.ASYNC_CLEAN_PROP.key()));
   }
 
   public boolean incrementalCleanerModeEnabled() {
-    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.CLEANER_INCREMENTAL_MODE));
+    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.CLEANER_INCREMENTAL_MODE.key()));
   }
 
   public boolean inlineCompactionEnabled() {
-    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_PROP.key()));
   }
 
   public CompactionTriggerStrategy getInlineCompactTriggerStrategy() {
-    return CompactionTriggerStrategy.valueOf(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_TRIGGER_STRATEGY_PROP));
+    return CompactionTriggerStrategy.valueOf(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_TRIGGER_STRATEGY_PROP.key()));
   }
 
   public int getInlineCompactDeltaCommitMax() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_NUM_DELTA_COMMITS_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_NUM_DELTA_COMMITS_PROP.key()));
   }
 
   public int getInlineCompactDeltaSecondsMax() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_TIME_DELTA_SECONDS_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.INLINE_COMPACT_TIME_DELTA_SECONDS_PROP.key()));
   }
 
   public CompactionStrategy getCompactionStrategy() {
-    return ReflectionUtils.loadClass(props.getProperty(HoodieCompactionConfig.COMPACTION_STRATEGY_PROP));
+    return ReflectionUtils.loadClass(props.getProperty(HoodieCompactionConfig.COMPACTION_STRATEGY_PROP.key()));
   }
 
   public Long getTargetIOPerCompactionInMB() {
-    return Long.parseLong(props.getProperty(HoodieCompactionConfig.TARGET_IO_PER_COMPACTION_IN_MB_PROP));
+    return Long.parseLong(props.getProperty(HoodieCompactionConfig.TARGET_IO_PER_COMPACTION_IN_MB_PROP.key()));
   }
 
   public Boolean getCompactionLazyBlockReadEnabled() {
-    return Boolean.valueOf(props.getProperty(HoodieCompactionConfig.COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP));
+    return Boolean.valueOf(props.getProperty(HoodieCompactionConfig.COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP.key()));
   }
 
   public Boolean getCompactionReverseLogReadEnabled() {
-    return Boolean.valueOf(props.getProperty(HoodieCompactionConfig.COMPACTION_REVERSE_LOG_READ_ENABLED_PROP));
+    return Boolean.valueOf(props.getProperty(HoodieCompactionConfig.COMPACTION_REVERSE_LOG_READ_ENABLED_PROP.key()));
   }
 
   public boolean inlineClusteringEnabled() {
@@ -490,19 +490,19 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getPayloadClass() {
-    return props.getProperty(HoodieCompactionConfig.PAYLOAD_CLASS_PROP);
+    return props.getProperty(HoodieCompactionConfig.PAYLOAD_CLASS_PROP.key());
   }
 
   public int getTargetPartitionsPerDayBasedCompaction() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP.key()));
   }
 
   public int getCommitArchivalBatchSize() {
-    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.COMMITS_ARCHIVAL_BATCH_SIZE_PROP));
+    return Integer.parseInt(props.getProperty(HoodieCompactionConfig.COMMITS_ARCHIVAL_BATCH_SIZE_PROP.key()));
   }
 
   public Boolean shouldCleanBootstrapBaseFile() {
-    return Boolean.valueOf(props.getProperty(HoodieCompactionConfig.CLEANER_BOOTSTRAP_BASE_FILE_ENABLED));
+    return Boolean.valueOf(props.getProperty(HoodieCompactionConfig.CLEANER_BOOTSTRAP_BASE_FILE_ENABLED.key()));
   }
 
   public String getClusteringUpdatesStrategyClass() {
@@ -511,7 +511,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
 
   public HoodieFailedWritesCleaningPolicy getFailedWritesCleanPolicy() {
     return HoodieFailedWritesCleaningPolicy
-        .valueOf(props.getProperty(HoodieCompactionConfig.FAILED_WRITES_CLEANER_POLICY_PROP));
+        .valueOf(props.getProperty(HoodieCompactionConfig.FAILED_WRITES_CLEANER_POLICY_PROP.key()));
   }
 
   /**
@@ -1423,7 +1423,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
       Objects.requireNonNull(props.getProperty(BASE_PATH_PROP));
       if (props.getProperty(WRITE_CONCURRENCY_MODE_PROP)
           .equalsIgnoreCase(WriteConcurrencyMode.OPTIMISTIC_CONCURRENCY_CONTROL.name())) {
-        ValidationUtils.checkArgument(props.getProperty(HoodieCompactionConfig.FAILED_WRITES_CLEANER_POLICY_PROP)
+        ValidationUtils.checkArgument(props.getProperty(HoodieCompactionConfig.FAILED_WRITES_CLEANER_POLICY_PROP.key())
             != HoodieFailedWritesCleaningPolicy.EAGER.name(), "To enable optimistic concurrency control, set hoodie.cleaner.policy.failed.writes=LAZY");
       }
     }
