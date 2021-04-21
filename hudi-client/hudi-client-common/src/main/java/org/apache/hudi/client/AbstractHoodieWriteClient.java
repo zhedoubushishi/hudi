@@ -442,10 +442,10 @@ public abstract class AbstractHoodieWriteClient<T extends HoodieRecordPayload, I
       // Do an inline compaction if enabled
       if (config.inlineCompactionEnabled()) {
         runAnyPendingCompactions(table);
-        metadata.addMetadata(HoodieCompactionConfig.INLINE_COMPACT_PROP, "true");
+        metadata.addMetadata(HoodieCompactionConfig.INLINE_COMPACT_PROP.key(), "true");
         inlineCompact(extraMetadata);
       } else {
-        metadata.addMetadata(HoodieCompactionConfig.INLINE_COMPACT_PROP, "false");
+        metadata.addMetadata(HoodieCompactionConfig.INLINE_COMPACT_PROP.key(), "false");
       }
 
       // Do an inline clustering if enabled
