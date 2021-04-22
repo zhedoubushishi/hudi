@@ -473,11 +473,11 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public boolean inlineClusteringEnabled() {
-    return Boolean.parseBoolean(props.getProperty(HoodieClusteringConfig.INLINE_CLUSTERING_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieClusteringConfig.INLINE_CLUSTERING_PROP.key()));
   }
 
   public boolean isAsyncClusteringEnabled() {
-    return Boolean.parseBoolean(props.getProperty(HoodieClusteringConfig.ASYNC_CLUSTERING_ENABLE_OPT_KEY));
+    return Boolean.parseBoolean(props.getProperty(HoodieClusteringConfig.ASYNC_CLUSTERING_ENABLE_OPT_KEY.key()));
   }
 
   public boolean isClusteringEnabled() {
@@ -486,7 +486,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public int getInlineClusterMaxCommits() {
-    return Integer.parseInt(props.getProperty(HoodieClusteringConfig.INLINE_CLUSTERING_MAX_COMMIT_PROP));
+    return Integer.parseInt(props.getProperty(HoodieClusteringConfig.INLINE_CLUSTERING_MAX_COMMIT_PROP.key()));
   }
 
   public String getPayloadClass() {
@@ -506,7 +506,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getClusteringUpdatesStrategyClass() {
-    return props.getProperty(HoodieClusteringConfig.CLUSTERING_UPDATES_STRATEGY_PROP);
+    return props.getProperty(HoodieClusteringConfig.CLUSTERING_UPDATES_STRATEGY_PROP.key());
   }
 
   public HoodieFailedWritesCleaningPolicy getFailedWritesCleanPolicy() {
@@ -518,35 +518,35 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * Clustering properties.
    */
   public String getClusteringPlanStrategyClass() {
-    return props.getProperty(HoodieClusteringConfig.CLUSTERING_PLAN_STRATEGY_CLASS);
+    return props.getProperty(HoodieClusteringConfig.CLUSTERING_PLAN_STRATEGY_CLASS.key());
   }
 
   public String getClusteringExecutionStrategyClass() {
-    return props.getProperty(HoodieClusteringConfig.CLUSTERING_EXECUTION_STRATEGY_CLASS);
+    return props.getProperty(HoodieClusteringConfig.CLUSTERING_EXECUTION_STRATEGY_CLASS.key());
   }
 
   public long getClusteringMaxBytesInGroup() {
-    return Long.parseLong(props.getProperty(HoodieClusteringConfig.CLUSTERING_MAX_BYTES_PER_GROUP));
+    return Long.parseLong(props.getProperty(HoodieClusteringConfig.CLUSTERING_MAX_BYTES_PER_GROUP.key()));
   }
 
   public long getClusteringSmallFileLimit() {
-    return Long.parseLong(props.getProperty(HoodieClusteringConfig.CLUSTERING_PLAN_SMALL_FILE_LIMIT));
+    return Long.parseLong(props.getProperty(HoodieClusteringConfig.CLUSTERING_PLAN_SMALL_FILE_LIMIT.key()));
   }
 
   public int getClusteringMaxNumGroups() {
-    return Integer.parseInt(props.getProperty(HoodieClusteringConfig.CLUSTERING_MAX_NUM_GROUPS));
+    return Integer.parseInt(props.getProperty(HoodieClusteringConfig.CLUSTERING_MAX_NUM_GROUPS.key()));
   }
 
   public long getClusteringTargetFileMaxBytes() {
-    return Long.parseLong(props.getProperty(HoodieClusteringConfig.CLUSTERING_TARGET_FILE_MAX_BYTES));
+    return Long.parseLong(props.getProperty(HoodieClusteringConfig.CLUSTERING_TARGET_FILE_MAX_BYTES.key()));
   }
 
   public int getTargetPartitionsForClustering() {
-    return Integer.parseInt(props.getProperty(HoodieClusteringConfig.CLUSTERING_TARGET_PARTITIONS));
+    return Integer.parseInt(props.getProperty(HoodieClusteringConfig.CLUSTERING_TARGET_PARTITIONS.key()));
   }
 
   public String getClusteringSortColumns() {
-    return props.getProperty(HoodieClusteringConfig.CLUSTERING_SORT_COLUMNS_PROPERTY);
+    return props.getProperty(HoodieClusteringConfig.CLUSTERING_SORT_COLUMNS_PROPERTY.key());
   }
 
   /**
