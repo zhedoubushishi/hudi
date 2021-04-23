@@ -35,10 +35,10 @@ public class SparkMemoryUtils {
   }
 
   public static StorageLevel getBloomIndexInputStorageLevel(Properties properties) {
-    return StorageLevel.fromString(properties.getProperty(HoodieIndexConfig.BLOOM_INDEX_INPUT_STORAGE_LEVEL));
+    return StorageLevel.fromString(properties.getProperty(HoodieIndexConfig.BLOOM_INDEX_INPUT_STORAGE_LEVEL.key()));
   }
 
   public static StorageLevel getSimpleIndexInputStorageLevel(Properties properties) {
-    return StorageLevel.fromString(properties.getProperty(HoodieIndexConfig.SIMPLE_INDEX_INPUT_STORAGE_LEVEL));
+    return StorageLevel.fromString(properties.getProperty(HoodieIndexConfig.SIMPLE_INDEX_INPUT_STORAGE_LEVEL.key()));
   }
 }
