@@ -553,19 +553,19 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * index properties.
    */
   public HoodieIndex.IndexType getIndexType() {
-    return HoodieIndex.IndexType.valueOf(props.getProperty(HoodieIndexConfig.INDEX_TYPE_PROP));
+    return HoodieIndex.IndexType.valueOf(props.getProperty(HoodieIndexConfig.INDEX_TYPE_PROP.key()));
   }
 
   public String getIndexClass() {
-    return props.getProperty(HoodieIndexConfig.INDEX_CLASS_PROP);
+    return props.getProperty(HoodieIndexConfig.INDEX_CLASS_PROP.key());
   }
 
   public int getBloomFilterNumEntries() {
-    return Integer.parseInt(props.getProperty(HoodieIndexConfig.BLOOM_FILTER_NUM_ENTRIES));
+    return Integer.parseInt(props.getProperty(HoodieIndexConfig.BLOOM_FILTER_NUM_ENTRIES.key()));
   }
 
   public double getBloomFilterFPP() {
-    return Double.parseDouble(props.getProperty(HoodieIndexConfig.BLOOM_FILTER_FPP));
+    return Double.parseDouble(props.getProperty(HoodieIndexConfig.BLOOM_FILTER_FPP.key()));
   }
 
   public String getHbaseZkQuorum() {
@@ -577,7 +577,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getHBaseZkZnodeParent() {
-    return props.getProperty(HoodieIndexConfig.HBASE_ZK_ZNODEPARENT);
+    return props.getProperty(HoodieHBaseIndexConfig.HBASE_ZK_ZNODEPARENT.key());
   }
 
   public String getHbaseTableName() {
@@ -625,11 +625,11 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getBloomFilterType() {
-    return props.getProperty(HoodieIndexConfig.BLOOM_INDEX_FILTER_TYPE);
+    return props.getProperty(HoodieIndexConfig.BLOOM_INDEX_FILTER_TYPE.key());
   }
 
   public int getDynamicBloomFilterMaxNumEntries() {
-    return Integer.parseInt(props.getProperty(HoodieIndexConfig.HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES));
+    return Integer.parseInt(props.getProperty(HoodieIndexConfig.HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES.key()));
   }
 
   /**
@@ -662,47 +662,47 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public int getBloomIndexParallelism() {
-    return Integer.parseInt(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_PARALLELISM_PROP));
+    return Integer.parseInt(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_PARALLELISM_PROP.key()));
   }
 
   public boolean getBloomIndexPruneByRanges() {
-    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_PRUNE_BY_RANGES_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_PRUNE_BY_RANGES_PROP.key()));
   }
 
   public boolean getBloomIndexUseCaching() {
-    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_USE_CACHING_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_USE_CACHING_PROP.key()));
   }
 
   public boolean useBloomIndexTreebasedFilter() {
-    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_TREE_BASED_FILTER_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_TREE_BASED_FILTER_PROP.key()));
   }
 
   public boolean useBloomIndexBucketizedChecking() {
-    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_BUCKETIZED_CHECKING_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_BUCKETIZED_CHECKING_PROP.key()));
   }
 
   public int getBloomIndexKeysPerBucket() {
-    return Integer.parseInt(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_KEYS_PER_BUCKET_PROP));
+    return Integer.parseInt(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_KEYS_PER_BUCKET_PROP.key()));
   }
 
   public boolean getBloomIndexUpdatePartitionPath() {
-    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_UPDATE_PARTITION_PATH));
+    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.BLOOM_INDEX_UPDATE_PARTITION_PATH.key()));
   }
 
   public int getSimpleIndexParallelism() {
-    return Integer.parseInt(props.getProperty(HoodieIndexConfig.SIMPLE_INDEX_PARALLELISM_PROP));
+    return Integer.parseInt(props.getProperty(HoodieIndexConfig.SIMPLE_INDEX_PARALLELISM_PROP.key()));
   }
 
   public boolean getSimpleIndexUseCaching() {
-    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.SIMPLE_INDEX_USE_CACHING_PROP));
+    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.SIMPLE_INDEX_USE_CACHING_PROP.key()));
   }
 
   public int getGlobalSimpleIndexParallelism() {
-    return Integer.parseInt(props.getProperty(HoodieIndexConfig.GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP));
+    return Integer.parseInt(props.getProperty(HoodieIndexConfig.GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP.key()));
   }
 
   public boolean getGlobalSimpleIndexUpdatePartitionPath() {
-    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.SIMPLE_INDEX_UPDATE_PARTITION_PATH));
+    return Boolean.parseBoolean(props.getProperty(HoodieIndexConfig.SIMPLE_INDEX_UPDATE_PARTITION_PATH.key()));
   }
 
   /**
