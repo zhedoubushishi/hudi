@@ -569,11 +569,11 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getHbaseZkQuorum() {
-    return props.getProperty(HoodieHBaseIndexConfig.HBASE_ZKQUORUM_PROP);
+    return props.getProperty(HoodieHBaseIndexConfig.HBASE_ZKQUORUM_PROP.key());
   }
 
   public int getHbaseZkPort() {
-    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_ZKPORT_PROP));
+    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_ZKPORT_PROP.key()));
   }
 
   public String getHBaseZkZnodeParent() {
@@ -581,47 +581,47 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public String getHbaseTableName() {
-    return props.getProperty(HoodieHBaseIndexConfig.HBASE_TABLENAME_PROP);
+    return props.getProperty(HoodieHBaseIndexConfig.HBASE_TABLENAME_PROP.key());
   }
 
   public int getHbaseIndexGetBatchSize() {
-    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_GET_BATCH_SIZE_PROP));
+    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_GET_BATCH_SIZE_PROP.key()));
   }
 
   public Boolean getHBaseIndexRollbackSync() {
-    return Boolean.parseBoolean(props.getProperty(HoodieHBaseIndexConfig.HBASE_INDEX_ROLLBACK_SYNC));
+    return Boolean.parseBoolean(props.getProperty(HoodieHBaseIndexConfig.HBASE_INDEX_ROLLBACK_SYNC.key()));
   }
 
   public int getHbaseIndexPutBatchSize() {
-    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_PROP));
+    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_PROP.key()));
   }
 
   public Boolean getHbaseIndexPutBatchSizeAutoCompute() {
-    return Boolean.valueOf(props.getProperty(HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP));
+    return Boolean.valueOf(props.getProperty(HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP.key()));
   }
 
   public String getHBaseQPSResourceAllocatorClass() {
-    return props.getProperty(HoodieHBaseIndexConfig.HBASE_INDEX_QPS_ALLOCATOR_CLASS);
+    return props.getProperty(HoodieHBaseIndexConfig.HBASE_INDEX_QPS_ALLOCATOR_CLASS.key());
   }
 
   public String getHBaseQPSZKnodePath() {
-    return props.getProperty(HoodieHBaseIndexConfig.HBASE_ZK_PATH_QPS_ROOT);
+    return props.getProperty(HoodieHBaseIndexConfig.HBASE_ZK_PATH_QPS_ROOT.key());
   }
 
   public String getHBaseZkZnodeSessionTimeout() {
-    return props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS);
+    return props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS.key());
   }
 
   public String getHBaseZkZnodeConnectionTimeout() {
-    return props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS);
+    return props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS.key());
   }
 
   public boolean getHBaseIndexShouldComputeQPSDynamically() {
-    return Boolean.parseBoolean(props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY));
+    return Boolean.parseBoolean(props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY.key()));
   }
 
   public int getHBaseIndexDesiredPutsTime() {
-    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS));
+    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS.key()));
   }
 
   public String getBloomFilterType() {
@@ -638,15 +638,15 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * the jobs would be (0.17) 1/6, 0.33 (2/6) and 0.5 (3/6) respectively.
    */
   public float getHbaseIndexQPSFraction() {
-    return Float.parseFloat(props.getProperty(HoodieHBaseIndexConfig.HBASE_QPS_FRACTION_PROP));
+    return Float.parseFloat(props.getProperty(HoodieHBaseIndexConfig.HBASE_QPS_FRACTION_PROP.key()));
   }
 
   public float getHBaseIndexMinQPSFraction() {
-    return Float.parseFloat(props.getProperty(HoodieHBaseIndexConfig.HBASE_MIN_QPS_FRACTION_PROP));
+    return Float.parseFloat(props.getProperty(HoodieHBaseIndexConfig.HBASE_MIN_QPS_FRACTION_PROP.key()));
   }
 
   public float getHBaseIndexMaxQPSFraction() {
-    return Float.parseFloat(props.getProperty(HoodieHBaseIndexConfig.HBASE_MAX_QPS_FRACTION_PROP));
+    return Float.parseFloat(props.getProperty(HoodieHBaseIndexConfig.HBASE_MAX_QPS_FRACTION_PROP.key()));
   }
 
   /**
@@ -654,11 +654,11 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * Hoodie jobs to an Hbase Region Server
    */
   public int getHbaseIndexMaxQPSPerRegionServer() {
-    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP));
+    return Integer.parseInt(props.getProperty(HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP.key()));
   }
 
   public boolean getHbaseIndexUpdatePartitionPath() {
-    return Boolean.parseBoolean(props.getProperty(HoodieHBaseIndexConfig.HBASE_INDEX_UPDATE_PARTITION_PATH));
+    return Boolean.parseBoolean(props.getProperty(HoodieHBaseIndexConfig.HBASE_INDEX_UPDATE_PARTITION_PATH.key()));
   }
 
   public int getBloomIndexParallelism() {
