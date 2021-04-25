@@ -35,6 +35,8 @@ import java.util.Properties;
 public class HoodieMetricsConfig extends DefaultHoodieConfig {
 
   public static final String METRIC_PREFIX = "hoodie.metrics";
+
+
   public static final String METRICS_ON = METRIC_PREFIX + ".on";
   public static final boolean DEFAULT_METRICS_ON = false;
   public static final String METRICS_REPORTER_TYPE = METRIC_PREFIX + ".reporter.type";
