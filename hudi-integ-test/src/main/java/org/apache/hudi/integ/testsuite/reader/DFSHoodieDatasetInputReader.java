@@ -276,8 +276,8 @@ public class DFSHoodieDatasetInputReader extends DFSDeltaInputReader {
               HoodieMemoryConfig.DEFAULT_MAX_MEMORY_FOR_SPILLABLE_MAP_IN_BYTES)
           .withReadBlocksLazily(true)
           .withReverseReader(false)
-          .withBufferSize(HoodieMemoryConfig.DEFAULT_MAX_DFS_STREAM_BUFFER_SIZE)
-          .withSpillableMapBasePath(HoodieMemoryConfig.DEFAULT_SPILLABLE_MAP_BASE_PATH)
+          .withBufferSize(HoodieMemoryConfig.MAX_DFS_STREAM_BUFFER_SIZE_PROP.defaultValue())
+          .withSpillableMapBasePath(HoodieMemoryConfig.SPILLABLE_MAP_BASE_PATH_PROP.defaultValue())
           .build();
       // readAvro log files
       Iterable<HoodieRecord<? extends HoodieRecordPayload>> iterable = () -> scanner.iterator();
