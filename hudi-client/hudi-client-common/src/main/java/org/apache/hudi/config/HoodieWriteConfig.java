@@ -756,106 +756,106 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * metrics properties.
    */
   public boolean isMetricsOn() {
-    return Boolean.parseBoolean(props.getProperty(HoodieMetricsConfig.METRICS_ON));
+    return Boolean.parseBoolean(props.getProperty(HoodieMetricsConfig.METRICS_ON.key()));
   }
 
   public boolean isExecutorMetricsEnabled() {
-    return Boolean.parseBoolean(props.getProperty(HoodieMetricsConfig.ENABLE_EXECUTOR_METRICS, "false"));
+    return Boolean.parseBoolean(props.getProperty(HoodieMetricsConfig.ENABLE_EXECUTOR_METRICS.key(), "false"));
   }
 
   public MetricsReporterType getMetricsReporterType() {
-    return MetricsReporterType.valueOf(props.getProperty(HoodieMetricsConfig.METRICS_REPORTER_TYPE));
+    return MetricsReporterType.valueOf(props.getProperty(HoodieMetricsConfig.METRICS_REPORTER_TYPE.key()));
   }
 
   public String getGraphiteServerHost() {
-    return props.getProperty(HoodieMetricsConfig.GRAPHITE_SERVER_HOST);
+    return props.getProperty(HoodieMetricsConfig.GRAPHITE_SERVER_HOST.key());
   }
 
   public int getGraphiteServerPort() {
-    return Integer.parseInt(props.getProperty(HoodieMetricsConfig.GRAPHITE_SERVER_PORT));
+    return Integer.parseInt(props.getProperty(HoodieMetricsConfig.GRAPHITE_SERVER_PORT.key()));
   }
 
   public String getGraphiteMetricPrefix() {
-    return props.getProperty(HoodieMetricsConfig.GRAPHITE_METRIC_PREFIX);
+    return props.getProperty(HoodieMetricsConfig.GRAPHITE_METRIC_PREFIX.key());
   }
 
   public String getJmxHost() {
-    return props.getProperty(HoodieMetricsConfig.JMX_HOST);
+    return props.getProperty(HoodieMetricsConfig.JMX_HOST.key());
   }
 
   public String getJmxPort() {
-    return props.getProperty(HoodieMetricsConfig.JMX_PORT);
+    return props.getProperty(HoodieMetricsConfig.JMX_PORT.key());
   }
 
   public int getDatadogReportPeriodSeconds() {
-    return Integer.parseInt(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_REPORT_PERIOD_SECONDS));
+    return Integer.parseInt(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_REPORT_PERIOD_SECONDS.key()));
   }
 
   public ApiSite getDatadogApiSite() {
-    return ApiSite.valueOf(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_SITE));
+    return ApiSite.valueOf(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_SITE.key()));
   }
 
   public String getDatadogApiKey() {
-    if (props.containsKey(HoodieMetricsDatadogConfig.DATADOG_API_KEY)) {
-      return props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_KEY);
+    if (props.containsKey(HoodieMetricsDatadogConfig.DATADOG_API_KEY.key())) {
+      return props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_KEY.key());
     } else {
       Supplier<String> apiKeySupplier = ReflectionUtils.loadClass(
-          props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_KEY_SUPPLIER));
+          props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_KEY_SUPPLIER.key()));
       return apiKeySupplier.get();
     }
   }
 
   public boolean getDatadogApiKeySkipValidation() {
-    return Boolean.parseBoolean(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_KEY_SKIP_VALIDATION));
+    return Boolean.parseBoolean(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_KEY_SKIP_VALIDATION.key()));
   }
 
   public int getDatadogApiTimeoutSeconds() {
-    return Integer.parseInt(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_TIMEOUT_SECONDS));
+    return Integer.parseInt(props.getProperty(HoodieMetricsDatadogConfig.DATADOG_API_TIMEOUT_SECONDS.key()));
   }
 
   public String getDatadogMetricPrefix() {
-    return props.getProperty(HoodieMetricsDatadogConfig.DATADOG_METRIC_PREFIX);
+    return props.getProperty(HoodieMetricsDatadogConfig.DATADOG_METRIC_PREFIX.key());
   }
 
   public String getDatadogMetricHost() {
-    return props.getProperty(HoodieMetricsDatadogConfig.DATADOG_METRIC_HOST);
+    return props.getProperty(HoodieMetricsDatadogConfig.DATADOG_METRIC_HOST.key());
   }
 
   public List<String> getDatadogMetricTags() {
     return Arrays.stream(props.getProperty(
-        HoodieMetricsDatadogConfig.DATADOG_METRIC_TAGS, ",").split("\\s*,\\s*")).collect(Collectors.toList());
+        HoodieMetricsDatadogConfig.DATADOG_METRIC_TAGS.key(), ",").split("\\s*,\\s*")).collect(Collectors.toList());
   }
 
   public String getMetricReporterClassName() {
-    return props.getProperty(HoodieMetricsConfig.METRICS_REPORTER_CLASS);
+    return props.getProperty(HoodieMetricsConfig.METRICS_REPORTER_CLASS.key());
   }
 
   public int getPrometheusPort() {
-    return Integer.parseInt(props.getProperty(HoodieMetricsPrometheusConfig.PROMETHEUS_PORT));
+    return Integer.parseInt(props.getProperty(HoodieMetricsPrometheusConfig.PROMETHEUS_PORT.key()));
   }
 
   public String getPushGatewayHost() {
-    return props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_HOST);
+    return props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_HOST.key());
   }
 
   public int getPushGatewayPort() {
-    return Integer.parseInt(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_PORT));
+    return Integer.parseInt(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_PORT.key()));
   }
 
   public int getPushGatewayReportPeriodSeconds() {
-    return Integer.parseInt(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_REPORT_PERIOD_SECONDS));
+    return Integer.parseInt(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_REPORT_PERIOD_SECONDS.key()));
   }
 
   public boolean getPushGatewayDeleteOnShutdown() {
-    return Boolean.parseBoolean(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_DELETE_ON_SHUTDOWN));
+    return Boolean.parseBoolean(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_DELETE_ON_SHUTDOWN.key()));
   }
 
   public String getPushGatewayJobName() {
-    return props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_JOB_NAME);
+    return props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_JOB_NAME.key());
   }
 
   public boolean getPushGatewayRandomJobNameSuffix() {
-    return Boolean.parseBoolean(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX));
+    return Boolean.parseBoolean(props.getProperty(HoodieMetricsPrometheusConfig.PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX.key()));
   }
 
   /**
