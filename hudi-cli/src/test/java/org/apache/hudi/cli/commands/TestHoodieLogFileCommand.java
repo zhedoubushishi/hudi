@@ -211,8 +211,8 @@ public class TestHoodieLogFileCommand extends AbstractShellIntegrationTest {
         .withReverseReader(
             Boolean.parseBoolean(
                 HoodieCompactionConfig.COMPACTION_REVERSE_LOG_READ_ENABLED_PROP.defaultValue()))
-        .withBufferSize(HoodieMemoryConfig.DEFAULT_MAX_DFS_STREAM_BUFFER_SIZE)
-        .withSpillableMapBasePath(HoodieMemoryConfig.DEFAULT_SPILLABLE_MAP_BASE_PATH)
+        .withBufferSize(HoodieMemoryConfig.MAX_DFS_STREAM_BUFFER_SIZE_PROP.defaultValue())
+        .withSpillableMapBasePath(HoodieMemoryConfig.SPILLABLE_MAP_BASE_PATH_PROP.defaultValue())
         .build();
 
     Iterator<HoodieRecord<? extends HoodieRecordPayload>> records = scanner.iterator();

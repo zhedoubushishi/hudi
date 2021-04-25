@@ -18,6 +18,7 @@
 
 package org.apache.hudi.config;
 
+import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.DefaultHoodieConfig;
 
 import javax.annotation.concurrent.Immutable;
@@ -33,34 +34,54 @@ import java.util.Properties;
 @Immutable
 public class HoodieMemoryConfig extends DefaultHoodieConfig {
 
-  // This fraction is multiplied with the spark.memory.fraction to get a final fraction of heap space to use
-  // during merge. This makes it easier to scale this value as one increases the spark.executor.memory
-  public static final String MAX_MEMORY_FRACTION_FOR_MERGE_PROP = "hoodie.memory.merge.fraction";
   // Default max memory fraction during hash-merge, excess spills to disk
-  public static final String DEFAULT_MAX_MEMORY_FRACTION_FOR_MERGE = String.valueOf(0.6);
-  public static final String MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP = "hoodie.memory.compaction.fraction";
+  public static final ConfigOption<String> MAX_MEMORY_FRACTION_FOR_MERGE_PROP = ConfigOption
+      .key("hoodie.memory.merge.fraction")
+      .defaultValue(String.valueOf(0.6))
+      .withDescription("This fraction is multiplied with the user memory fraction (1 - spark.memory.fraction) "
+          + "to get a final fraction of heap space to use during merge");
+
   // Default max memory fraction during compaction, excess spills to disk
-  public static final String DEFAULT_MAX_MEMORY_FRACTION_FOR_COMPACTION = String.valueOf(0.6);
+  public static final ConfigOption<String> MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP = ConfigOption
+      .key("hoodie.memory.compaction.fraction")
+      .defaultValue(String.valueOf(0.6))
+      .withDescription("HoodieCompactedLogScanner reads logblocks, converts records to HoodieRecords and then "
+          + "merges these log blocks and records. At any point, the number of entries in a log block can be "
+          + "less than or equal to the number of entries in the corresponding parquet file. This can lead to "
+          + "OOM in the Scanner. Hence, a spillable map helps alleviate the memory pressure. Use this config to "
+          + "set the max allowable inMemory footprint of the spillable map");
+
   // Default memory size (1GB) per compaction (used if SparkEnv is absent), excess spills to disk
   public static final long DEFAULT_MAX_MEMORY_FOR_SPILLABLE_MAP_IN_BYTES = 1024 * 1024 * 1024L;
   // Minimum memory size (100MB) for the spillable map.
   public static final long DEFAULT_MIN_MEMORY_FOR_SPILLABLE_MAP_IN_BYTES = 100 * 1024 * 1024L;
-  // Property to set the max memory for merge
-  public static final String MAX_MEMORY_FOR_MERGE_PROP = "hoodie.memory.merge.max.size";
-  // Property to set the max memory for compaction
-  public static final String MAX_MEMORY_FOR_COMPACTION_PROP = "hoodie.memory.compaction.max.size";
-  // Property to set the max memory for dfs inputstream buffer size
-  public static final String MAX_DFS_STREAM_BUFFER_SIZE_PROP = "hoodie.memory.dfs.buffer.max.size";
-  public static final int DEFAULT_MAX_DFS_STREAM_BUFFER_SIZE = 16 * 1024 * 1024; // 16MB
-  public static final String SPILLABLE_MAP_BASE_PATH_PROP = "hoodie.memory.spillable.map.path";
-  // Default file path prefix for spillable file
-  public static final String DEFAULT_SPILLABLE_MAP_BASE_PATH = "/tmp/";
 
-  // Property to control how what fraction of the failed record, exceptions we report back to driver.
-  public static final String WRITESTATUS_FAILURE_FRACTION_PROP = "hoodie.memory.writestatus.failure.fraction";
-  // Default is 10%. If set to 100%, with lot of failures, this can cause memory pressure, cause OOMs and
-  // mask actual data errors.
-  public static final double DEFAULT_WRITESTATUS_FAILURE_FRACTION = 0.1;
+  public static final ConfigOption<Long> MAX_MEMORY_FOR_MERGE_PROP = ConfigOption
+      .key("hoodie.memory.merge.max.size")
+      .defaultValue(DEFAULT_MAX_MEMORY_FOR_SPILLABLE_MAP_IN_BYTES)
+      .withDescription("Property to set the max memory for merge");
+
+  public static final ConfigOption<String> MAX_MEMORY_FOR_COMPACTION_PROP = ConfigOption
+      .key("hoodie.memory.compaction.max.size")
+      .noDefaultValue()
+      .withDescription("Property to set the max memory for compaction");
+
+  public static final ConfigOption<Integer> MAX_DFS_STREAM_BUFFER_SIZE_PROP = ConfigOption
+      .key("hoodie.memory.dfs.buffer.max.size")
+      .defaultValue(16 * 1024 * 1024)
+      .withDescription("Property to set the max memory for dfs inputstream buffer size");
+
+  public static final ConfigOption<String> SPILLABLE_MAP_BASE_PATH_PROP = ConfigOption
+      .key("hoodie.memory.spillable.map.path")
+      .defaultValue("/tmp/")
+      .withDescription("Default file path prefix for spillable file");
+
+  public static final ConfigOption<Double> WRITESTATUS_FAILURE_FRACTION_PROP = ConfigOption
+      .key("hoodie.memory.writestatus.failure.fraction")
+      .defaultValue(0.1)
+      .withDescription("Property to control how what fraction of the failed record, exceptions we report back to driver. "
+          + "Default is 10%. If set to 100%, with lot of failures, this can cause memory pressure, cause OOMs and "
+          + "mask actual data errors.");
 
   private HoodieMemoryConfig(Properties props) {
     super(props);
@@ -87,41 +108,37 @@ public class HoodieMemoryConfig extends DefaultHoodieConfig {
     }
 
     public Builder withMaxMemoryFractionPerPartitionMerge(double maxMemoryFractionPerPartitionMerge) {
-      props.setProperty(MAX_MEMORY_FRACTION_FOR_MERGE_PROP, String.valueOf(maxMemoryFractionPerPartitionMerge));
+      props.setProperty(MAX_MEMORY_FRACTION_FOR_MERGE_PROP.key(), String.valueOf(maxMemoryFractionPerPartitionMerge));
       return this;
     }
 
     public Builder withMaxMemoryMaxSize(long mergeMaxSize, long compactionMaxSize) {
-      props.setProperty(MAX_MEMORY_FOR_MERGE_PROP, String.valueOf(mergeMaxSize));
-      props.setProperty(MAX_MEMORY_FOR_COMPACTION_PROP, String.valueOf(compactionMaxSize));
+      props.setProperty(MAX_MEMORY_FOR_MERGE_PROP.key(), String.valueOf(mergeMaxSize));
+      props.setProperty(MAX_MEMORY_FOR_COMPACTION_PROP.key(), String.valueOf(compactionMaxSize));
       return this;
     }
 
     public Builder withMaxMemoryFractionPerCompaction(double maxMemoryFractionPerCompaction) {
-      props.setProperty(MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP, String.valueOf(maxMemoryFractionPerCompaction));
+      props.setProperty(MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP.key(), String.valueOf(maxMemoryFractionPerCompaction));
       return this;
     }
 
     public Builder withMaxDFSStreamBufferSize(int maxStreamBufferSize) {
-      props.setProperty(MAX_DFS_STREAM_BUFFER_SIZE_PROP, String.valueOf(maxStreamBufferSize));
+      props.setProperty(MAX_DFS_STREAM_BUFFER_SIZE_PROP.key(), String.valueOf(maxStreamBufferSize));
       return this;
     }
 
     public Builder withWriteStatusFailureFraction(double failureFraction) {
-      props.setProperty(WRITESTATUS_FAILURE_FRACTION_PROP, String.valueOf(failureFraction));
+      props.setProperty(WRITESTATUS_FAILURE_FRACTION_PROP.key(), String.valueOf(failureFraction));
       return this;
     }
 
     public HoodieMemoryConfig build() {
       HoodieMemoryConfig config = new HoodieMemoryConfig(props);
-      setDefaultOnCondition(props, !props.containsKey(MAX_DFS_STREAM_BUFFER_SIZE_PROP), MAX_DFS_STREAM_BUFFER_SIZE_PROP,
-          String.valueOf(DEFAULT_MAX_DFS_STREAM_BUFFER_SIZE));
-      setDefaultOnCondition(props, !props.containsKey(SPILLABLE_MAP_BASE_PATH_PROP), SPILLABLE_MAP_BASE_PATH_PROP,
-          DEFAULT_SPILLABLE_MAP_BASE_PATH);
-      setDefaultOnCondition(props, !props.containsKey(MAX_MEMORY_FOR_MERGE_PROP), MAX_MEMORY_FOR_MERGE_PROP,
-          String.valueOf(DEFAULT_MAX_MEMORY_FOR_SPILLABLE_MAP_IN_BYTES));
-      setDefaultOnCondition(props, !props.containsKey(WRITESTATUS_FAILURE_FRACTION_PROP),
-          WRITESTATUS_FAILURE_FRACTION_PROP, String.valueOf(DEFAULT_WRITESTATUS_FAILURE_FRACTION));
+      setDefaultValue(props, MAX_DFS_STREAM_BUFFER_SIZE_PROP);
+      setDefaultValue(props, SPILLABLE_MAP_BASE_PATH_PROP);
+      setDefaultValue(props, MAX_MEMORY_FOR_MERGE_PROP);
+      setDefaultValue(props, WRITESTATUS_FAILURE_FRACTION_PROP);
       return config;
     }
   }
