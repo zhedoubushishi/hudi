@@ -862,15 +862,15 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * memory configs.
    */
   public int getMaxDFSStreamBufferSize() {
-    return Integer.parseInt(props.getProperty(HoodieMemoryConfig.MAX_DFS_STREAM_BUFFER_SIZE_PROP));
+    return Integer.parseInt(props.getProperty(HoodieMemoryConfig.MAX_DFS_STREAM_BUFFER_SIZE_PROP.key()));
   }
 
   public String getSpillableMapBasePath() {
-    return props.getProperty(HoodieMemoryConfig.SPILLABLE_MAP_BASE_PATH_PROP);
+    return props.getProperty(HoodieMemoryConfig.SPILLABLE_MAP_BASE_PATH_PROP.key());
   }
 
   public double getWriteStatusFailureFraction() {
-    return Double.parseDouble(props.getProperty(HoodieMemoryConfig.WRITESTATUS_FAILURE_FRACTION_PROP));
+    return Double.parseDouble(props.getProperty(HoodieMemoryConfig.WRITESTATUS_FAILURE_FRACTION_PROP.key()));
   }
 
   public ConsistencyGuardConfig getConsistencyGuardConfig() {
@@ -949,7 +949,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public Long getMaxMemoryPerPartitionMerge() {
-    return Long.valueOf(props.getProperty(HoodieMemoryConfig.MAX_MEMORY_FOR_MERGE_PROP));
+    return Long.valueOf(props.getProperty(HoodieMemoryConfig.MAX_MEMORY_FOR_MERGE_PROP.key()));
   }
 
   public Long getHoodieClientHeartbeatIntervalInMs() {
