@@ -18,6 +18,8 @@
 
 package org.apache.hudi.common.model;
 
+import org.apache.hudi.common.config.ConfigOption;
+
 /**
  * Holds payload properties that implementation of {@link HoodieRecordPayload} can leverage.
  * Since both payload classes and HoodiePayloadConfig needs to access these props, storing it here in hudi-common.
@@ -30,14 +32,18 @@ public class HoodiePayloadProps {
    *
    * @see DefaultHoodieRecordPayload
    */
-  public static final String PAYLOAD_ORDERING_FIELD_PROP = "hoodie.payload.ordering.field";
-  public static String DEFAULT_PAYLOAD_ORDERING_FIELD_VAL = "ts";
+  public static final ConfigOption<String> PAYLOAD_ORDERING_FIELD_PROP = ConfigOption
+      .key("hoodie.payload.ordering.field")
+      .defaultValue("ts")
+      .withDescription("Property to hold the payload ordering field name");
 
   /**
    * Property for payload event time field; to be used to extract source event time info.
    *
    * @see DefaultHoodieRecordPayload
    */
-  public static final String PAYLOAD_EVENT_TIME_FIELD_PROP = "hoodie.payload.event.time.field";
-  public static String DEFAULT_PAYLOAD_EVENT_TIME_FIELD_VAL = "ts";
+  public static final ConfigOption<String> PAYLOAD_EVENT_TIME_FIELD_PROP = ConfigOption
+      .key("hoodie.payload.event.time.field")
+      .defaultValue("ts")
+      .withDescription("Property for payload event time field");
 }
