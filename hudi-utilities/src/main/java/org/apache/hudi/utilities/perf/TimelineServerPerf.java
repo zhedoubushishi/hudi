@@ -289,10 +289,10 @@ public class TimelineServerPerf implements Serializable {
 
     @Parameter(names = {"--base-store-path", "-sp"},
         description = "Directory where spilled view entries will be stored. Used for SPILLABLE_DISK storage type")
-    public String baseStorePathForFileGroups = FileSystemViewStorageConfig.DEFAULT_VIEW_SPILLABLE_DIR;
+    public String baseStorePathForFileGroups = FileSystemViewStorageConfig.FILESYSTEM_VIEW_SPILLABLE_DIR.defaultValue();
 
     @Parameter(names = {"--rocksdb-path", "-rp"}, description = "Root directory for RocksDB")
-    public String rocksDBPath = FileSystemViewStorageConfig.DEFAULT_ROCKSDB_BASE_PATH;
+    public String rocksDBPath = FileSystemViewStorageConfig.ROCKSDB_BASE_PATH_PROP.defaultValue();
 
     @Parameter(names = {"--wait-for-manual-queries", "-ww"})
     public Boolean waitForManualQueries = false;
