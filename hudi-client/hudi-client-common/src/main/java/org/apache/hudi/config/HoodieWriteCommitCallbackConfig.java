@@ -17,6 +17,7 @@
 
 package org.apache.hudi.config;
 
+import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.DefaultHoodieConfig;
 
 import java.io.File;
@@ -30,18 +31,32 @@ import java.util.Properties;
 public class HoodieWriteCommitCallbackConfig extends DefaultHoodieConfig {
 
   public static final String CALLBACK_PREFIX = "hoodie.write.commit.callback.";
-  public static final String CALLBACK_ON = CALLBACK_PREFIX + "on";
-  public static final boolean DEFAULT_CALLBACK_ON = false;
 
-  public static final String CALLBACK_CLASS_PROP = CALLBACK_PREFIX + "class";
-  public static final String DEFAULT_CALLBACK_CLASS_PROP = "org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback";
+  public static final ConfigOption<Boolean> CALLBACK_ON = ConfigOption
+      .key(CALLBACK_PREFIX + "on")
+      .defaultValue(false)
+      .withDescription("");
+
+  public static final ConfigOption<String> CALLBACK_CLASS_PROP = ConfigOption
+      .key(CALLBACK_PREFIX + "class")
+      .defaultValue("org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback")
+      .withDescription("");
 
   // ***** HTTP callback configs *****
-  public static final String CALLBACK_HTTP_URL_PROP = CALLBACK_PREFIX + "http.url";
-  public static final String CALLBACK_HTTP_API_KEY = CALLBACK_PREFIX + "http.api.key";
-  public static final String DEFAULT_CALLBACK_HTTP_API_KEY = "hudi_write_commit_http_callback";
-  public static final String CALLBACK_HTTP_TIMEOUT_SECONDS = CALLBACK_PREFIX + "http.timeout.seconds";
-  public static final int DEFAULT_CALLBACK_HTTP_TIMEOUT_SECONDS = 3;
+  public static final ConfigOption<String> CALLBACK_HTTP_URL_PROP = ConfigOption
+      .key(CALLBACK_PREFIX + "http.url")
+      .noDefaultValue()
+      .withDescription("");
+
+  public static final ConfigOption<String> CALLBACK_HTTP_API_KEY = ConfigOption
+      .key(CALLBACK_PREFIX + "http.api.key")
+      .defaultValue("hudi_write_commit_http_callback")
+      .withDescription("");
+
+  public static final ConfigOption<Integer> CALLBACK_HTTP_TIMEOUT_SECONDS = ConfigOption
+      .key(CALLBACK_PREFIX + "http.timeout.seconds")
+      .defaultValue(3)
+      .withDescription("");
 
   private HoodieWriteCommitCallbackConfig(Properties props) {
     super(props);
@@ -68,37 +83,36 @@ public class HoodieWriteCommitCallbackConfig extends DefaultHoodieConfig {
     }
 
     public HoodieWriteCommitCallbackConfig.Builder writeCommitCallbackOn(String callbackOn) {
-      props.setProperty(CALLBACK_ON, callbackOn);
+      props.setProperty(CALLBACK_ON.key(), callbackOn);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackClass(String callbackClass) {
-      props.setProperty(CALLBACK_CLASS_PROP, callbackClass);
+      props.setProperty(CALLBACK_CLASS_PROP.key(), callbackClass);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackHttpUrl(String url) {
-      props.setProperty(CALLBACK_HTTP_URL_PROP, url);
+      props.setProperty(CALLBACK_HTTP_URL_PROP.key(), url);
       return this;
     }
 
     public Builder withCallbackHttpTimeoutSeconds(String timeoutSeconds) {
-      props.setProperty(CALLBACK_HTTP_TIMEOUT_SECONDS, timeoutSeconds);
+      props.setProperty(CALLBACK_HTTP_TIMEOUT_SECONDS.key(), timeoutSeconds);
       return this;
     }
 
     public Builder withCallbackHttpApiKey(String apiKey) {
-      props.setProperty(CALLBACK_HTTP_API_KEY, apiKey);
+      props.setProperty(CALLBACK_HTTP_API_KEY.key(), apiKey);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig build() {
       HoodieWriteCommitCallbackConfig config = new HoodieWriteCommitCallbackConfig(props);
-      setDefaultOnCondition(props, !props.containsKey(CALLBACK_ON), CALLBACK_ON, String.valueOf(DEFAULT_CALLBACK_ON));
-      setDefaultOnCondition(props, !props.containsKey(CALLBACK_CLASS_PROP), CALLBACK_CLASS_PROP, DEFAULT_CALLBACK_CLASS_PROP);
-      setDefaultOnCondition(props, !props.containsKey(CALLBACK_HTTP_API_KEY), CALLBACK_HTTP_API_KEY, DEFAULT_CALLBACK_HTTP_API_KEY);
-      setDefaultOnCondition(props, !props.containsKey(CALLBACK_HTTP_TIMEOUT_SECONDS), CALLBACK_HTTP_TIMEOUT_SECONDS,
-          String.valueOf(DEFAULT_CALLBACK_HTTP_TIMEOUT_SECONDS));
+      setDefaultValue(props, CALLBACK_ON);
+      setDefaultValue(props, CALLBACK_CLASS_PROP);
+      setDefaultValue(props, CALLBACK_HTTP_API_KEY);
+      setDefaultValue(props, CALLBACK_HTTP_TIMEOUT_SECONDS);
 
       return config;
     }
