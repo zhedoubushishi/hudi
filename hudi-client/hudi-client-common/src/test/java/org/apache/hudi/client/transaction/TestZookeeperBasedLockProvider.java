@@ -64,14 +64,14 @@ public class TestZookeeperBasedLockProvider {
       }
     }
     Properties properties = new Properties();
-    properties.setProperty(ZK_BASE_PATH_PROP, basePath);
-    properties.setProperty(ZK_LOCK_KEY_PROP, key);
-    properties.setProperty(ZK_CONNECT_URL_PROP, server.getConnectString());
-    properties.setProperty(ZK_BASE_PATH_PROP, server.getTempDirectory().getAbsolutePath());
-    properties.setProperty(ZK_SESSION_TIMEOUT_MS_PROP, "10000");
-    properties.setProperty(ZK_CONNECTION_TIMEOUT_MS_PROP, "10000");
-    properties.setProperty(ZK_LOCK_KEY_PROP, "key");
-    properties.setProperty(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP, "1000");
+    properties.setProperty(ZK_BASE_PATH_PROP.key(), basePath);
+    properties.setProperty(ZK_LOCK_KEY_PROP.key(), key);
+    properties.setProperty(ZK_CONNECT_URL_PROP.key(), server.getConnectString());
+    properties.setProperty(ZK_BASE_PATH_PROP.key(), server.getTempDirectory().getAbsolutePath());
+    properties.setProperty(ZK_SESSION_TIMEOUT_MS_PROP.key(), "10000");
+    properties.setProperty(ZK_CONNECTION_TIMEOUT_MS_PROP.key(), "10000");
+    properties.setProperty(ZK_LOCK_KEY_PROP.key(), "key");
+    properties.setProperty(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key(), "1000");
     lockConfiguration = new LockConfiguration(properties);
   }
 
@@ -79,7 +79,7 @@ public class TestZookeeperBasedLockProvider {
   public void testAcquireLock() {
     ZookeeperBasedLockProvider zookeeperBasedLockProvider = new ZookeeperBasedLockProvider(lockConfiguration, client);
     Assertions.assertTrue(zookeeperBasedLockProvider.tryLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP), TimeUnit.MILLISECONDS));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS));
     zookeeperBasedLockProvider.unlock();
   }
 
@@ -87,20 +87,20 @@ public class TestZookeeperBasedLockProvider {
   public void testUnLock() {
     ZookeeperBasedLockProvider zookeeperBasedLockProvider = new ZookeeperBasedLockProvider(lockConfiguration, client);
     Assertions.assertTrue(zookeeperBasedLockProvider.tryLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP), TimeUnit.MILLISECONDS));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS));
     zookeeperBasedLockProvider.unlock();
     zookeeperBasedLockProvider.tryLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP), TimeUnit.MILLISECONDS);
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS);
   }
 
   @Test
   public void testReentrantLock() {
     ZookeeperBasedLockProvider zookeeperBasedLockProvider = new ZookeeperBasedLockProvider(lockConfiguration, client);
     Assertions.assertTrue(zookeeperBasedLockProvider.tryLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP), TimeUnit.MILLISECONDS));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS));
     try {
       zookeeperBasedLockProvider.tryLock(lockConfiguration.getConfig()
-          .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP), TimeUnit.MILLISECONDS);
+          .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS);
       Assertions.fail();
     } catch (HoodieLockException e) {
       // expected

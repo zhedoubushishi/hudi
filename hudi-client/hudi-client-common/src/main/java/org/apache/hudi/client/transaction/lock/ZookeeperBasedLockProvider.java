@@ -36,8 +36,6 @@ import org.apache.log4j.Logger;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_ZK_CONNECTION_TIMEOUT_MS;
-import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_ZK_SESSION_TIMEOUT_MS;
 import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_NUM_RETRIES_PROP;
 import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP;
 import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP;
@@ -64,11 +62,11 @@ public class ZookeeperBasedLockProvider implements LockProvider<InterProcessMute
     checkRequiredProps(lockConfiguration);
     this.lockConfiguration = lockConfiguration;
     this.curatorFrameworkClient = CuratorFrameworkFactory.builder()
-        .connectString(lockConfiguration.getConfig().getString(ZK_CONNECT_URL_PROP))
-        .retryPolicy(new BoundedExponentialBackoffRetry(lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP),
-            lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP), lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_NUM_RETRIES_PROP)))
-        .sessionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_SESSION_TIMEOUT_MS_PROP, DEFAULT_ZK_SESSION_TIMEOUT_MS))
-        .connectionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_CONNECTION_TIMEOUT_MS_PROP, DEFAULT_ZK_CONNECTION_TIMEOUT_MS))
+        .connectString(lockConfiguration.getConfig().getString(ZK_CONNECT_URL_PROP.key()))
+        .retryPolicy(new BoundedExponentialBackoffRetry(lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP.key()),
+            lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP.key()), lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_NUM_RETRIES_PROP.key())))
+        .sessionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_SESSION_TIMEOUT_MS_PROP.key(), ZK_SESSION_TIMEOUT_MS_PROP.defaultValue()))
+        .connectionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_CONNECTION_TIMEOUT_MS_PROP.key(), ZK_CONNECTION_TIMEOUT_MS_PROP.defaultValue()))
         .build();
     this.curatorFrameworkClient.start();
   }
@@ -136,8 +134,8 @@ public class ZookeeperBasedLockProvider implements LockProvider<InterProcessMute
   private void acquireLock(long time, TimeUnit unit) throws Exception {
     ValidationUtils.checkArgument(this.lock == null, generateLogStatement(LockState.ALREADY_ACQUIRED, generateLogSuffixString()));
     InterProcessMutex newLock = new InterProcessMutex(
-        this.curatorFrameworkClient, lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP) + "/"
-        + this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP));
+        this.curatorFrameworkClient, lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP.key()) + "/"
+        + this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP.key()));
     boolean acquired = newLock.acquire(time, unit);
     if (!acquired) {
       throw new HoodieLockException(generateLogStatement(LockState.FAILED_TO_ACQUIRE, generateLogSuffixString()));
@@ -150,16 +148,16 @@ public class ZookeeperBasedLockProvider implements LockProvider<InterProcessMute
   }
 
   private void checkRequiredProps(final LockConfiguration config) {
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECT_URL_PROP) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_BASE_PATH_PROP) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_SESSION_TIMEOUT_MS_PROP) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECTION_TIMEOUT_MS_PROP) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_LOCK_KEY_PROP) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECT_URL_PROP.key()) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_BASE_PATH_PROP.key()) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_SESSION_TIMEOUT_MS_PROP.key()) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECTION_TIMEOUT_MS_PROP.key()) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_LOCK_KEY_PROP.key()) != null);
   }
 
   private String generateLogSuffixString() {
-    String zkBasePath = this.lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP);
-    String lockKey = this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP);
+    String zkBasePath = this.lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP.key());
+    String lockKey = this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP.key());
     return StringUtils.join("ZkBasePath = ", zkBasePath, ", lock key = ", lockKey);
   }
 

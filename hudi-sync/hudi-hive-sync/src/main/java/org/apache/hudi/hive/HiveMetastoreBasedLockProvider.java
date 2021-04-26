@@ -100,9 +100,9 @@ public class HiveMetastoreBasedLockProvider implements LockProvider<LockResponse
   HiveMetastoreBasedLockProvider(final LockConfiguration lockConfiguration) {
     checkRequiredProps(lockConfiguration);
     this.lockConfiguration = lockConfiguration;
-    this.databaseName = this.lockConfiguration.getConfig().getString(HIVE_DATABASE_NAME_PROP);
-    this.tableName = this.lockConfiguration.getConfig().getString(HIVE_TABLE_NAME_PROP);
-    this.hiveMetastoreUris = this.lockConfiguration.getConfig().getOrDefault(HIVE_METASTORE_URI_PROP, "").toString();
+    this.databaseName = this.lockConfiguration.getConfig().getString(HIVE_DATABASE_NAME_PROP.key());
+    this.tableName = this.lockConfiguration.getConfig().getString(HIVE_TABLE_NAME_PROP.key());
+    this.hiveMetastoreUris = this.lockConfiguration.getConfig().getOrDefault(HIVE_METASTORE_URI_PROP.key(), "").toString();
   }
 
   @Override
@@ -201,8 +201,8 @@ public class HiveMetastoreBasedLockProvider implements LockProvider<LockResponse
   }
 
   private void checkRequiredProps(final LockConfiguration lockConfiguration) {
-    ValidationUtils.checkArgument(lockConfiguration.getConfig().getString(HIVE_DATABASE_NAME_PROP) != null);
-    ValidationUtils.checkArgument(lockConfiguration.getConfig().getString(HIVE_TABLE_NAME_PROP) != null);
+    ValidationUtils.checkArgument(lockConfiguration.getConfig().getString(HIVE_DATABASE_NAME_PROP.key()) != null);
+    ValidationUtils.checkArgument(lockConfiguration.getConfig().getString(HIVE_TABLE_NAME_PROP.key()) != null);
   }
 
   private void setHiveLockConfs(HiveConf hiveConf) {
@@ -211,18 +211,18 @@ public class HiveMetastoreBasedLockProvider implements LockProvider<LockResponse
     }
     hiveConf.set("hive.support.concurrency", "true");
     hiveConf.set("hive.lock.manager", "org.apache.hadoop.hive.ql.lockmgr.zookeeper.ZooKeeperHiveLockManager");
-    hiveConf.set("hive.lock.numretries", lockConfiguration.getConfig().getString(LOCK_ACQUIRE_NUM_RETRIES_PROP));
-    hiveConf.set("hive.unlock.numretries", lockConfiguration.getConfig().getString(LOCK_ACQUIRE_NUM_RETRIES_PROP));
-    hiveConf.set("hive.lock.sleep.between.retries", lockConfiguration.getConfig().getString(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP));
-    String zkConnectUrl = lockConfiguration.getConfig().getOrDefault(ZK_CONNECT_URL_PROP, "").toString();
+    hiveConf.set("hive.lock.numretries", lockConfiguration.getConfig().getString(LOCK_ACQUIRE_NUM_RETRIES_PROP.key()));
+    hiveConf.set("hive.unlock.numretries", lockConfiguration.getConfig().getString(LOCK_ACQUIRE_NUM_RETRIES_PROP.key()));
+    hiveConf.set("hive.lock.sleep.between.retries", lockConfiguration.getConfig().getString(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP.key()));
+    String zkConnectUrl = lockConfiguration.getConfig().getOrDefault(ZK_CONNECT_URL_PROP.key(), "").toString();
     if (zkConnectUrl.length() > 0) {
       hiveConf.set("hive.zookeeper.quorum", zkConnectUrl);
     }
-    String zkPort = lockConfiguration.getConfig().getOrDefault(ZK_PORT_PROP, "").toString();
+    String zkPort = lockConfiguration.getConfig().getOrDefault(ZK_PORT_PROP.key(), "").toString();
     if (zkPort.length() > 0) {
       hiveConf.set("hive.zookeeper.client.port", zkPort);
     }
-    String zkSessionTimeout = lockConfiguration.getConfig().getOrDefault(ZK_SESSION_TIMEOUT_MS_PROP, "").toString();
+    String zkSessionTimeout = lockConfiguration.getConfig().getOrDefault(ZK_SESSION_TIMEOUT_MS_PROP.key(), "").toString();
     if (zkSessionTimeout.length() > 0) {
       hiveConf.set("hive.zookeeper.session.timeout", zkSessionTimeout);
     }

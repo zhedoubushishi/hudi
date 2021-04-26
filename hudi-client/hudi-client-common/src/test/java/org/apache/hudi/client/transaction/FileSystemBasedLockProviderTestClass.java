@@ -49,7 +49,7 @@ public class FileSystemBasedLockProviderTestClass implements LockProvider<String
 
   public FileSystemBasedLockProviderTestClass(final LockConfiguration lockConfiguration, final Configuration configuration) {
     this.lockConfiguration = lockConfiguration;
-    this.lockPath = lockConfiguration.getConfig().getString(FILESYSTEM_LOCK_PATH_PROP);
+    this.lockPath = lockConfiguration.getConfig().getString(FILESYSTEM_LOCK_PATH_PROP.key());
     this.fs = FSUtils.getFs(this.lockPath, configuration);
   }
 
@@ -75,8 +75,8 @@ public class FileSystemBasedLockProviderTestClass implements LockProvider<String
     try {
       int numRetries = 0;
       while (fs.exists(new Path(lockPath + "/" + LOCK_NAME))
-          && (numRetries <= lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_NUM_RETRIES_PROP))) {
-        Thread.sleep(lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP));
+          && (numRetries <= lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_NUM_RETRIES_PROP.key()))) {
+        Thread.sleep(lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP.key()));
       }
       acquireLock();
       return true;
