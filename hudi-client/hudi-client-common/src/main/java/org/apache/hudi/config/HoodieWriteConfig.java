@@ -909,11 +909,11 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    * Commit call back configs.
    */
   public boolean writeCommitCallbackOn() {
-    return Boolean.parseBoolean(props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_ON));
+    return Boolean.parseBoolean(props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_ON.key()));
   }
 
   public String getCallbackClass() {
-    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_CLASS_PROP);
+    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_CLASS_PROP.key());
   }
 
   public String getBootstrapSourceBasePath() {
