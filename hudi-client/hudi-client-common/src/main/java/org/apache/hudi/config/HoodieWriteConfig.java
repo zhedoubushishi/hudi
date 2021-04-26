@@ -1001,23 +1001,23 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
    */
 
   public String getLockProviderClass() {
-    return props.getProperty(HoodieLockConfig.LOCK_PROVIDER_CLASS_PROP);
+    return props.getProperty(HoodieLockConfig.LOCK_PROVIDER_CLASS_PROP.key());
   }
 
   public String getLockHiveDatabaseName() {
-    return props.getProperty(HIVE_DATABASE_NAME_PROP);
+    return props.getProperty(HIVE_DATABASE_NAME_PROP.key());
   }
 
   public String getLockHiveTableName() {
-    return props.getProperty(HIVE_TABLE_NAME_PROP);
+    return props.getProperty(HIVE_TABLE_NAME_PROP.key());
   }
 
   public ConflictResolutionStrategy getWriteConflictResolutionStrategy() {
-    return ReflectionUtils.loadClass(props.getProperty(HoodieLockConfig.WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP));
+    return ReflectionUtils.loadClass(props.getProperty(HoodieLockConfig.WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP.key()));
   }
 
   public Long getLockAcquireWaitTimeoutInMs() {
-    return Long.valueOf(props.getProperty(LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP));
+    return Long.valueOf(props.getProperty(LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()));
   }
 
   public WriteConcurrencyMode getWriteConcurrencyMode() {
