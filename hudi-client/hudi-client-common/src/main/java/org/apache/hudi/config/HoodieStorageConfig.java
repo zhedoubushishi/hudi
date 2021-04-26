@@ -18,6 +18,7 @@
 
 package org.apache.hudi.config;
 
+import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.DefaultHoodieConfig;
 
 import javax.annotation.concurrent.Immutable;
@@ -33,33 +34,65 @@ import java.util.Properties;
 @Immutable
 public class HoodieStorageConfig extends DefaultHoodieConfig {
 
-  public static final String PARQUET_FILE_MAX_BYTES = "hoodie.parquet.max.file.size";
-  public static final String DEFAULT_PARQUET_FILE_MAX_BYTES = String.valueOf(120 * 1024 * 1024);
-  public static final String PARQUET_BLOCK_SIZE_BYTES = "hoodie.parquet.block.size";
-  public static final String DEFAULT_PARQUET_BLOCK_SIZE_BYTES = DEFAULT_PARQUET_FILE_MAX_BYTES;
-  public static final String PARQUET_PAGE_SIZE_BYTES = "hoodie.parquet.page.size";
-  public static final String DEFAULT_PARQUET_PAGE_SIZE_BYTES = String.valueOf(1 * 1024 * 1024);
-  public static final String HFILE_FILE_MAX_BYTES = "hoodie.hfile.max.file.size";
-  public static final String HFILE_BLOCK_SIZE_BYTES = "hoodie.hfile.block.size";
-  public static final String DEFAULT_HFILE_BLOCK_SIZE_BYTES = String.valueOf(1 * 1024 * 1024);
-  public static final String DEFAULT_HFILE_FILE_MAX_BYTES = String.valueOf(120 * 1024 * 1024);
+  public static final ConfigOption<String> PARQUET_FILE_MAX_BYTES = ConfigOption
+      .key("hoodie.parquet.max.file.size")
+      .defaultValue(String.valueOf(120 * 1024 * 1024))
+      .withDescription("");
+
+  public static final ConfigOption<String> PARQUET_BLOCK_SIZE_BYTES = ConfigOption
+      .key("hoodie.parquet.block.size")
+      .defaultValue(String.valueOf(120 * 1024 * 1024))
+      .withDescription("");
+
+  public static final ConfigOption<String> PARQUET_PAGE_SIZE_BYTES = ConfigOption
+      .key("hoodie.parquet.page.size")
+      .defaultValue(String.valueOf(1 * 1024 * 1024))
+      .withDescription("");
+
+  public static final ConfigOption<String> HFILE_FILE_MAX_BYTES = ConfigOption
+      .key("hoodie.hfile.max.file.size")
+      .defaultValue(String.valueOf(120 * 1024 * 1024))
+      .withDescription("");
+
+  public static final ConfigOption<String> HFILE_BLOCK_SIZE_BYTES = ConfigOption
+      .key("hoodie.hfile.block.size")
+      .defaultValue(String.valueOf(1 * 1024 * 1024))
+      .withDescription("");
+
   // used to size log files
-  public static final String LOGFILE_SIZE_MAX_BYTES = "hoodie.logfile.max.size";
-  public static final String DEFAULT_LOGFILE_SIZE_MAX_BYTES = String.valueOf(1024 * 1024 * 1024); // 1 GB
+  public static final ConfigOption<String> LOGFILE_SIZE_MAX_BYTES = ConfigOption
+      .key("hoodie.logfile.max.size")
+      .defaultValue(String.valueOf(1024 * 1024 * 1024)) // 1 GB
+      .withDescription("");
+
   // used to size data blocks in log file
-  public static final String LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES = "hoodie.logfile.data.block.max.size";
-  public static final String DEFAULT_LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES = String.valueOf(256 * 1024 * 1024); // 256 MB
-  public static final String PARQUET_COMPRESSION_RATIO = "hoodie.parquet.compression.ratio";
+  public static final ConfigOption<String> LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES = ConfigOption
+      .key("hoodie.logfile.data.block.max.size")
+      .defaultValue(String.valueOf(256 * 1024 * 1024))
+      .withDescription("");
+
   // Default compression ratio for parquet
-  public static final String DEFAULT_STREAM_COMPRESSION_RATIO = String.valueOf(0.1);
-  public static final String PARQUET_COMPRESSION_CODEC = "hoodie.parquet.compression.codec";
-  public static final String HFILE_COMPRESSION_ALGORITHM = "hoodie.hfile.compression.algorithm";
+  public static final ConfigOption<String> PARQUET_COMPRESSION_RATIO = ConfigOption
+      .key("hoodie.parquet.compression.ratio")
+      .defaultValue(String.valueOf(0.1))
+      .withDescription("");
+
   // Default compression codec for parquet
-  public static final String DEFAULT_PARQUET_COMPRESSION_CODEC = "gzip";
-  public static final String DEFAULT_HFILE_COMPRESSION_ALGORITHM = "GZ";
-  public static final String LOGFILE_TO_PARQUET_COMPRESSION_RATIO = "hoodie.logfile.to.parquet.compression.ratio";
+  public static final ConfigOption<String> PARQUET_COMPRESSION_CODEC = ConfigOption
+      .key("hoodie.parquet.compression.codec")
+      .defaultValue("gzip")
+      .withDescription("");
+
+  public static final ConfigOption<String> HFILE_COMPRESSION_ALGORITHM = ConfigOption
+      .key("hoodie.hfile.compression.algorithm")
+      .defaultValue("GZ")
+      .withDescription("");
+
   // Default compression ratio for log file to parquet, general 3x
-  public static final String DEFAULT_LOGFILE_TO_PARQUET_COMPRESSION_RATIO = String.valueOf(0.35);
+  public static final ConfigOption<String> LOGFILE_TO_PARQUET_COMPRESSION_RATIO = ConfigOption
+      .key("hoodie.logfile.to.parquet.compression.ratio")
+      .defaultValue(String.valueOf(0.35))
+      .withDescription("");
 
   private HoodieStorageConfig(Properties props) {
     super(props);
@@ -86,85 +119,73 @@ public class HoodieStorageConfig extends DefaultHoodieConfig {
     }
 
     public Builder parquetMaxFileSize(long maxFileSize) {
-      props.setProperty(PARQUET_FILE_MAX_BYTES, String.valueOf(maxFileSize));
+      props.setProperty(PARQUET_FILE_MAX_BYTES.key(), String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder parquetBlockSize(int blockSize) {
-      props.setProperty(PARQUET_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
+      props.setProperty(PARQUET_BLOCK_SIZE_BYTES.key(), String.valueOf(blockSize));
       return this;
     }
 
     public Builder parquetPageSize(int pageSize) {
-      props.setProperty(PARQUET_PAGE_SIZE_BYTES, String.valueOf(pageSize));
+      props.setProperty(PARQUET_PAGE_SIZE_BYTES.key(), String.valueOf(pageSize));
       return this;
     }
 
     public Builder hfileMaxFileSize(long maxFileSize) {
-      props.setProperty(HFILE_FILE_MAX_BYTES, String.valueOf(maxFileSize));
+      props.setProperty(HFILE_FILE_MAX_BYTES.key(), String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder hfileBlockSize(int blockSize) {
-      props.setProperty(HFILE_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
+      props.setProperty(HFILE_BLOCK_SIZE_BYTES.key(), String.valueOf(blockSize));
       return this;
     }
 
     public Builder logFileDataBlockMaxSize(int dataBlockSize) {
-      props.setProperty(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES, String.valueOf(dataBlockSize));
+      props.setProperty(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES.key(), String.valueOf(dataBlockSize));
       return this;
     }
 
     public Builder logFileMaxSize(int logFileSize) {
-      props.setProperty(LOGFILE_SIZE_MAX_BYTES, String.valueOf(logFileSize));
+      props.setProperty(LOGFILE_SIZE_MAX_BYTES.key(), String.valueOf(logFileSize));
       return this;
     }
 
     public Builder parquetCompressionRatio(double parquetCompressionRatio) {
-      props.setProperty(PARQUET_COMPRESSION_RATIO, String.valueOf(parquetCompressionRatio));
+      props.setProperty(PARQUET_COMPRESSION_RATIO.key(), String.valueOf(parquetCompressionRatio));
       return this;
     }
 
     public Builder parquetCompressionCodec(String parquetCompressionCodec) {
-      props.setProperty(PARQUET_COMPRESSION_CODEC, parquetCompressionCodec);
+      props.setProperty(PARQUET_COMPRESSION_CODEC.key(), parquetCompressionCodec);
       return this;
     }
 
     public Builder hfileCompressionAlgorithm(String hfileCompressionAlgorithm) {
-      props.setProperty(HFILE_COMPRESSION_ALGORITHM, hfileCompressionAlgorithm);
+      props.setProperty(HFILE_COMPRESSION_ALGORITHM.key(), hfileCompressionAlgorithm);
       return this;
     }
 
     public Builder logFileToParquetCompressionRatio(double logFileToParquetCompressionRatio) {
-      props.setProperty(LOGFILE_TO_PARQUET_COMPRESSION_RATIO, String.valueOf(logFileToParquetCompressionRatio));
+      props.setProperty(LOGFILE_TO_PARQUET_COMPRESSION_RATIO.key(), String.valueOf(logFileToParquetCompressionRatio));
       return this;
     }
 
     public HoodieStorageConfig build() {
       HoodieStorageConfig config = new HoodieStorageConfig(props);
-      setDefaultOnCondition(props, !props.containsKey(PARQUET_FILE_MAX_BYTES), PARQUET_FILE_MAX_BYTES,
-          DEFAULT_PARQUET_FILE_MAX_BYTES);
-      setDefaultOnCondition(props, !props.containsKey(PARQUET_BLOCK_SIZE_BYTES), PARQUET_BLOCK_SIZE_BYTES,
-          DEFAULT_PARQUET_BLOCK_SIZE_BYTES);
-      setDefaultOnCondition(props, !props.containsKey(PARQUET_PAGE_SIZE_BYTES), PARQUET_PAGE_SIZE_BYTES,
-          DEFAULT_PARQUET_PAGE_SIZE_BYTES);
-      setDefaultOnCondition(props, !props.containsKey(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES),
-          LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES, DEFAULT_LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES);
-      setDefaultOnCondition(props, !props.containsKey(LOGFILE_SIZE_MAX_BYTES), LOGFILE_SIZE_MAX_BYTES,
-          DEFAULT_LOGFILE_SIZE_MAX_BYTES);
-      setDefaultOnCondition(props, !props.containsKey(PARQUET_COMPRESSION_RATIO), PARQUET_COMPRESSION_RATIO,
-          DEFAULT_STREAM_COMPRESSION_RATIO);
-      setDefaultOnCondition(props, !props.containsKey(PARQUET_COMPRESSION_CODEC), PARQUET_COMPRESSION_CODEC,
-          DEFAULT_PARQUET_COMPRESSION_CODEC);
-      setDefaultOnCondition(props, !props.containsKey(LOGFILE_TO_PARQUET_COMPRESSION_RATIO),
-          LOGFILE_TO_PARQUET_COMPRESSION_RATIO, DEFAULT_LOGFILE_TO_PARQUET_COMPRESSION_RATIO);
-
-      setDefaultOnCondition(props, !props.containsKey(HFILE_BLOCK_SIZE_BYTES), HFILE_BLOCK_SIZE_BYTES,
-          DEFAULT_HFILE_BLOCK_SIZE_BYTES);
-      setDefaultOnCondition(props, !props.containsKey(HFILE_COMPRESSION_ALGORITHM), HFILE_COMPRESSION_ALGORITHM,
-          DEFAULT_HFILE_COMPRESSION_ALGORITHM);
-      setDefaultOnCondition(props, !props.containsKey(HFILE_FILE_MAX_BYTES), HFILE_FILE_MAX_BYTES,
-          DEFAULT_HFILE_FILE_MAX_BYTES);
+      setDefaultValue(props, PARQUET_FILE_MAX_BYTES);
+      setDefaultValue(props, PARQUET_BLOCK_SIZE_BYTES);
+      setDefaultValue(props, PARQUET_PAGE_SIZE_BYTES);
+      setDefaultValue(props, LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES);
+      setDefaultValue(props, LOGFILE_SIZE_MAX_BYTES);
+      setDefaultValue(props, PARQUET_COMPRESSION_RATIO);
+      setDefaultValue(props, PARQUET_COMPRESSION_CODEC);
+      setDefaultValue(props, LOGFILE_TO_PARQUET_COMPRESSION_RATIO);
+      setDefaultValue(props, HFILE_BLOCK_SIZE_BYTES);
+      setDefaultValue(props, HFILE_COMPRESSION_ALGORITHM);
+      setDefaultValue(props, HFILE_FILE_MAX_BYTES);
 
       return config;
     }
