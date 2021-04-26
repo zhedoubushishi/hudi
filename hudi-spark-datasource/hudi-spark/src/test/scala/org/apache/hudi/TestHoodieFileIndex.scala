@@ -172,7 +172,7 @@ class TestHoodieFileIndex extends HoodieClientTestBase {
       .option(PARTITIONPATH_FIELD_OPT_KEY, "dt,hh")
       .option(KEYGENERATOR_CLASS_OPT_KEY, classOf[ComplexKeyGenerator].getName)
       .option(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY, "false")
-      .option(HoodieMetadataConfig.METADATA_ENABLE_PROP, useMetaFileList)
+      .option(HoodieMetadataConfig.METADATA_ENABLE_PROP.key, useMetaFileList)
       .mode(SaveMode.Overwrite)
       .save(basePath)
     metaClient = HoodieTableMetaClient.reload(metaClient)
