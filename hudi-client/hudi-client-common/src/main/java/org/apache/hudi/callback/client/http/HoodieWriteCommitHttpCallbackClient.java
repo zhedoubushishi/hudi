@@ -80,11 +80,11 @@ public class HoodieWriteCommitHttpCallbackClient implements Closeable {
   }
 
   private String getApiKey() {
-    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_API_KEY);
+    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_API_KEY.key());
   }
 
   private String getUrl() {
-    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_URL_PROP);
+    return props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_URL_PROP.key());
   }
 
   private CloseableHttpClient getClient() {
@@ -98,7 +98,7 @@ public class HoodieWriteCommitHttpCallbackClient implements Closeable {
   }
 
   private Integer getHttpTimeoutSeconds() {
-    return Integer.parseInt(props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_TIMEOUT_SECONDS));
+    return Integer.parseInt(props.getProperty(HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_TIMEOUT_SECONDS.key()));
   }
 
   @Override
