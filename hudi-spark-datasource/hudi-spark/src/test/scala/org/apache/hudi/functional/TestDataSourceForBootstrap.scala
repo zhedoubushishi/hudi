@@ -41,16 +41,16 @@ class TestDataSourceForBootstrap {
 
   var spark: SparkSession = _
   val commonOpts: Map[String, String] = Map(
-    HoodieWriteConfig.INSERT_PARALLELISM -> "4",
-    HoodieWriteConfig.UPSERT_PARALLELISM -> "4",
-    HoodieWriteConfig.DELETE_PARALLELISM -> "4",
-    HoodieWriteConfig.BULKINSERT_PARALLELISM -> "4",
-    HoodieWriteConfig.FINALIZE_WRITE_PARALLELISM -> "4",
+    HoodieWriteConfig.INSERT_PARALLELISM.key -> "4",
+    HoodieWriteConfig.UPSERT_PARALLELISM.key -> "4",
+    HoodieWriteConfig.DELETE_PARALLELISM.key -> "4",
+    HoodieWriteConfig.BULKINSERT_PARALLELISM.key -> "4",
+    HoodieWriteConfig.FINALIZE_WRITE_PARALLELISM.key -> "4",
     "hoodie.bootstrap.parallelism" -> "4",
-    DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
-    DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
-    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY -> "timestamp",
-    HoodieWriteConfig.TABLE_NAME -> "hoodie_test"
+    DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY.key -> "_row_key",
+    DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key -> "partition",
+    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY.key -> "timestamp",
+    HoodieWriteConfig.TABLE_NAME.key -> "hoodie_test"
   )
   var basePath: String = _
   var srcPath: String = _
@@ -117,9 +117,9 @@ class TestDataSourceForBootstrap {
     updateDF.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY, "org.apache.hudi.keygen.NonpartitionedKeyGenerator")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY.key, "org.apache.hudi.keygen.NonpartitionedKeyGenerator")
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -168,11 +168,11 @@ class TestDataSourceForBootstrap {
     updateDF.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       // Required because source data is hive style partitioned
-      .option(DataSourceWriteOptions.HIVE_STYLE_PARTITIONING_OPT_KEY, "true")
+      .option(DataSourceWriteOptions.HIVE_STYLE_PARTITIONING_OPT_KEY.key, "true")
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -221,9 +221,9 @@ class TestDataSourceForBootstrap {
     updateDf1.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -241,9 +241,9 @@ class TestDataSourceForBootstrap {
     updateDF2.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -295,9 +295,9 @@ class TestDataSourceForBootstrap {
     updateDF.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       .option(HoodieCompactionConfig.INLINE_COMPACT_PROP.key, "true")
       .option(HoodieCompactionConfig.INLINE_COMPACT_NUM_DELTA_COMMITS_PROP.key, "1")
       .mode(SaveMode.Append)
@@ -363,9 +363,9 @@ class TestDataSourceForBootstrap {
     updateDf1.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -386,9 +386,9 @@ class TestDataSourceForBootstrap {
     updateDF2.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -428,8 +428,8 @@ class TestDataSourceForBootstrap {
     bootstrapDF.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       .option("hoodie.bootstrap.base.path", srcPath)
       .option("hoodie.bootstrap.keygen.class", classOf[SimpleKeyGenerator].getName)
       .option("hoodie.bootstrap.mode.selector", classOf[FullRecordBootstrapModeSelector].getName)
@@ -455,9 +455,9 @@ class TestDataSourceForBootstrap {
     updateDF.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "datestr")
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -478,9 +478,9 @@ class TestDataSourceForBootstrap {
     bootstrapDF.write
       .format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, tableType)
-      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, partitionColumns.getOrElse(""))
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, tableType)
+      .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, partitionColumns.getOrElse(""))
       .option("hoodie.bootstrap.base.path", srcPath)
       .option("hoodie.bootstrap.keygen.class", classOf[SimpleKeyGenerator].getName)
       .mode(SaveMode.Overwrite)
