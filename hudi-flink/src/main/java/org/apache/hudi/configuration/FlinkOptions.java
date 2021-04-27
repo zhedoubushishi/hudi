@@ -162,7 +162,7 @@ public class FlinkOptions {
   //  Write Options
   // ------------------------------------------------------------------------
   public static final ConfigOption<String> TABLE_NAME = ConfigOptions
-      .key(HoodieWriteConfig.TABLE_NAME)
+      .key(HoodieWriteConfig.TABLE_NAME.key())
       .stringType()
       .noDefaultValue()
       .withDescription("Table name to register to Hive metastore");
@@ -250,7 +250,7 @@ public class FlinkOptions {
       .withDescription("Whether to encode the partition path url, default false");
 
   public static final ConfigOption<String> KEYGEN_CLASS = ConfigOptions
-      .key(HoodieWriteConfig.KEYGENERATOR_CLASS_PROP)
+      .key(HoodieWriteConfig.KEYGENERATOR_CLASS_PROP.key())
       .stringType()
       .defaultValue(SimpleAvroKeyGenerator.class.getName())
       .withDescription("Key generator class, that implements will extract the key out of incoming record");

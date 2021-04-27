@@ -57,8 +57,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
     "hoodie.delete.shuffle.parallelism" -> "1",
     DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
     DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
-    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY -> "timestamp",
-    HoodieWriteConfig.TABLE_NAME -> "hoodie_test"
+    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY.key -> "timestamp",
+    HoodieWriteConfig.TABLE_NAME.key -> "hoodie_test"
   )
 
   val verificationCol: String = "driver"
@@ -119,7 +119,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
 
     val tableMetaClient = HoodieTableMetaClient.builder().setConf(spark.sparkContext.hadoopConfiguration).setBasePath(basePath).build()
     val actualSchema = new TableSchemaResolver(tableMetaClient).getTableAvroSchemaWithoutMetadataFields
-    val (structName, nameSpace) = AvroConversionUtils.getAvroRecordNameAndNamespace(commonOpts(HoodieWriteConfig.TABLE_NAME))
+    val (structName, nameSpace) = AvroConversionUtils.getAvroRecordNameAndNamespace(commonOpts(HoodieWriteConfig.TABLE_NAME.key))
     spark.sparkContext.getConf.registerKryoClasses(
       Array(classOf[org.apache.avro.generic.GenericData],
         classOf[org.apache.avro.Schema]))
@@ -503,7 +503,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
-      .option(HoodieWriteConfig.HOODIE_AUTO_COMMIT_PROP, "true")
+      .option(HoodieWriteConfig.HOODIE_AUTO_COMMIT_PROP.key, "true")
       .mode(SaveMode.Overwrite)
       .save(basePath)
 
@@ -516,7 +516,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
 
     inputDF.write.format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY, keyGenerator)
+      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY.key, keyGenerator)
       .mode(SaveMode.Overwrite)
   }
 

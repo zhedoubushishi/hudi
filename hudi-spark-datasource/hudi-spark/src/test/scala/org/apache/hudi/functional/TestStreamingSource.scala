@@ -30,10 +30,10 @@ class TestStreamingSource extends StreamTest {
   import testImplicits._
   private val commonOptions = Map(
     RECORDKEY_FIELD_OPT_KEY -> "id",
-    PRECOMBINE_FIELD_OPT_KEY -> "ts",
-    INSERT_PARALLELISM -> "4",
-    UPSERT_PARALLELISM -> "4",
-    DELETE_PARALLELISM -> "4"
+    PRECOMBINE_FIELD_OPT_KEY.key -> "ts",
+    INSERT_PARALLELISM.key -> "4",
+    UPSERT_PARALLELISM.key -> "4",
+    DELETE_PARALLELISM.key -> "4"
   )
   private val columns = Seq("id", "name", "price", "ts")
 
@@ -140,7 +140,7 @@ class TestStreamingSource extends StreamTest {
       .write
       .format("org.apache.hudi")
       .options(commonOptions)
-      .option(TABLE_NAME, getTableName(inputPath))
+      .option(TABLE_NAME.key, getTableName(inputPath))
       .mode(SaveMode.Append)
       .save(inputPath)
   }

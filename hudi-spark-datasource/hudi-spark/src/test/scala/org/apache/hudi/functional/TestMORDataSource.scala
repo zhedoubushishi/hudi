@@ -49,8 +49,8 @@ class TestMORDataSource extends HoodieClientTestBase {
     "hoodie.upsert.shuffle.parallelism" -> "4",
     DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
     DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
-    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY -> "timestamp",
-    HoodieWriteConfig.TABLE_NAME -> "hoodie_test"
+    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY.key -> "timestamp",
+    HoodieWriteConfig.TABLE_NAME.key -> "hoodie_test"
   )
 
   val verificationCol: String = "driver"
@@ -528,12 +528,12 @@ class TestMORDataSource extends HoodieClientTestBase {
     df.write.format("org.apache.hudi")
       .options(commonOpts)
       // use DefaultHoodieRecordPayload here
-      .option(PAYLOAD_CLASS_OPT_KEY, classOf[DefaultHoodieRecordPayload].getCanonicalName)
+      .option(PAYLOAD_CLASS_OPT_KEY.key, classOf[DefaultHoodieRecordPayload].getCanonicalName)
       .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.MOR_TABLE_TYPE_OPT_VAL)
       .option(RECORDKEY_FIELD_OPT_KEY, "id")
-      .option(PRECOMBINE_FIELD_OPT_KEY, "version")
+      .option(PRECOMBINE_FIELD_OPT_KEY.key, "version")
       .option(PARTITIONPATH_FIELD_OPT_KEY, "")
-      .option(KEYGENERATOR_CLASS_OPT_KEY, classOf[NonpartitionedKeyGenerator].getName)
+      .option(KEYGENERATOR_CLASS_OPT_KEY.key, classOf[NonpartitionedKeyGenerator].getName)
       .mode(SaveMode.Append)
       .save(basePath)
   }

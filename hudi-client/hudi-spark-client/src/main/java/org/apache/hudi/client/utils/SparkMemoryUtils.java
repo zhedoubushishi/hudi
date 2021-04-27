@@ -31,7 +31,7 @@ import static org.apache.hudi.config.HoodieWriteConfig.WRITE_STATUS_STORAGE_LEVE
  */
 public class SparkMemoryUtils {
   public static StorageLevel getWriteStatusStorageLevel(Properties properties) {
-    return StorageLevel.fromString(properties.getProperty(WRITE_STATUS_STORAGE_LEVEL));
+    return StorageLevel.fromString(properties.getProperty(WRITE_STATUS_STORAGE_LEVEL.key()));
   }
 
   public static StorageLevel getBloomIndexInputStorageLevel(Properties properties) {

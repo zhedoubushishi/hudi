@@ -84,7 +84,7 @@ class MergeOnReadIncrementalRelation(val sqlContext: SQLContext,
     } else {
       // get preCombineFiled from the options if this is a old table which have not store
       // the field to hoodie.properties
-      optParams.get(DataSourceReadOptions.READ_PRE_COMBINE_FIELD)
+      optParams.get(DataSourceReadOptions.READ_PRE_COMBINE_FIELD.key)
     }
   }
   override def schema: StructType = tableStructSchema

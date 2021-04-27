@@ -41,16 +41,16 @@ class TestDataSourceForBootstrap {
 
   var spark: SparkSession = _
   val commonOpts: Map[String, String] = Map(
-    HoodieWriteConfig.INSERT_PARALLELISM -> "4",
-    HoodieWriteConfig.UPSERT_PARALLELISM -> "4",
-    HoodieWriteConfig.DELETE_PARALLELISM -> "4",
-    HoodieWriteConfig.BULKINSERT_PARALLELISM -> "4",
-    HoodieWriteConfig.FINALIZE_WRITE_PARALLELISM -> "4",
+    HoodieWriteConfig.INSERT_PARALLELISM.key -> "4",
+    HoodieWriteConfig.UPSERT_PARALLELISM.key -> "4",
+    HoodieWriteConfig.DELETE_PARALLELISM.key -> "4",
+    HoodieWriteConfig.BULKINSERT_PARALLELISM.key -> "4",
+    HoodieWriteConfig.FINALIZE_WRITE_PARALLELISM.key -> "4",
     "hoodie.bootstrap.parallelism" -> "4",
     DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
     DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
-    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY -> "timestamp",
-    HoodieWriteConfig.TABLE_NAME -> "hoodie_test"
+    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY.key -> "timestamp",
+    HoodieWriteConfig.TABLE_NAME.key -> "hoodie_test"
   )
   var basePath: String = _
   var srcPath: String = _
@@ -119,7 +119,7 @@ class TestDataSourceForBootstrap {
       .options(commonOpts)
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.UPSERT_OPERATION_OPT_VAL)
       .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY, DataSourceWriteOptions.COW_TABLE_TYPE_OPT_VAL)
-      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY, "org.apache.hudi.keygen.NonpartitionedKeyGenerator")
+      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY.key, "org.apache.hudi.keygen.NonpartitionedKeyGenerator")
       .mode(SaveMode.Append)
       .save(basePath)
 

@@ -50,8 +50,8 @@ class TestHoodieFileIndex extends HoodieClientTestBase {
     "hoodie.upsert.shuffle.parallelism" -> "4",
     DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
     DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
-    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY -> "timestamp",
-    HoodieWriteConfig.TABLE_NAME -> "hoodie_test"
+    DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY.key -> "timestamp",
+    HoodieWriteConfig.TABLE_NAME.key -> "hoodie_test"
   )
 
   @BeforeEach override def setUp() {
@@ -90,7 +90,7 @@ class TestHoodieFileIndex extends HoodieClientTestBase {
     inputDF1.write.format("hudi")
       .options(commonOpts)
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY, keyGenerator)
+      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY.key, keyGenerator)
       .option(Config.TIMESTAMP_TYPE_FIELD_PROP, TimestampType.DATE_STRING.name())
       .option(Config.TIMESTAMP_INPUT_DATE_FORMAT_PROP, "yyyy/MM/dd")
       .option(Config.TIMESTAMP_OUTPUT_DATE_FORMAT_PROP, "yyyy-MM-dd")
@@ -111,7 +111,7 @@ class TestHoodieFileIndex extends HoodieClientTestBase {
     inputDF1.write.format("hudi")
       .options(commonOpts)
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY, keyGenerator)
+      .option(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY.key, keyGenerator)
       .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY, "partition:simple")
       .mode(SaveMode.Overwrite)
       .save(basePath)
@@ -168,9 +168,9 @@ class TestHoodieFileIndex extends HoodieClientTestBase {
       .options(commonOpts)
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .option(RECORDKEY_FIELD_OPT_KEY, "id")
-      .option(PRECOMBINE_FIELD_OPT_KEY, "version")
+      .option(PRECOMBINE_FIELD_OPT_KEY.key, "version")
       .option(PARTITIONPATH_FIELD_OPT_KEY, "dt,hh")
-      .option(KEYGENERATOR_CLASS_OPT_KEY, classOf[ComplexKeyGenerator].getName)
+      .option(KEYGENERATOR_CLASS_OPT_KEY.key, classOf[ComplexKeyGenerator].getName)
       .option(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY, "false")
       .option(HoodieMetadataConfig.METADATA_ENABLE_PROP.key, useMetaFileList)
       .mode(SaveMode.Overwrite)
@@ -202,9 +202,9 @@ class TestHoodieFileIndex extends HoodieClientTestBase {
       .options(commonOpts)
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .option(RECORDKEY_FIELD_OPT_KEY, "id")
-      .option(PRECOMBINE_FIELD_OPT_KEY, "version")
+      .option(PRECOMBINE_FIELD_OPT_KEY.key, "version")
       .option(PARTITIONPATH_FIELD_OPT_KEY, "dt,hh")
-      .option(KEYGENERATOR_CLASS_OPT_KEY, classOf[ComplexKeyGenerator].getName)
+      .option(KEYGENERATOR_CLASS_OPT_KEY.key, classOf[ComplexKeyGenerator].getName)
       .option(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY, "false")
       .mode(SaveMode.Overwrite)
       .save(basePath)
