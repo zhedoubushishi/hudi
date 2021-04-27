@@ -55,8 +55,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
     "hoodie.upsert.shuffle.parallelism" -> "4",
     "hoodie.bulkinsert.shuffle.parallelism" -> "2",
     "hoodie.delete.shuffle.parallelism" -> "1",
-    DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
-    DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
+    DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY.key -> "_row_key",
+    DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key -> "partition",
     DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY.key -> "timestamp",
     HoodieWriteConfig.TABLE_NAME.key -> "hoodie_test"
   )
@@ -84,7 +84,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF = spark.read.json(spark.sparkContext.parallelize(records, 2))
     inputDF.write.format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .mode(SaveMode.Overwrite)
       .save(basePath)
 
@@ -112,7 +112,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
         .option("hoodie.keep.max.commits", "2")
         .option("hoodie.cleaner.commits.retained", "0")
         .option("hoodie.datasource.write.row.writer.enable", "true")
-        .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.BULK_INSERT_OPERATION_OPT_VAL)
+        .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.BULK_INSERT_OPERATION_OPT_VAL)
         .mode(if (i == 0) SaveMode.Overwrite else SaveMode.Append)
         .save(basePath)
     }
@@ -149,7 +149,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
 
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.DELETE_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.DELETE_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -169,7 +169,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(records1, 2))
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .option(HoodieMetadataConfig.METADATA_ENABLE_PROP.key, isMetadataEnabled)
       .mode(SaveMode.Overwrite)
       .save(basePath)
@@ -271,7 +271,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(records1, 2))
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -279,7 +279,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(records2, 2))
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OVERWRITE_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OVERWRITE_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -297,7 +297,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(records1, 2))
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -305,7 +305,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(records2, 2))
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OVERWRITE_TABLE_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OVERWRITE_TABLE_OPERATION_OPT_VAL)
       .mode(SaveMode.Overwrite)
       .save(basePath)
 
@@ -324,7 +324,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(records1, 2))
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -333,7 +333,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(records2, 2))
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -342,7 +342,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF3 = spark.read.json(spark.sparkContext.parallelize(records3, 2))
     inputDF3.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OVERWRITE_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OVERWRITE_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -380,7 +380,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(records1, 2))
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .mode(SaveMode.Append)
       .save(basePath)
 
@@ -389,7 +389,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(records2, 2))
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OVERWRITE_TABLE_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OVERWRITE_TABLE_OPERATION_OPT_VAL)
       .mode(SaveMode.Overwrite)
       .save(basePath)
 
@@ -439,7 +439,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(records1, 2))
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .mode(SaveMode.Overwrite)
       .save(basePath)
     val hoodieROViewDF1 = spark.read.format("org.apache.hudi")
@@ -451,7 +451,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(records2, 2))
     inputDF2.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.INSERT_DROP_DUPS_OPT_KEY, "true")
+      .option(DataSourceWriteOptions.INSERT_DROP_DUPS_OPT_KEY.key, "true")
       .mode(SaveMode.Append)
       .save(basePath)
     val hoodieROViewDF2 = spark.read.format("org.apache.hudi")
@@ -502,7 +502,7 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(records1, 2))
     inputDF1.write.format("org.apache.hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
       .option(HoodieWriteConfig.HOODIE_AUTO_COMMIT_PROP.key, "true")
       .mode(SaveMode.Overwrite)
       .save(basePath)
@@ -666,8 +666,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF1 = spark.read.json(spark.sparkContext.parallelize(recordsToStrings(records1), 2))
     inputDF1.write.format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY, partitionEncode)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY.key, partitionEncode)
       .mode(SaveMode.Overwrite)
       .save(basePath)
     val commitInstantTime1 = HoodieDataSourceHelpers.latestCommit(fs, basePath)
@@ -692,8 +692,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
     val inputDF2 = spark.read.json(spark.sparkContext.parallelize(recordsToStrings(records2), 2))
     inputDF2.write.format("hudi")
       .options(commonOpts)
-      .option(DataSourceWriteOptions.OPERATION_OPT_KEY, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
-      .option(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY, partitionEncode)
+      .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.INSERT_OPERATION_OPT_VAL)
+      .option(DataSourceWriteOptions.URL_ENCODE_PARTITIONING_OPT_KEY.key, partitionEncode)
       .mode(SaveMode.Append)
       .save(basePath)
     // Incremental query without "*" in path

@@ -59,29 +59,20 @@ object DataSourceReadOptions {
     .withDeprecatedNames("hoodie.datasource.view.type")
     .withDescription("")
 
-  // val QUERY_TYPE_OPT_KEY = "hoodie.datasource.query.type"
-  // val QUERY_TYPE_SNAPSHOT_OPT_VAL = "snapshot"
-  // val QUERY_TYPE_READ_OPTIMIZED_OPT_VAL = "read_optimized"
-  // val QUERY_TYPE_INCREMENTAL_OPT_VAL = "incremental"
-  // val DEFAULT_QUERY_TYPE_OPT_VAL: String = QUERY_TYPE_SNAPSHOT_OPT_VAL
-
   /**
    * For Snapshot query on merge on read table. Use this key to define the payload class.
    */
-  // val REALTIME_MERGE_OPT_KEY = "hoodie.datasource.merge.type"
   val REALTIME_SKIP_MERGE_OPT_VAL = "skip_merge"
   val REALTIME_PAYLOAD_COMBINE_OPT_VAL = "payload_combine"
   val REALTIME_MERGE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.merge.type")
     .defaultValue(REALTIME_PAYLOAD_COMBINE_OPT_VAL)
     .withDescription("")
-  // val DEFAULT_REALTIME_MERGE_OPT_VAL = REALTIME_PAYLOAD_COMBINE_OPT_VAL
 
   val READ_PATHS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.paths")
     .noDefaultValue()
     .withDescription("")
-  // val READ_PATHS_OPT_KEY = "hoodie.datasource.read.paths"
 
   // TODO modify this when refactor HoodieWriteConfig
   val READ_PRE_COMBINE_FIELD = HoodieWriteConfig.PRECOMBINE_FIELD_PROP
@@ -90,8 +81,6 @@ object DataSourceReadOptions {
     .key("hoodie.file.index.enable")
     .defaultValue(true)
     .withDescription("")
-  // val ENABLE_HOODIE_FILE_INDEX = "hoodie.file.index.enable"
-  // val DEFAULT_ENABLE_HOODIE_FILE_INDEX = true
 
   @Deprecated
   val VIEW_TYPE_OPT_KEY = "hoodie.datasource.view.type"
@@ -135,8 +124,6 @@ object DataSourceReadOptions {
     .key("hoodie.datasource.read.begin.instanttime")
     .noDefaultValue()
     .withDescription("")
-  // val BEGIN_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.begin.instanttime"
-
 
   /**
     * Instant time to limit incrementally fetched data to. New data written with an
@@ -145,7 +132,6 @@ object DataSourceReadOptions {
     * Default: latest instant (i.e fetches all new data since begin instant time)
     *
     */
-  // val END_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.end.instanttime"
   val END_INSTANTTIME_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.end.instanttime")
     .noDefaultValue()
@@ -161,8 +147,6 @@ object DataSourceReadOptions {
     .key("hoodie.datasource.read.schema.use.end.instanttime")
     .defaultValue("false")
     .withDescription("")
-  // val INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.schema.use.end.instanttime"
-  // val DEFAULT_INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_VAL = "false"
 
   /**
     * For use-cases like DeltaStreamer which reads from Hoodie Incremental table and applies opaque map functions,
@@ -174,9 +158,6 @@ object DataSourceReadOptions {
     .defaultValue("")
     .withDescription("")
 
-  // val PUSH_DOWN_INCR_FILTERS_OPT_KEY = "hoodie.datasource.read.incr.filters"
-  // val DEFAULT_PUSH_DOWN_FILTERS_OPT_VAL = ""
-
   /**
    * For the use-cases like users only want to incremental pull from certain partitions instead of the full table.
    * This option allows using glob pattern to directly filter on path.
@@ -185,8 +166,6 @@ object DataSourceReadOptions {
     .key("hoodie.datasource.read.incr.path.glob")
     .defaultValue("")
     .withDescription("")
-  // val INCR_PATH_GLOB_OPT_KEY = "hoodie.datasource.read.incr.path.glob"
-  // val DEFAULT_INCR_PATH_GLOB_OPT_VAL = ""
 }
 
 /**
@@ -201,7 +180,6 @@ object DataSourceWriteOptions {
     *
     * Default: upsert()
     */
-  val OPERATION_OPT_KEY = "hoodie.datasource.write.operation"
   val BULK_INSERT_OPERATION_OPT_VAL = WriteOperationType.BULK_INSERT.value
   val INSERT_OPERATION_OPT_VAL = WriteOperationType.INSERT.value
   val UPSERT_OPERATION_OPT_VAL = WriteOperationType.UPSERT.value
@@ -209,7 +187,10 @@ object DataSourceWriteOptions {
   val BOOTSTRAP_OPERATION_OPT_VAL = WriteOperationType.BOOTSTRAP.value
   val INSERT_OVERWRITE_OPERATION_OPT_VAL = WriteOperationType.INSERT_OVERWRITE.value
   val INSERT_OVERWRITE_TABLE_OPERATION_OPT_VAL = WriteOperationType.INSERT_OVERWRITE_TABLE.value
-  val DEFAULT_OPERATION_OPT_VAL = UPSERT_OPERATION_OPT_VAL
+  val OPERATION_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.operation")
+    .defaultValue(UPSERT_OPERATION_OPT_VAL)
+    .withDescription("")
 
   /**
     * The table type for the underlying data, for this write.
@@ -217,10 +198,15 @@ object DataSourceWriteOptions {
     *
     * Default: COPY_ON_WRITE
     */
-  val TABLE_TYPE_OPT_KEY = "hoodie.datasource.write.table.type"
+  // val TABLE_TYPE_OPT_KEY = "hoodie.datasource.write.table.type"
   val COW_TABLE_TYPE_OPT_VAL = HoodieTableType.COPY_ON_WRITE.name
   val MOR_TABLE_TYPE_OPT_VAL = HoodieTableType.MERGE_ON_READ.name
-  val DEFAULT_TABLE_TYPE_OPT_VAL = COW_TABLE_TYPE_OPT_VAL
+  // val DEFAULT_TABLE_TYPE_OPT_VAL = COW_TABLE_TYPE_OPT_VAL
+  val TABLE_TYPE_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.table.type")
+    .defaultValue(COW_TABLE_TYPE_OPT_VAL)
+    .withDeprecatedNames("hoodie.datasource.write.storage.type")
+    .withDescription("")
 
   @Deprecated
   val STORAGE_TYPE_OPT_KEY = "hoodie.datasource.write.storage.type"
@@ -232,9 +218,9 @@ object DataSourceWriteOptions {
   val DEFAULT_STORAGE_TYPE_OPT_VAL = COW_STORAGE_TYPE_OPT_VAL
 
   def translateStorageTypeToTableType(optParams: Map[String, String]) : Map[String, String] = {
-    if (optParams.contains(STORAGE_TYPE_OPT_KEY) && !optParams.contains(TABLE_TYPE_OPT_KEY)) {
-      log.warn(STORAGE_TYPE_OPT_KEY + " is deprecated and will be removed in a later release; Please use " + TABLE_TYPE_OPT_KEY)
-      optParams ++ Map(TABLE_TYPE_OPT_KEY -> optParams(STORAGE_TYPE_OPT_KEY))
+    if (optParams.contains(STORAGE_TYPE_OPT_KEY) && !optParams.contains(TABLE_TYPE_OPT_KEY.key)) {
+      log.warn(STORAGE_TYPE_OPT_KEY + " is deprecated and will be removed in a later release; Please use " + TABLE_TYPE_OPT_KEY.key)
+      optParams ++ Map(TABLE_TYPE_OPT_KEY.key -> optParams(STORAGE_TYPE_OPT_KEY))
     } else {
       optParams
     }
@@ -272,7 +258,7 @@ object DataSourceWriteOptions {
           case _ =>
             partitionColumns.mkString(",")
         }
-      translatedOptParams = optParams ++ Map(PARTITIONPATH_FIELD_OPT_KEY -> partitionPathField)
+      translatedOptParams = optParams ++ Map(PARTITIONPATH_FIELD_OPT_KEY.key -> partitionPathField)
     }
     translatedOptParams
   }
@@ -282,7 +268,11 @@ object DataSourceWriteOptions {
     *
     * Default:  None (mandatory)
     */
-  val TABLE_NAME_OPT_KEY = "hoodie.datasource.write.table.name"
+  // val TABLE_NAME_OPT_KEY = "hoodie.datasource.write.table.name"
+  val TABLE_NAME_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.table.name")
+    .noDefaultValue()
+    .withDescription("")
 
   /**
     * Field used in preCombining before actual write. When two records have the same
@@ -290,14 +280,14 @@ object DataSourceWriteOptions {
     * determined by Object.compareTo(..)
     */
   val PRECOMBINE_FIELD_OPT_KEY = HoodieWriteConfig.PRECOMBINE_FIELD_PROP
-  val DEFAULT_PRECOMBINE_FIELD_OPT_VAL = "ts"
+  // val DEFAULT_PRECOMBINE_FIELD_OPT_VAL = "ts"
 
   /**
     * Payload class used. Override this, if you like to roll your own merge logic, when upserting/inserting.
     * This will render any value set for `PRECOMBINE_FIELD_OPT_VAL` in-effective
     */
   val PAYLOAD_CLASS_OPT_KEY = HoodieWriteConfig.WRITE_PAYLOAD_CLASS
-  val DEFAULT_PAYLOAD_OPT_VAL = classOf[OverwriteWithLatestAvroPayload].getName
+  // val DEFAULT_PAYLOAD_OPT_VAL = classOf[OverwriteWithLatestAvroPayload].getName
 
   /**
     * Record key field. Value to be used as the `recordKey` component of `HoodieKey`. Actual value
@@ -306,14 +296,14 @@ object DataSourceWriteOptions {
     *
     */
   val RECORDKEY_FIELD_OPT_KEY = KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY
-  val DEFAULT_RECORDKEY_FIELD_OPT_VAL = "uuid"
+  // val DEFAULT_RECORDKEY_FIELD_OPT_VAL = "uuid"
 
   /**
     * Partition path field. Value to be used at the `partitionPath` component of `HoodieKey`. Actual
     * value obtained by invoking .toString()
     */
   val PARTITIONPATH_FIELD_OPT_KEY = KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY
-  val DEFAULT_PARTITIONPATH_FIELD_OPT_VAL = "partitionpath"
+  // val DEFAULT_PARTITIONPATH_FIELD_OPT_VAL = "partitionpath"
 
   /**
     * Flag to indicate whether to use Hive style partitioning.
@@ -321,9 +311,9 @@ object DataSourceWriteOptions {
     * By default false (the names of partition folders are only partition values)
     */
   val HIVE_STYLE_PARTITIONING_OPT_KEY = KeyGeneratorOptions.HIVE_STYLE_PARTITIONING_OPT_KEY
-  val DEFAULT_HIVE_STYLE_PARTITIONING_OPT_VAL = KeyGeneratorOptions.DEFAULT_HIVE_STYLE_PARTITIONING_OPT_VAL
+  // val DEFAULT_HIVE_STYLE_PARTITIONING_OPT_VAL = KeyGeneratorOptions.DEFAULT_HIVE_STYLE_PARTITIONING_OPT_VAL
   val URL_ENCODE_PARTITIONING_OPT_KEY = KeyGeneratorOptions.URL_ENCODE_PARTITIONING_OPT_KEY
-  val DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL = KeyGeneratorOptions.DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL
+  // val DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL = KeyGeneratorOptions.DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL
   /**
     * Key generator class, that implements will extract the key out of incoming record
     *
@@ -335,95 +325,221 @@ object DataSourceWriteOptions {
    * When set to true, will perform write operations directly using the spark native `Row` representation.
    * By default, false (will be enabled as default in a future release)
    */
-  val ENABLE_ROW_WRITER_OPT_KEY = "hoodie.datasource.write.row.writer.enable"
-  val DEFAULT_ENABLE_ROW_WRITER_OPT_VAL = "false"
+  val ENABLE_ROW_WRITER_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.row.writer.enable")
+    .defaultValue("false")
+    .withDescription("")
+  // val ENABLE_ROW_WRITER_OPT_KEY = "hoodie.datasource.write.row.writer.enable"
+  // val DEFAULT_ENABLE_ROW_WRITER_OPT_VAL = "false"
 
   /**
     * Option keys beginning with this prefix, are automatically added to the commit/deltacommit metadata.
     * This is useful to store checkpointing information, in a consistent way with the hoodie timeline
     */
-  val COMMIT_METADATA_KEYPREFIX_OPT_KEY = "hoodie.datasource.write.commitmeta.key.prefix"
-  val DEFAULT_COMMIT_METADATA_KEYPREFIX_OPT_VAL = "_"
+  val COMMIT_METADATA_KEYPREFIX_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.commitmeta.key.prefix")
+    .defaultValue("_")
+    .withDescription("")
+  // val COMMIT_METADATA_KEYPREFIX_OPT_KEY = "hoodie.datasource.write.commitmeta.key.prefix"
+  // val DEFAULT_COMMIT_METADATA_KEYPREFIX_OPT_VAL = "_"
 
   /**
     * Flag to indicate whether to drop duplicates upon insert.
     * By default insert will accept duplicates, to gain extra performance.
     */
-  val INSERT_DROP_DUPS_OPT_KEY = "hoodie.datasource.write.insert.drop.duplicates"
-  val DEFAULT_INSERT_DROP_DUPS_OPT_VAL = "false"
+  val INSERT_DROP_DUPS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.insert.drop.duplicates")
+    .defaultValue("false")
+    .withDescription("")
+  // val INSERT_DROP_DUPS_OPT_KEY = "hoodie.datasource.write.insert.drop.duplicates"
+  // val DEFAULT_INSERT_DROP_DUPS_OPT_VAL = "false"
 
   /**
     * Flag to indicate how many times streaming job should retry for a failed microbatch
     * By default 3
     */
-  val STREAMING_RETRY_CNT_OPT_KEY = "hoodie.datasource.write.streaming.retry.count"
-  val DEFAULT_STREAMING_RETRY_CNT_OPT_VAL = "3"
+  val STREAMING_RETRY_CNT_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.streaming.retry.count")
+    .defaultValue("3")
+    .withDescription("")
+  // val STREAMING_RETRY_CNT_OPT_KEY = "hoodie.datasource.write.streaming.retry.count"
+  // val DEFAULT_STREAMING_RETRY_CNT_OPT_VAL = "3"
 
   /**
     * Flag to indicate how long (by millisecond) before a retry should issued for failed microbatch
     * By default 2000 and it will be doubled by every retry
     */
-  val STREAMING_RETRY_INTERVAL_MS_OPT_KEY = "hoodie.datasource.write.streaming.retry.interval.ms"
-  val DEFAULT_STREAMING_RETRY_INTERVAL_MS_OPT_VAL = "2000"
+  val STREAMING_RETRY_INTERVAL_MS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.streaming.retry.interval.ms")
+    .defaultValue("2000")
+    .withDescription("")
+  // val STREAMING_RETRY_INTERVAL_MS_OPT_KEY = "hoodie.datasource.write.streaming.retry.interval.ms"
+  // val DEFAULT_STREAMING_RETRY_INTERVAL_MS_OPT_VAL = "2000"
 
   /**
     * Flag to indicate whether to ignore any non exception error (e.g. writestatus error)
     * within a streaming microbatch
     * By default true (in favor of streaming progressing over data integrity)
     */
-  val STREAMING_IGNORE_FAILED_BATCH_OPT_KEY = "hoodie.datasource.write.streaming.ignore.failed.batch"
-  val DEFAULT_STREAMING_IGNORE_FAILED_BATCH_OPT_VAL = "true"
-  val META_SYNC_CLIENT_TOOL_CLASS = "hoodie.meta.sync.client.tool.class"
-  val DEFAULT_META_SYNC_CLIENT_TOOL_CLASS = classOf[HiveSyncTool].getName
+  val STREAMING_IGNORE_FAILED_BATCH_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.write.streaming.ignore.failed.batch")
+    .defaultValue("true")
+    .withDescription("")
+
+  val META_SYNC_CLIENT_TOOL_CLASS: ConfigOption[String] = ConfigOption
+    .key("hoodie.meta.sync.client.tool.class")
+    .defaultValue(classOf[HiveSyncTool].getName)
+    .withDescription("")
+  // val STREAMING_IGNORE_FAILED_BATCH_OPT_KEY = "hoodie.datasource.write.streaming.ignore.failed.batch"
+  // val DEFAULT_STREAMING_IGNORE_FAILED_BATCH_OPT_VAL = "true"
+  // val META_SYNC_CLIENT_TOOL_CLASS = "hoodie.meta.sync.client.tool.class"
+  // val DEFAULT_META_SYNC_CLIENT_TOOL_CLASS = classOf[HiveSyncTool].getName
 
   // HIVE SYNC SPECIFIC CONFIGS
-  //NOTE: DO NOT USE uppercase for the keys as they are internally lower-cased. Using upper-cases causes
+  // NOTE: DO NOT USE uppercase for the keys as they are internally lower-cased. Using upper-cases causes
   // unexpected issues with config getting reset
-  val HIVE_SYNC_ENABLED_OPT_KEY = "hoodie.datasource.hive_sync.enable"
-  val META_SYNC_ENABLED_OPT_KEY = "hoodie.datasource.meta.sync.enable"
-  val HIVE_DATABASE_OPT_KEY = "hoodie.datasource.hive_sync.database"
-  val HIVE_TABLE_OPT_KEY = "hoodie.datasource.hive_sync.table"
-  val HIVE_BASE_FILE_FORMAT_OPT_KEY = "hoodie.datasource.hive_sync.base_file_format"
-  val HIVE_USER_OPT_KEY = "hoodie.datasource.hive_sync.username"
-  val HIVE_PASS_OPT_KEY = "hoodie.datasource.hive_sync.password"
-  val HIVE_URL_OPT_KEY = "hoodie.datasource.hive_sync.jdbcurl"
-  val HIVE_PARTITION_FIELDS_OPT_KEY = "hoodie.datasource.hive_sync.partition_fields"
-  val HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY = "hoodie.datasource.hive_sync.partition_extractor_class"
-  val HIVE_ASSUME_DATE_PARTITION_OPT_KEY = "hoodie.datasource.hive_sync.assume_date_partitioning"
-  val HIVE_USE_PRE_APACHE_INPUT_FORMAT_OPT_KEY = "hoodie.datasource.hive_sync.use_pre_apache_input_format"
-  val HIVE_USE_JDBC_OPT_KEY = "hoodie.datasource.hive_sync.use_jdbc"
-  val HIVE_AUTO_CREATE_DATABASE_OPT_KEY = "hoodie.datasource.hive_sync.auto_create_database"
-  val HIVE_IGNORE_EXCEPTIONS_OPT_KEY = "hoodie.datasource.hive_sync.ignore_exceptions"
-  val HIVE_SKIP_RO_SUFFIX = "hoodie.datasource.hive_sync.skip_ro_suffix"
-  val HIVE_SUPPORT_TIMESTAMP = "hoodie.datasource.hive_sync.support_timestamp"
+  val HIVE_SYNC_ENABLED_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.enable")
+    .defaultValue("false")
+    .withDescription("")
+
+  val META_SYNC_ENABLED_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.meta.sync.enable")
+    .defaultValue("false")
+    .withDescription("")
+
+  val HIVE_DATABASE_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.database")
+    .defaultValue("default")
+    .withDescription("")
+
+  val HIVE_TABLE_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.table")
+    .defaultValue("unknown")
+    .withDescription("")
+
+  val HIVE_BASE_FILE_FORMAT_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.base_file_format")
+    .defaultValue("PARQUET")
+    .withDescription("")
+
+  val HIVE_USER_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.username")
+    .defaultValue("hive")
+    .withDescription("")
+
+  val HIVE_PASS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.password")
+    .defaultValue("hive")
+    .withDescription("")
+
+  val HIVE_URL_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.jdbcurl")
+    .defaultValue("jdbc:hive2://localhost:10000")
+    .withDescription("")
+
+  val HIVE_PARTITION_FIELDS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.partition_fields")
+    .defaultValue("")
+    .withDescription("")
+
+  val HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.partition_extractor_class")
+    .defaultValue(classOf[SlashEncodedDayPartitionValueExtractor].getCanonicalName)
+    .withDescription("")
+
+  val HIVE_ASSUME_DATE_PARTITION_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.assume_date_partitioning")
+    .defaultValue("false")
+    .withDescription("")
+
+  val HIVE_USE_PRE_APACHE_INPUT_FORMAT_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.use_pre_apache_input_format")
+    .defaultValue("false")
+    .withDescription("")
+
+  val HIVE_USE_JDBC_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.use_jdbc")
+    .defaultValue("true")
+    .withDescription("")
+
+  val HIVE_AUTO_CREATE_DATABASE_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.auto_create_database")
+    .defaultValue("true")
+    .withDescription("")
+
+  val HIVE_IGNORE_EXCEPTIONS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.ignore_exceptions")
+    .defaultValue("false")
+    .withDescription("")
+
+  val HIVE_SKIP_RO_SUFFIX: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.skip_ro_suffix")
+    .defaultValue("false")
+    .withDescription("")
+
+  val HIVE_SUPPORT_TIMESTAMP: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.hive_sync.support_timestamp")
+    .defaultValue("false")
+    .withDescription("")
+
+  // val HIVE_SYNC_ENABLED_OPT_KEY = "hoodie.datasource.hive_sync.enable"
+  // val META_SYNC_ENABLED_OPT_KEY = "hoodie.datasource.meta.sync.enable"
+  // val HIVE_DATABASE_OPT_KEY = "hoodie.datasource.hive_sync.database"
+  // val HIVE_TABLE_OPT_KEY = "hoodie.datasource.hive_sync.table"
+  // val HIVE_BASE_FILE_FORMAT_OPT_KEY = "hoodie.datasource.hive_sync.base_file_format"
+  // val HIVE_USER_OPT_KEY = "hoodie.datasource.hive_sync.username"
+  // val HIVE_PASS_OPT_KEY = "hoodie.datasource.hive_sync.password"
+  // val HIVE_URL_OPT_KEY = "hoodie.datasource.hive_sync.jdbcurl"
+  // val HIVE_PARTITION_FIELDS_OPT_KEY = "hoodie.datasource.hive_sync.partition_fields"
+  // val HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY = "hoodie.datasource.hive_sync.partition_extractor_class"
+  // val HIVE_ASSUME_DATE_PARTITION_OPT_KEY = "hoodie.datasource.hive_sync.assume_date_partitioning"
+  // val HIVE_USE_PRE_APACHE_INPUT_FORMAT_OPT_KEY = "hoodie.datasource.hive_sync.use_pre_apache_input_format"
+  // val HIVE_USE_JDBC_OPT_KEY = "hoodie.datasource.hive_sync.use_jdbc"
+  // val HIVE_AUTO_CREATE_DATABASE_OPT_KEY = "hoodie.datasource.hive_sync.auto_create_database"
+  // val HIVE_IGNORE_EXCEPTIONS_OPT_KEY = "hoodie.datasource.hive_sync.ignore_exceptions"
+  // val HIVE_SKIP_RO_SUFFIX = "hoodie.datasource.hive_sync.skip_ro_suffix"
+  // val HIVE_SUPPORT_TIMESTAMP = "hoodie.datasource.hive_sync.support_timestamp"
 
   // DEFAULT FOR HIVE SPECIFIC CONFIGS
-  val DEFAULT_HIVE_SYNC_ENABLED_OPT_VAL = "false"
-  val DEFAULT_META_SYNC_ENABLED_OPT_VAL = "false"
-  val DEFAULT_HIVE_DATABASE_OPT_VAL = "default"
-  val DEFAULT_HIVE_TABLE_OPT_VAL = "unknown"
-  val DEFAULT_HIVE_BASE_FILE_FORMAT_OPT_VAL = "PARQUET"
-  val DEFAULT_HIVE_USER_OPT_VAL = "hive"
-  val DEFAULT_HIVE_PASS_OPT_VAL = "hive"
-  val DEFAULT_HIVE_URL_OPT_VAL = "jdbc:hive2://localhost:10000"
-  val DEFAULT_HIVE_PARTITION_FIELDS_OPT_VAL = ""
-  val DEFAULT_HIVE_PARTITION_EXTRACTOR_CLASS_OPT_VAL = classOf[SlashEncodedDayPartitionValueExtractor].getCanonicalName
-  val DEFAULT_HIVE_ASSUME_DATE_PARTITION_OPT_VAL = "false"
-  val DEFAULT_USE_PRE_APACHE_INPUT_FORMAT_OPT_VAL = "false"
-  val DEFAULT_HIVE_USE_JDBC_OPT_VAL = "true"
-  val DEFAULT_HIVE_AUTO_CREATE_DATABASE_OPT_KEY = "true"
-  val DEFAULT_HIVE_IGNORE_EXCEPTIONS_OPT_KEY = "false"
-  val DEFAULT_HIVE_SKIP_RO_SUFFIX_VAL = "false"
-  val DEFAULT_HIVE_SUPPORT_TIMESTAMP = "false"
+  // val DEFAULT_HIVE_SYNC_ENABLED_OPT_VAL = "false"
+  // val DEFAULT_META_SYNC_ENABLED_OPT_VAL = "false"
+  // val DEFAULT_HIVE_DATABASE_OPT_VAL = "default"
+  // val DEFAULT_HIVE_TABLE_OPT_VAL = "unknown"
+  // val DEFAULT_HIVE_BASE_FILE_FORMAT_OPT_VAL = "PARQUET"
+  // val DEFAULT_HIVE_USER_OPT_VAL = "hive"
+  // val DEFAULT_HIVE_PASS_OPT_VAL = "hive"
+  // val DEFAULT_HIVE_URL_OPT_VAL = "jdbc:hive2://localhost:10000"
+  // val DEFAULT_HIVE_PARTITION_FIELDS_OPT_VAL = ""
+  // val DEFAULT_HIVE_PARTITION_EXTRACTOR_CLASS_OPT_VAL = classOf[SlashEncodedDayPartitionValueExtractor].getCanonicalName
+  // val DEFAULT_HIVE_ASSUME_DATE_PARTITION_OPT_VAL = "false"
+  // val DEFAULT_USE_PRE_APACHE_INPUT_FORMAT_OPT_VAL = "false"
+  // val DEFAULT_HIVE_USE_JDBC_OPT_VAL = "true"
+  // val DEFAULT_HIVE_AUTO_CREATE_DATABASE_OPT_KEY = "true"
+  // val DEFAULT_HIVE_IGNORE_EXCEPTIONS_OPT_KEY = "false"
+  // val DEFAULT_HIVE_SKIP_RO_SUFFIX_VAL = "false"
+  // val DEFAULT_HIVE_SUPPORT_TIMESTAMP = "false"
 
   // Async Compaction - Enabled by default for MOR
-  val ASYNC_COMPACT_ENABLE_OPT_KEY = "hoodie.datasource.compaction.async.enable"
-  val DEFAULT_ASYNC_COMPACT_ENABLE_OPT_VAL = "true"
+  val ASYNC_COMPACT_ENABLE_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.compaction.async.enable")
+    .defaultValue("true")
+    .withDescription("")
+  // val ASYNC_COMPACT_ENABLE_OPT_KEY = "hoodie.datasource.compaction.async.enable"
+  // val DEFAULT_ASYNC_COMPACT_ENABLE_OPT_VAL = "true"
 
   // Avro Kafka Source configs
-  val KAFKA_AVRO_VALUE_DESERIALIZER = "hoodie.deltastreamer.source.kafka.value.deserializer.class"
+  val KAFKA_AVRO_VALUE_DESERIALIZER: ConfigOption[String] = ConfigOption
+    .key("hoodie.deltastreamer.source.kafka.value.deserializer.class")
+    .noDefaultValue()
+    .withDescription("")
+  // val KAFKA_AVRO_VALUE_DESERIALIZER = "hoodie.deltastreamer.source.kafka.value.deserializer.class"
 
   // Schema provider class to be set to be used in custom kakfa deserializer
-  val SCHEMA_PROVIDER_CLASS_PROP = "hoodie.deltastreamer.schemaprovider.class"
+  val SCHEMA_PROVIDER_CLASS_PROP: ConfigOption[String] = ConfigOption
+    .key("hoodie.deltastreamer.schemaprovider.class")
+    .noDefaultValue()
+    .withDescription("")
+  // val SCHEMA_PROVIDER_CLASS_PROP = "hoodie.deltastreamer.schemaprovider.class"
 
 }

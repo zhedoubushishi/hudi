@@ -78,12 +78,12 @@ private[hudi] object HoodieSparkSqlWriter {
       case Some(ser) if ser.equals("org.apache.spark.serializer.KryoSerializer") =>
       case _ => throw new HoodieException("hoodie only support org.apache.spark.serializer.KryoSerializer as spark.serializer")
     }
-    val tableType = HoodieTableType.valueOf(parameters(TABLE_TYPE_OPT_KEY))
-    var operation = WriteOperationType.fromValue(parameters(OPERATION_OPT_KEY))
+    val tableType = HoodieTableType.valueOf(parameters(TABLE_TYPE_OPT_KEY.key))
+    var operation = WriteOperationType.fromValue(parameters(OPERATION_OPT_KEY.key))
     // It does not make sense to allow upsert() operation if INSERT_DROP_DUPS_OPT_KEY is true
     // Auto-correct the operation to "insert" if OPERATION_OPT_KEY is set to "upsert" wrongly
     // or not set (in which case it will be set as "upsert" by parametersWithWriteDefaults()) .
-    if (parameters(INSERT_DROP_DUPS_OPT_KEY).toBoolean &&
+    if (parameters(INSERT_DROP_DUPS_OPT_KEY.key).toBoolean &&
       operation == WriteOperationType.UPSERT) {
 
       log.warn(s"$UPSERT_OPERATION_OPT_VAL is not applicable " +
@@ -129,7 +129,7 @@ private[hudi] object HoodieSparkSqlWriter {
 
       // short-circuit if bulk_insert via row is enabled.
       // scalastyle:off
-      if (parameters(ENABLE_ROW_WRITER_OPT_KEY).toBoolean &&
+      if (parameters(ENABLE_ROW_WRITER_OPT_KEY.key).toBoolean &&
         operation == WriteOperationType.BULK_INSERT) {
         val (success, commitTime: common.util.Option[String]) = bulkInsertAsRow(sqlContext, parameters, df, tblName,
                                                                                 basePath, path, instantTime)
@@ -150,7 +150,7 @@ private[hudi] object HoodieSparkSqlWriter {
 
           // Convert to RDD[HoodieRecord]
           val genericRecords: RDD[GenericRecord] = HoodieSparkUtils.createRdd(df, schema, structName, nameSpace)
-          val shouldCombine = parameters(INSERT_DROP_DUPS_OPT_KEY).toBoolean || operation.equals(WriteOperationType.UPSERT);
+          val shouldCombine = parameters(INSERT_DROP_DUPS_OPT_KEY.key).toBoolean || operation.equals(WriteOperationType.UPSERT);
           val hoodieAllIncomingRecords = genericRecords.map(gr => {
             val hoodieRecord = if (shouldCombine) {
               val orderingVal = HoodieAvroUtils.getNestedFieldVal(gr, parameters(PRECOMBINE_FIELD_OPT_KEY.key), false)
@@ -174,7 +174,7 @@ private[hudi] object HoodieSparkSqlWriter {
           }
 
           val hoodieRecords =
-            if (parameters(INSERT_DROP_DUPS_OPT_KEY).toBoolean) {
+            if (parameters(INSERT_DROP_DUPS_OPT_KEY.key).toBoolean) {
               DataSourceUtils.dropDuplicates(jsc, hoodieAllIncomingRecords, mapAsJavaMap(parameters))
             } else {
               hoodieAllIncomingRecords
@@ -254,7 +254,7 @@ private[hudi] object HoodieSparkSqlWriter {
     val path = parameters.getOrElse("path", throw new HoodieException("'path' must be set."))
     val tableName = parameters.getOrElse(HoodieWriteConfig.TABLE_NAME.key,
       throw new HoodieException(s"'${HoodieWriteConfig.TABLE_NAME.key}' must be set."))
-    val tableType = parameters(TABLE_TYPE_OPT_KEY)
+    val tableType = parameters(TABLE_TYPE_OPT_KEY.key)
     val bootstrapBasePath = parameters.getOrElse(BOOTSTRAP_BASE_PATH_PROP.key(),
       throw new HoodieException(s"'${BOOTSTRAP_BASE_PATH_PROP.key()}' is required for '${BOOTSTRAP_OPERATION_OPT_VAL}'" +
         " operation'"))
@@ -344,8 +344,8 @@ private[hudi] object HoodieSparkSqlWriter {
       throw new HoodieException("Bulk insert using row writer is not supported with current Spark version."
         + " To use row writer please switch to spark 2 or spark 3")
     }
-    val hiveSyncEnabled = params.get(HIVE_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
-    val metaSyncEnabled = params.get(META_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
+    val hiveSyncEnabled = params.get(HIVE_SYNC_ENABLED_OPT_KEY.key).exists(r => r.toBoolean)
+    val metaSyncEnabled = params.get(META_SYNC_ENABLED_OPT_KEY.key).exists(r => r.toBoolean)
     val syncHiveSucess = if (hiveSyncEnabled || metaSyncEnabled) {
       metaSync(params, basePath, sqlContext.sparkContext.hadoopConfiguration)
     } else {
@@ -398,35 +398,35 @@ private[hudi] object HoodieSparkSqlWriter {
   private def buildSyncConfig(basePath: Path, parameters: Map[String, String]): HiveSyncConfig = {
     val hiveSyncConfig: HiveSyncConfig = new HiveSyncConfig()
     hiveSyncConfig.basePath = basePath.toString
-    hiveSyncConfig.baseFileFormat = parameters(HIVE_BASE_FILE_FORMAT_OPT_KEY);
+    hiveSyncConfig.baseFileFormat = parameters(HIVE_BASE_FILE_FORMAT_OPT_KEY.key);
     hiveSyncConfig.usePreApacheInputFormat =
-      parameters.get(HIVE_USE_PRE_APACHE_INPUT_FORMAT_OPT_KEY).exists(r => r.toBoolean)
-    hiveSyncConfig.databaseName = parameters(HIVE_DATABASE_OPT_KEY)
-    hiveSyncConfig.tableName = parameters(HIVE_TABLE_OPT_KEY)
-    hiveSyncConfig.hiveUser = parameters(HIVE_USER_OPT_KEY)
-    hiveSyncConfig.hivePass = parameters(HIVE_PASS_OPT_KEY)
-    hiveSyncConfig.jdbcUrl = parameters(HIVE_URL_OPT_KEY)
+      parameters.get(HIVE_USE_PRE_APACHE_INPUT_FORMAT_OPT_KEY.key).exists(r => r.toBoolean)
+    hiveSyncConfig.databaseName = parameters(HIVE_DATABASE_OPT_KEY.key)
+    hiveSyncConfig.tableName = parameters(HIVE_TABLE_OPT_KEY.key)
+    hiveSyncConfig.hiveUser = parameters(HIVE_USER_OPT_KEY.key)
+    hiveSyncConfig.hivePass = parameters(HIVE_PASS_OPT_KEY.key)
+    hiveSyncConfig.jdbcUrl = parameters(HIVE_URL_OPT_KEY.key)
     hiveSyncConfig.partitionFields =
-      ListBuffer(parameters(HIVE_PARTITION_FIELDS_OPT_KEY).split(",").map(_.trim).filter(!_.isEmpty).toList: _*)
-    hiveSyncConfig.partitionValueExtractorClass = parameters(HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY)
-    hiveSyncConfig.useJdbc = parameters(HIVE_USE_JDBC_OPT_KEY).toBoolean
+      ListBuffer(parameters(HIVE_PARTITION_FIELDS_OPT_KEY.key).split(",").map(_.trim).filter(!_.isEmpty).toList: _*)
+    hiveSyncConfig.partitionValueExtractorClass = parameters(HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY.key)
+    hiveSyncConfig.useJdbc = parameters(HIVE_USE_JDBC_OPT_KEY.key).toBoolean
     hiveSyncConfig.useFileListingFromMetadata = parameters(HoodieMetadataConfig.METADATA_ENABLE_PROP.key).toBoolean
     hiveSyncConfig.verifyMetadataFileListing = parameters(HoodieMetadataConfig.METADATA_VALIDATE_PROP.key).toBoolean
-    hiveSyncConfig.ignoreExceptions = parameters.get(HIVE_IGNORE_EXCEPTIONS_OPT_KEY).exists(r => r.toBoolean)
-    hiveSyncConfig.supportTimestamp = parameters.get(HIVE_SUPPORT_TIMESTAMP).exists(r => r.toBoolean)
-    hiveSyncConfig.autoCreateDatabase = parameters.get(HIVE_AUTO_CREATE_DATABASE_OPT_KEY).exists(r => r.toBoolean)
-    hiveSyncConfig.decodePartition = parameters.getOrElse(URL_ENCODE_PARTITIONING_OPT_KEY,
-      DEFAULT_URL_ENCODE_PARTITIONING_OPT_VAL).toBoolean
+    hiveSyncConfig.ignoreExceptions = parameters.get(HIVE_IGNORE_EXCEPTIONS_OPT_KEY.key).exists(r => r.toBoolean)
+    hiveSyncConfig.supportTimestamp = parameters.get(HIVE_SUPPORT_TIMESTAMP.key).exists(r => r.toBoolean)
+    hiveSyncConfig.autoCreateDatabase = parameters.get(HIVE_AUTO_CREATE_DATABASE_OPT_KEY.key).exists(r => r.toBoolean)
+    hiveSyncConfig.decodePartition = parameters.getOrElse(URL_ENCODE_PARTITIONING_OPT_KEY.key,
+      URL_ENCODE_PARTITIONING_OPT_KEY.defaultValue()).toBoolean
     hiveSyncConfig
   }
 
   private def metaSync(parameters: Map[String, String],
                        basePath: Path,
                        hadoopConf: Configuration): Boolean = {
-    val hiveSyncEnabled = parameters.get(HIVE_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
-    var metaSyncEnabled = parameters.get(META_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
+    val hiveSyncEnabled = parameters.get(HIVE_SYNC_ENABLED_OPT_KEY.key).exists(r => r.toBoolean)
+    var metaSyncEnabled = parameters.get(META_SYNC_ENABLED_OPT_KEY.key).exists(r => r.toBoolean)
     var syncClientToolClassSet = scala.collection.mutable.Set[String]()
-    parameters(META_SYNC_CLIENT_TOOL_CLASS).split(",").foreach(syncClass =>  syncClientToolClassSet += syncClass)
+    parameters(META_SYNC_CLIENT_TOOL_CLASS.key).split(",").foreach(syncClass =>  syncClientToolClassSet += syncClass)
 
     // for backward compatibility
     if (hiveSyncEnabled) {
@@ -439,7 +439,7 @@ private[hudi] object HoodieSparkSqlWriter {
       syncClientToolClassSet.foreach(impl => {
         val syncSuccess = impl.trim match {
           case "org.apache.hudi.hive.HiveSyncTool" => {
-            log.info("Syncing to Hive Metastore (URL: " + parameters(HIVE_URL_OPT_KEY) + ")")
+            log.info("Syncing to Hive Metastore (URL: " + parameters(HIVE_URL_OPT_KEY.key) + ")")
             syncHive(basePath, fs, parameters)
             true
           }
@@ -474,7 +474,7 @@ private[hudi] object HoodieSparkSqlWriter {
     if (errorCount == 0) {
       log.info("No errors. Proceeding to commit the write.")
       val metaMap = parameters.filter(kv =>
-        kv._1.startsWith(parameters(COMMIT_METADATA_KEYPREFIX_OPT_KEY)))
+        kv._1.startsWith(parameters(COMMIT_METADATA_KEYPREFIX_OPT_KEY.key)))
       val commitSuccess =
         client.commit(tableInstantInfo.instantTime, writeResult.getWriteStatuses,
           common.util.Option.of(new util.HashMap[String, String](mapAsJavaMap(metaMap))),
@@ -527,7 +527,7 @@ private[hudi] object HoodieSparkSqlWriter {
                                        parameters: Map[String, String], configuration: Configuration) : Boolean = {
     log.info(s"Config.inlineCompactionEnabled ? ${client.getConfig.inlineCompactionEnabled}")
     if (asyncCompactionTriggerFnDefined && !client.getConfig.inlineCompactionEnabled
-      && parameters.get(ASYNC_COMPACT_ENABLE_OPT_KEY).exists(r => r.toBoolean)) {
+      && parameters.get(ASYNC_COMPACT_ENABLE_OPT_KEY.key).exists(r => r.toBoolean)) {
       tableConfig.getTableType == HoodieTableType.MERGE_ON_READ
     } else {
       false

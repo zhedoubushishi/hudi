@@ -77,8 +77,8 @@ object HoodieDataSourceExample {
     df.write.format("org.apache.hudi").
         options(getQuickstartWriteConfigs).
         option(PRECOMBINE_FIELD_OPT_KEY.key, "ts").
-        option(RECORDKEY_FIELD_OPT_KEY, "uuid").
-        option(PARTITIONPATH_FIELD_OPT_KEY, "partitionpath").
+        option(RECORDKEY_FIELD_OPT_KEY.key, "uuid").
+        option(PARTITIONPATH_FIELD_OPT_KEY.key, "partitionpath").
         option(TABLE_NAME.key, tableName).
         mode(Overwrite).
         save(tablePath)
@@ -122,8 +122,8 @@ object HoodieDataSourceExample {
     df.write.format("org.apache.hudi").
         options(getQuickstartWriteConfigs).
         option(PRECOMBINE_FIELD_OPT_KEY.key, "ts").
-        option(RECORDKEY_FIELD_OPT_KEY, "uuid").
-        option(PARTITIONPATH_FIELD_OPT_KEY, "partitionpath").
+        option(RECORDKEY_FIELD_OPT_KEY.key, "uuid").
+        option(PARTITIONPATH_FIELD_OPT_KEY.key, "partitionpath").
         option(TABLE_NAME.key, tableName).
         mode(Append).
         save(tablePath)

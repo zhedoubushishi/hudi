@@ -229,7 +229,7 @@ public class FlinkOptions {
           + "By default true (in favor of streaming progressing over data integrity)");
 
   public static final ConfigOption<String> RECORD_KEY_FIELD = ConfigOptions
-      .key(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY)
+      .key(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY.key())
       .stringType()
       .defaultValue("uuid")
       .withDescription("Record key field. Value to be used as the `recordKey` component of `HoodieKey`.\n"
@@ -237,7 +237,7 @@ public class FlinkOptions {
           + "the dot notation eg: `a.b.c`");
 
   public static final ConfigOption<String> PARTITION_PATH_FIELD = ConfigOptions
-      .key(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY)
+      .key(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key())
       .stringType()
       .defaultValue("partition-path")
       .withDescription("Partition path field. Value to be used at the `partitionPath` component of `HoodieKey`.\n"

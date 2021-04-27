@@ -33,48 +33,48 @@ public class TestCustomKeyGenerator extends KeyGeneratorTestUtilities {
   private TypedProperties getCommonProps(boolean getComplexRecordKey) {
     TypedProperties properties = new TypedProperties();
     if (getComplexRecordKey) {
-      properties.put(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY, "_row_key, pii_col");
+      properties.put(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY.key(), "_row_key, pii_col");
     } else {
-      properties.put(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY, "_row_key");
+      properties.put(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY.key(), "_row_key");
     }
-    properties.put(KeyGeneratorOptions.HIVE_STYLE_PARTITIONING_OPT_KEY, "true");
+    properties.put(KeyGeneratorOptions.HIVE_STYLE_PARTITIONING_OPT_KEY.key(), "true");
     return properties;
   }
 
   private TypedProperties getPropertiesForSimpleKeyGen() {
     TypedProperties properties = getCommonProps(false);
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "timestamp:simple");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "timestamp:simple");
     return properties;
   }
 
   private TypedProperties getImproperPartitionFieldFormatProp() {
     TypedProperties properties = getCommonProps(false);
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "timestamp");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "timestamp");
     return properties;
   }
 
   private TypedProperties getInvalidPartitionKeyTypeProps() {
     TypedProperties properties = getCommonProps(false);
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "timestamp:dummy");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "timestamp:dummy");
     return properties;
   }
 
   private TypedProperties getComplexRecordKeyWithSimplePartitionProps() {
     TypedProperties properties = getCommonProps(true);
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "timestamp:simple");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "timestamp:simple");
     return properties;
   }
 
   private TypedProperties getComplexRecordKeyAndPartitionPathProps() {
     TypedProperties properties = getCommonProps(true);
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "timestamp:simple,ts_ms:timestamp");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "timestamp:simple,ts_ms:timestamp");
     populateNecessaryPropsForTimestampBasedKeyGen(properties);
     return properties;
   }
 
   private TypedProperties getPropsWithoutRecordKeyFieldProps() {
     TypedProperties properties = new TypedProperties();
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "timestamp:simple");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "timestamp:simple");
     return properties;
   }
 
@@ -86,14 +86,14 @@ public class TestCustomKeyGenerator extends KeyGeneratorTestUtilities {
 
   private TypedProperties getPropertiesForTimestampBasedKeyGen() {
     TypedProperties properties = getCommonProps(false);
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "ts_ms:timestamp");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "ts_ms:timestamp");
     populateNecessaryPropsForTimestampBasedKeyGen(properties);
     return properties;
   }
 
   private TypedProperties getPropertiesForNonPartitionedKeyGen() {
     TypedProperties properties = getCommonProps(false);
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "");
     return properties;
   }
 

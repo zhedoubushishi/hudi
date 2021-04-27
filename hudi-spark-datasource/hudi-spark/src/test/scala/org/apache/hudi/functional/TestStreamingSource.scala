@@ -29,7 +29,7 @@ class TestStreamingSource extends StreamTest {
 
   import testImplicits._
   private val commonOptions = Map(
-    RECORDKEY_FIELD_OPT_KEY -> "id",
+    RECORDKEY_FIELD_OPT_KEY.key -> "id",
     PRECOMBINE_FIELD_OPT_KEY.key -> "ts",
     INSERT_PARALLELISM.key -> "4",
     UPSERT_PARALLELISM.key -> "4",
@@ -47,7 +47,7 @@ class TestStreamingSource extends StreamTest {
       HoodieTableMetaClient.withPropertyBuilder()
           .setTableType(COPY_ON_WRITE)
           .setTableName(getTableName(tablePath))
-          .setPayloadClassName(DataSourceWriteOptions.DEFAULT_PAYLOAD_OPT_VAL)
+          .setPayloadClassName(DataSourceWriteOptions.PAYLOAD_CLASS_OPT_KEY.defaultValue)
           .initTable(spark.sessionState.newHadoopConf(), tablePath)
 
       addData(tablePath, Seq(("1", "a1", "10", "000")))
@@ -97,7 +97,7 @@ class TestStreamingSource extends StreamTest {
       HoodieTableMetaClient.withPropertyBuilder()
         .setTableType(MERGE_ON_READ)
         .setTableName(getTableName(tablePath))
-        .setPayloadClassName(DataSourceWriteOptions.DEFAULT_PAYLOAD_OPT_VAL)
+        .setPayloadClassName(DataSourceWriteOptions.PAYLOAD_CLASS_OPT_KEY.defaultValue)
         .initTable(spark.sessionState.newHadoopConf(), tablePath)
 
       addData(tablePath, Seq(("1", "a1", "10", "000")))

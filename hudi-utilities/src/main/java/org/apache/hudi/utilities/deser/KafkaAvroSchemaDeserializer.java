@@ -51,7 +51,7 @@ public class KafkaAvroSchemaDeserializer extends KafkaAvroDeserializer {
     super.configure(configs, isKey);
     try {
       TypedProperties props = getConvertToTypedProperties(configs);
-      String className = props.getString(DataSourceWriteOptions.SCHEMA_PROVIDER_CLASS_PROP());
+      String className = props.getString(DataSourceWriteOptions.SCHEMA_PROVIDER_CLASS_PROP().key());
       SchemaProvider schemaProvider = (SchemaProvider) ReflectionUtils.loadClass(className, props);
       sourceSchema = Objects.requireNonNull(schemaProvider).getSourceSchema();
     } catch (Throwable e) {
