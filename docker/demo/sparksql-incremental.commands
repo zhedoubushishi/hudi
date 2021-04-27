@@ -27,8 +27,8 @@ import org.apache.hadoop.fs.FileSystem;
 val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
 val beginInstantTime = HoodieDataSourceHelpers.listCommitsSince(fs, "/user/hive/warehouse/stock_ticks_cow", "00000").get(0)
 val hoodieIncQueryDF =  spark.read.format("org.apache.hudi").
-                      option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL).
-                      option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, beginInstantTime).
+                      option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key(), DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL).
+                      option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key(), beginInstantTime).
                       load("/user/hive/warehouse/stock_ticks_cow");
 hoodieIncQueryDF.registerTempTable("stock_ticks_cow_incr")
 spark.sql("select `_hoodie_commit_time`, symbol, ts, volume, open, close  from stock_ticks_cow_incr where  symbol = 'GOOG'").show(100, false);
@@ -59,8 +59,8 @@ spark.sql("select count(*) from stock_ticks_derived_mor_ro").show(20, false)
 spark.sql("select count(*) from stock_ticks_derived_mor_rt").show(20, false)
 
 val hoodieIncQueryBsDF =  spark.read.format("org.apache.hudi").
-                      option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL).
-                      option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, "00000000000001").
+                      option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key(), DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL).
+                      option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key(), "00000000000001").
                       load("/user/hive/warehouse/stock_ticks_cow_bs");
 hoodieIncQueryBsDF.registerTempTable("stock_ticks_cow_bs_incr")
 spark.sql("select `_hoodie_commit_time`, symbol, ts, volume, open, close  from stock_ticks_cow_bs_incr where  symbol = 'GOOG'").show(100, false);
