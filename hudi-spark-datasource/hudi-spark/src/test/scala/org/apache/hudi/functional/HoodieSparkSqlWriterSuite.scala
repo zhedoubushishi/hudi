@@ -26,7 +26,7 @@ import org.apache.hudi.DataSourceWriteOptions._
 import org.apache.hudi.client.{SparkRDDWriteClient, TestBootstrap}
 import org.apache.hudi.common.model.{HoodieRecord, HoodieRecordPayload}
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator
-import org.apache.hudi.config.{HoodieBootstrapConfig, HoodieWriteConfig}
+import org.apache.hudi.config.HoodieWriteConfig
 import org.apache.hudi.exception.HoodieException
 import org.apache.hudi.keygen.{NonpartitionedKeyGenerator, SimpleKeyGenerator}
 import org.apache.hudi.hive.HiveSyncConfig
@@ -413,13 +413,13 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
           val hoodieFooTableName = "hoodie_foo_tbl_" + tableType
           //create a new table
           val fooTableModifier = Map("path" -> path.toAbsolutePath.toString,
-            HoodieWriteConfig.TABLE_NAME -> hoodieFooTableName,
+            HoodieWriteConfig.TABLE_NAME.key -> hoodieFooTableName,
             "hoodie.insert.shuffle.parallelism" -> "1",
             "hoodie.upsert.shuffle.parallelism" -> "1",
-            DataSourceWriteOptions.TABLE_TYPE_OPT_KEY -> tableType,
-            DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY -> "_row_key",
-            DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY -> "partition",
-            DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY -> "org.apache.hudi.keygen.SimpleKeyGenerator")
+            DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key -> tableType,
+            DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY.key -> "_row_key",
+            DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key -> "partition",
+            DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY.key -> "org.apache.hudi.keygen.SimpleKeyGenerator")
           val fooTableParams = HoodieWriterUtils.parametersWithWriteDefaults(fooTableModifier)
 
           // generate the inserts
