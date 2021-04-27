@@ -54,8 +54,8 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
 
   public HoodieWriteCommitKafkaCallback(HoodieWriteConfig config) {
     this.props = config.getProps();
-    this.bootstrapServers = props.getProperty(CALLBACK_KAFKA_BOOTSTRAP_SERVERS);
-    this.topic = props.getProperty(CALLBACK_KAFKA_TOPIC);
+    this.bootstrapServers = props.getProperty(CALLBACK_KAFKA_BOOTSTRAP_SERVERS.key());
+    this.topic = props.getProperty(CALLBACK_KAFKA_TOPIC.key());
     validateKafkaConfig();
   }
 
@@ -83,9 +83,9 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
     // bootstrap.servers
     kafkaProducerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
     // default "all" to ensure no message loss
-    kafkaProducerProps.setProperty(ProducerConfig.ACKS_CONFIG, props.getProperty(CALLBACK_KAFKA_ACKS));
+    kafkaProducerProps.setProperty(ProducerConfig.ACKS_CONFIG, props.getProperty(CALLBACK_KAFKA_ACKS.key()));
     // retries 3 times by default
-    kafkaProducerProps.setProperty(ProducerConfig.RETRIES_CONFIG, props.getProperty(CALLBACK_KAFKA_RETRIES));
+    kafkaProducerProps.setProperty(ProducerConfig.RETRIES_CONFIG, props.getProperty(CALLBACK_KAFKA_RETRIES.key()));
     kafkaProducerProps.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
         "org.apache.kafka.common.serialization.StringSerializer");
     kafkaProducerProps.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
@@ -106,7 +106,7 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
    * @return Callback {@link ProducerRecord}
    */
   private ProducerRecord<String, String> buildProducerRecord(Properties props, String callbackMsg) {
-    String partition = props.getProperty(CALLBACK_KAFKA_PARTITION);
+    String partition = props.getProperty(CALLBACK_KAFKA_PARTITION.key());
     if (null != partition) {
       return new ProducerRecord<String, String>(topic, Integer.valueOf(partition), props.getProperty(TABLE_NAME),
           callbackMsg);
@@ -121,9 +121,9 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
    */
   private void validateKafkaConfig() {
     ValidationUtils.checkArgument(!StringUtils.isNullOrEmpty(bootstrapServers), String.format("Config %s can not be "
-        + "null or empty", CALLBACK_KAFKA_BOOTSTRAP_SERVERS));
+        + "null or empty", CALLBACK_KAFKA_BOOTSTRAP_SERVERS.key()));
     ValidationUtils.checkArgument(!StringUtils.isNullOrEmpty(topic), String.format("Config %s can not be null or empty",
-        CALLBACK_KAFKA_TOPIC));
+        CALLBACK_KAFKA_TOPIC.key()));
   }
 
   /**
