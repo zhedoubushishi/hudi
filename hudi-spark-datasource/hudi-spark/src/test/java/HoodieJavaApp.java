@@ -234,9 +234,9 @@ public class HoodieJavaApp {
        * Consume incrementally, only changes in commit 2 above. Currently only supported for COPY_ON_WRITE TABLE
        */
       Dataset<Row> incQueryDF = spark.read().format("org.apache.hudi")
-          .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY(), DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL())
+          .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY().key(), DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL())
           // Only changes in write 2 above
-          .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY(), commitInstantTime1)
+          .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY().key(), commitInstantTime1)
           // For incremental view, pass in the root/base path of dataset
           .load(tablePath);
 

@@ -72,7 +72,7 @@ class DefaultSource extends RelationProvider
     val parameters = translateViewTypesToQueryTypes(optParams)
 
     val path = parameters.get("path")
-    val readPathsStr = parameters.get(DataSourceReadOptions.READ_PATHS_OPT_KEY)
+    val readPathsStr = parameters.get(DataSourceReadOptions.READ_PATHS_OPT_KEY.key)
     if (path.isEmpty && readPathsStr.isEmpty) {
       throw new HoodieException(s"'path' or '$READ_PATHS_OPT_KEY' or both must be specified.")
     }
@@ -83,10 +83,10 @@ class DefaultSource extends RelationProvider
     val fs = FSUtils.getFs(allPaths.head, sqlContext.sparkContext.hadoopConfiguration)
     // Use the HoodieFileIndex only if the 'path' is not globbed.
     // Or else we use the original way to read hoodie table.
-    val enableFileIndex = optParams.get(ENABLE_HOODIE_FILE_INDEX)
-      .map(_.toBoolean).getOrElse(DEFAULT_ENABLE_HOODIE_FILE_INDEX)
+    val enableFileIndex = optParams.get(ENABLE_HOODIE_FILE_INDEX.key)
+      .map(_.toBoolean).getOrElse(ENABLE_HOODIE_FILE_INDEX.defaultValue)
     val useHoodieFileIndex = enableFileIndex && path.isDefined && !path.get.contains("*") &&
-      !parameters.contains(DataSourceReadOptions.READ_PATHS_OPT_KEY)
+      !parameters.contains(DataSourceReadOptions.READ_PATHS_OPT_KEY.key)
     val globPaths = if (useHoodieFileIndex) {
       None
     } else {
@@ -103,7 +103,7 @@ class DefaultSource extends RelationProvider
     val metaClient = HoodieTableMetaClient.builder().setConf(fs.getConf).setBasePath(tablePath).build()
     val isBootstrappedTable = metaClient.getTableConfig.getBootstrapBasePath.isPresent
     val tableType = metaClient.getTableType
-    val queryType = parameters(QUERY_TYPE_OPT_KEY)
+    val queryType = parameters(QUERY_TYPE_OPT_KEY.key)
     log.info(s"Is bootstrapped table => $isBootstrappedTable, tableType is: $tableType")
 
     (tableType, queryType, isBootstrappedTable) match {

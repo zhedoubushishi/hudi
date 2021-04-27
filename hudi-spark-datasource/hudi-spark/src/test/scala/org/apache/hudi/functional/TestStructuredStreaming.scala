@@ -138,9 +138,9 @@ class TestStructuredStreaming extends HoodieClientTestBase {
       // we have 2 commits, try pulling the first commit (which is not the latest)
       val firstCommit = HoodieDataSourceHelpers.listCommitsSince(fs, destPath, "000").get(0)
       val hoodieIncViewDF1 = spark.read.format("org.apache.hudi")
-        .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-        .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, "000")
-        .option(DataSourceReadOptions.END_INSTANTTIME_OPT_KEY, firstCommit)
+        .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+        .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, "000")
+        .option(DataSourceReadOptions.END_INSTANTTIME_OPT_KEY.key, firstCommit)
         .load(destPath)
       assertEquals(100, hoodieIncViewDF1.count())
       // 100 initial inserts must be pulled
@@ -150,8 +150,8 @@ class TestStructuredStreaming extends HoodieClientTestBase {
 
       // pull the latest commit
       val hoodieIncViewDF2 = spark.read.format("org.apache.hudi")
-        .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-        .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, commitInstantTime1)
+        .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+        .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, commitInstantTime1)
         .load(destPath)
 
       assertEquals(uniqueKeyCnt, hoodieIncViewDF2.count()) // 100 records must be pulled

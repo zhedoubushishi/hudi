@@ -143,8 +143,8 @@ object HoodieDataSourceExample {
     val incViewDF = spark.
         read.
         format("org.apache.hudi").
-        option(QUERY_TYPE_OPT_KEY, QUERY_TYPE_INCREMENTAL_OPT_VAL).
-        option(BEGIN_INSTANTTIME_OPT_KEY, beginTime).
+        option(QUERY_TYPE_OPT_KEY.key, QUERY_TYPE_INCREMENTAL_OPT_VAL).
+        option(BEGIN_INSTANTTIME_OPT_KEY.key, beginTime).
         load(tablePath)
     incViewDF.createOrReplaceTempView("hudi_incr_table")
     spark.sql("select `_hoodie_commit_time`, fare, begin_lon, begin_lat, ts from hudi_incr_table where fare > 20.0").show()
@@ -163,9 +163,9 @@ object HoodieDataSourceExample {
 
     //incrementally query data
     val incViewDF = spark.read.format("org.apache.hudi").
-        option(QUERY_TYPE_OPT_KEY, QUERY_TYPE_INCREMENTAL_OPT_VAL).
-        option(BEGIN_INSTANTTIME_OPT_KEY, beginTime).
-        option(END_INSTANTTIME_OPT_KEY, endTime).
+        option(QUERY_TYPE_OPT_KEY.key, QUERY_TYPE_INCREMENTAL_OPT_VAL).
+        option(BEGIN_INSTANTTIME_OPT_KEY.key, beginTime).
+        option(END_INSTANTTIME_OPT_KEY.key, endTime).
         load(tablePath)
     incViewDF.createOrReplaceTempView("hudi_incr_table")
     spark.sql("select `_hoodie_commit_time`, fare, begin_lon, begin_lat, ts from  hudi_incr_table where fare > 20.0").show()

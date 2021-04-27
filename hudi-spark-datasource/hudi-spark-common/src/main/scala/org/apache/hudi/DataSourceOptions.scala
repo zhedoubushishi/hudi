@@ -17,13 +17,13 @@
 
 package org.apache.hudi
 
+import org.apache.hudi.common.config.ConfigOption
 import org.apache.hudi.common.model.HoodieTableType
 import org.apache.hudi.common.model.OverwriteWithLatestAvroPayload
 import org.apache.hudi.common.model.WriteOperationType
 import org.apache.hudi.config.HoodieWriteConfig
 import org.apache.hudi.hive.HiveSyncTool
 import org.apache.hudi.hive.SlashEncodedDayPartitionValueExtractor
-import org.apache.hudi.keygen.TimestampBasedAvroKeyGenerator.Config
 import org.apache.hudi.keygen.{CustomKeyGenerator, SimpleKeyGenerator}
 import org.apache.hudi.keygen.constant.KeyGeneratorOptions
 import org.apache.log4j.LogManager
@@ -42,34 +42,56 @@ object DataSourceReadOptions {
   private val log = LogManager.getLogger(DataSourceReadOptions.getClass)
 
   /**
-    * Whether data needs to be read, in
-    *
-    * 1) Snapshot mode (obtain latest view, based on row & columnar data)
-    * 2) incremental mode (new data since an instantTime)
-    * 3) Read Optimized mode (obtain latest view, based on columnar data)
-    *
-    * Default: snapshot
-    */
-  val QUERY_TYPE_OPT_KEY = "hoodie.datasource.query.type"
+   * Whether data needs to be read, in
+   *
+   * 1) Snapshot mode (obtain latest view, based on row & columnar data)
+   * 2) incremental mode (new data since an instantTime)
+   * 3) Read Optimized mode (obtain latest view, based on columnar data)
+   *
+   * Default: snapshot
+   */
   val QUERY_TYPE_SNAPSHOT_OPT_VAL = "snapshot"
   val QUERY_TYPE_READ_OPTIMIZED_OPT_VAL = "read_optimized"
   val QUERY_TYPE_INCREMENTAL_OPT_VAL = "incremental"
-  val DEFAULT_QUERY_TYPE_OPT_VAL: String = QUERY_TYPE_SNAPSHOT_OPT_VAL
+  val QUERY_TYPE_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.query.type")
+    .defaultValue(QUERY_TYPE_SNAPSHOT_OPT_VAL)
+    .withDeprecatedNames("hoodie.datasource.view.type")
+    .withDescription("")
+
+  // val QUERY_TYPE_OPT_KEY = "hoodie.datasource.query.type"
+  // val QUERY_TYPE_SNAPSHOT_OPT_VAL = "snapshot"
+  // val QUERY_TYPE_READ_OPTIMIZED_OPT_VAL = "read_optimized"
+  // val QUERY_TYPE_INCREMENTAL_OPT_VAL = "incremental"
+  // val DEFAULT_QUERY_TYPE_OPT_VAL: String = QUERY_TYPE_SNAPSHOT_OPT_VAL
 
   /**
    * For Snapshot query on merge on read table. Use this key to define the payload class.
    */
-  val REALTIME_MERGE_OPT_KEY = "hoodie.datasource.merge.type"
+  // val REALTIME_MERGE_OPT_KEY = "hoodie.datasource.merge.type"
   val REALTIME_SKIP_MERGE_OPT_VAL = "skip_merge"
   val REALTIME_PAYLOAD_COMBINE_OPT_VAL = "payload_combine"
-  val DEFAULT_REALTIME_MERGE_OPT_VAL = REALTIME_PAYLOAD_COMBINE_OPT_VAL
+  val REALTIME_MERGE_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.merge.type")
+    .defaultValue(REALTIME_PAYLOAD_COMBINE_OPT_VAL)
+    .withDescription("")
+  // val DEFAULT_REALTIME_MERGE_OPT_VAL = REALTIME_PAYLOAD_COMBINE_OPT_VAL
 
-  val READ_PATHS_OPT_KEY = "hoodie.datasource.read.paths"
+  val READ_PATHS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.read.paths")
+    .noDefaultValue()
+    .withDescription("")
+  // val READ_PATHS_OPT_KEY = "hoodie.datasource.read.paths"
 
+  // TODO modify this when refactor HoodieWriteConfig
   val READ_PRE_COMBINE_FIELD = HoodieWriteConfig.PRECOMBINE_FIELD_PROP
 
-  val ENABLE_HOODIE_FILE_INDEX = "hoodie.file.index.enable"
-  val DEFAULT_ENABLE_HOODIE_FILE_INDEX = true
+  val ENABLE_HOODIE_FILE_INDEX: ConfigOption[Boolean] = ConfigOption
+    .key("hoodie.file.index.enable")
+    .defaultValue(true)
+    .withDescription("")
+  // val ENABLE_HOODIE_FILE_INDEX = "hoodie.file.index.enable"
+  // val DEFAULT_ENABLE_HOODIE_FILE_INDEX = true
 
   @Deprecated
   val VIEW_TYPE_OPT_KEY = "hoodie.datasource.view.type"
@@ -89,12 +111,12 @@ object DataSourceReadOptions {
     val translation = Map(VIEW_TYPE_READ_OPTIMIZED_OPT_VAL -> QUERY_TYPE_SNAPSHOT_OPT_VAL,
                           VIEW_TYPE_INCREMENTAL_OPT_VAL -> QUERY_TYPE_INCREMENTAL_OPT_VAL,
                           VIEW_TYPE_REALTIME_OPT_VAL -> QUERY_TYPE_SNAPSHOT_OPT_VAL)
-    if (!optParams.contains(QUERY_TYPE_OPT_KEY)) {
+    if (!optParams.contains(QUERY_TYPE_OPT_KEY.key)) {
       if (optParams.contains(VIEW_TYPE_OPT_KEY)) {
         log.warn(VIEW_TYPE_OPT_KEY + " is deprecated and will be removed in a later release. Please use " + QUERY_TYPE_OPT_KEY)
-        optParams ++ Map(QUERY_TYPE_OPT_KEY -> translation(optParams(VIEW_TYPE_OPT_KEY)))
+        optParams ++ Map(QUERY_TYPE_OPT_KEY.key -> translation(optParams(VIEW_TYPE_OPT_KEY)))
       } else {
-        optParams ++ Map(QUERY_TYPE_OPT_KEY -> DEFAULT_QUERY_TYPE_OPT_VAL)
+        optParams ++ Map(QUERY_TYPE_OPT_KEY.key -> QUERY_TYPE_OPT_KEY.defaultValue)
       }
     } else {
       optParams
@@ -109,7 +131,11 @@ object DataSourceReadOptions {
     *
     * Default: None (Mandatory in incremental mode)
     */
-  val BEGIN_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.begin.instanttime"
+  val BEGIN_INSTANTTIME_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.read.begin.instanttime")
+    .noDefaultValue()
+    .withDescription("")
+  // val BEGIN_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.begin.instanttime"
 
 
   /**
@@ -119,7 +145,11 @@ object DataSourceReadOptions {
     * Default: latest instant (i.e fetches all new data since begin instant time)
     *
     */
-  val END_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.end.instanttime"
+  // val END_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.end.instanttime"
+  val END_INSTANTTIME_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.read.end.instanttime")
+    .noDefaultValue()
+    .withDescription("")
 
   /**
     * If use the end instant schema when incrementally fetched data to.
@@ -127,23 +157,36 @@ object DataSourceReadOptions {
     * Default: false (use latest instant schema)
     *
     */
-  val INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.schema.use.end.instanttime"
-  val DEFAULT_INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_VAL = "false"
+  val INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.read.schema.use.end.instanttime")
+    .defaultValue("false")
+    .withDescription("")
+  // val INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_KEY = "hoodie.datasource.read.schema.use.end.instanttime"
+  // val DEFAULT_INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_VAL = "false"
 
   /**
     * For use-cases like DeltaStreamer which reads from Hoodie Incremental table and applies opaque map functions,
     * filters appearing late in the sequence of transformations cannot be automatically pushed down.
     * This option allows setting filters directly on Hoodie Source
     */
-  val PUSH_DOWN_INCR_FILTERS_OPT_KEY = "hoodie.datasource.read.incr.filters"
-  val DEFAULT_PUSH_DOWN_FILTERS_OPT_VAL = ""
+  val PUSH_DOWN_INCR_FILTERS_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.read.incr.filters")
+    .defaultValue("")
+    .withDescription("")
+
+  // val PUSH_DOWN_INCR_FILTERS_OPT_KEY = "hoodie.datasource.read.incr.filters"
+  // val DEFAULT_PUSH_DOWN_FILTERS_OPT_VAL = ""
 
   /**
    * For the use-cases like users only want to incremental pull from certain partitions instead of the full table.
    * This option allows using glob pattern to directly filter on path.
    */
-  val INCR_PATH_GLOB_OPT_KEY = "hoodie.datasource.read.incr.path.glob"
-  val DEFAULT_INCR_PATH_GLOB_OPT_VAL = ""
+  val INCR_PATH_GLOB_OPT_KEY: ConfigOption[String] = ConfigOption
+    .key("hoodie.datasource.read.incr.path.glob")
+    .defaultValue("")
+    .withDescription("")
+  // val INCR_PATH_GLOB_OPT_KEY = "hoodie.datasource.read.incr.path.glob"
+  // val DEFAULT_INCR_PATH_GLOB_OPT_VAL = ""
 }
 
 /**
