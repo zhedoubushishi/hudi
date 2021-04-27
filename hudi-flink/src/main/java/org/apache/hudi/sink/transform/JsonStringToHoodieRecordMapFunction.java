@@ -75,14 +75,14 @@ public class JsonStringToHoodieRecordMapFunction implements MapFunction<String, 
     } else {
       this.avroConvertor = new AvroConvertor(new FilebasedSchemaProvider(props).getSourceSchema());
     }
-    this.payloadClassName = props.getString(HoodieWriteConfig.WRITE_PAYLOAD_CLASS,
+    this.payloadClassName = props.getString(HoodieWriteConfig.WRITE_PAYLOAD_CLASS.key(),
         OverwriteWithLatestAvroPayload.class.getName());
-    this.orderingField = props.getString(HoodieWriteConfig.PRECOMBINE_FIELD_PROP, "ts");
+    this.orderingField = props.getString(HoodieWriteConfig.PRECOMBINE_FIELD_PROP.key(), "ts");
     try {
       this.keyGenerator = StreamerUtil.createKeyGenerator(props);
     } catch (IOException e) {
       throw new HoodieFlinkStreamerException(String.format("KeyGenerator %s initialization failed",
-          props.getString(HoodieWriteConfig.KEYGENERATOR_CLASS_PROP, SimpleAvroKeyGenerator.class.getName())), e);
+          props.getString(HoodieWriteConfig.KEYGENERATOR_CLASS_PROP.key(), SimpleAvroKeyGenerator.class.getName())), e);
     }
   }
 }

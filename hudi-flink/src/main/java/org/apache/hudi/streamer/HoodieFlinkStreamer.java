@@ -76,8 +76,8 @@ public class HoodieFlinkStreamer {
     TypedProperties props = StreamerUtil.appendKafkaProps(cfg);
 
     // add data source config
-    props.put(HoodieWriteConfig.WRITE_PAYLOAD_CLASS, cfg.payloadClassName);
-    props.put(HoodieWriteConfig.PRECOMBINE_FIELD_PROP, cfg.sourceOrderingField);
+    props.put(HoodieWriteConfig.WRITE_PAYLOAD_CLASS.key(), cfg.payloadClassName);
+    props.put(HoodieWriteConfig.PRECOMBINE_FIELD_PROP.key(), cfg.sourceOrderingField);
 
     StreamerUtil.initTableIfNotExists(conf);
     // Read from kafka source

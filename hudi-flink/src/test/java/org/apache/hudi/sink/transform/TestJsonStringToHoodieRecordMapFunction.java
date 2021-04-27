@@ -65,10 +65,10 @@ public class TestJsonStringToHoodieRecordMapFunction extends HoodieFlinkClientTe
     Schema schema = AVRO_SCHEMA;
 
     TypedProperties props = new TypedProperties();
-    props.put(HoodieWriteConfig.WRITE_PAYLOAD_CLASS, OverwriteWithLatestAvroPayload.class.getName());
-    props.put(HoodieWriteConfig.PRECOMBINE_FIELD_PROP, "timestamp");
-    props.put(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY, "_row_key");
-    props.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "current_date");
+    props.put(HoodieWriteConfig.WRITE_PAYLOAD_CLASS.key(), OverwriteWithLatestAvroPayload.class.getName());
+    props.put(HoodieWriteConfig.PRECOMBINE_FIELD_PROP.key(), "timestamp");
+    props.put(KeyGeneratorOptions.RECORDKEY_FIELD_OPT_KEY.key(), "_row_key");
+    props.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "current_date");
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     env.setParallelism(1);
 
