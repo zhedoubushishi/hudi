@@ -221,9 +221,9 @@ class TestCOWDataSource extends HoodieClientTestBase {
     // we have 2 commits, try pulling the first commit (which is not the latest)
     val firstCommit = HoodieDataSourceHelpers.listCommitsSince(fs, basePath, "000").get(0)
     val hoodieIncViewDF1 = spark.read.format("org.apache.hudi")
-      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, "000")
-      .option(DataSourceReadOptions.END_INSTANTTIME_OPT_KEY, firstCommit)
+      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, "000")
+      .option(DataSourceReadOptions.END_INSTANTTIME_OPT_KEY.key, firstCommit)
       .load(basePath)
     assertEquals(100, hoodieIncViewDF1.count()) // 100 initial inserts must be pulled
     var countsPerCommit = hoodieIncViewDF1.groupBy("_hoodie_commit_time").count().collect()
@@ -241,8 +241,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
 
     // pull the latest commit
     val hoodieIncViewDF2 = spark.read.format("org.apache.hudi")
-      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, commitInstantTime2)
+      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, commitInstantTime2)
       .load(basePath)
 
     assertEquals(uniqueKeyCnt, hoodieIncViewDF2.count()) // 100 records must be pulled
@@ -252,16 +252,16 @@ class TestCOWDataSource extends HoodieClientTestBase {
 
     // pull the latest commit within certain partitions
     val hoodieIncViewDF3 = spark.read.format("org.apache.hudi")
-      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, commitInstantTime2)
-      .option(DataSourceReadOptions.INCR_PATH_GLOB_OPT_KEY, "/2016/*/*/*")
+      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, commitInstantTime2)
+      .option(DataSourceReadOptions.INCR_PATH_GLOB_OPT_KEY.key, "/2016/*/*/*")
       .load(basePath)
     assertEquals(hoodieIncViewDF2.filter(col("_hoodie_partition_path").contains("2016")).count(), hoodieIncViewDF3.count())
 
     val timeTravelDF = spark.read.format("org.apache.hudi")
-      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, "000")
-      .option(DataSourceReadOptions.END_INSTANTTIME_OPT_KEY, firstCommit)
+      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, "000")
+      .option(DataSourceReadOptions.END_INSTANTTIME_OPT_KEY.key, firstCommit)
       .load(basePath)
     assertEquals(100, timeTravelDF.count()) // 100 initial inserts must be pulled
   }
@@ -459,8 +459,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
     assertEquals(hoodieROViewDF2.count(), totalUniqueKeyToGenerate)
 
     val hoodieIncViewDF2 = spark.read.format("org.apache.hudi")
-      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, commitInstantTime1)
+      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, commitInstantTime1)
       .load(basePath)
     assertEquals(hoodieIncViewDF2.count(), insert2NewKeyCnt)
   }
@@ -698,8 +698,8 @@ class TestCOWDataSource extends HoodieClientTestBase {
       .save(basePath)
     // Incremental query without "*" in path
     val hoodieIncViewDF1 = spark.read.format("org.apache.hudi")
-      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
-      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY, commitInstantTime1)
+      .option(DataSourceReadOptions.QUERY_TYPE_OPT_KEY.key, DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL)
+      .option(DataSourceReadOptions.BEGIN_INSTANTTIME_OPT_KEY.key, commitInstantTime1)
       .load(basePath)
     assertEquals(N + 1, hoodieIncViewDF1.count())
   }

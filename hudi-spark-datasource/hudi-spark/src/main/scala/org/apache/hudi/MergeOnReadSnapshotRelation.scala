@@ -64,8 +64,8 @@ class MergeOnReadSnapshotRelation(val sqlContext: SQLContext,
   private val tableAvroSchema = schemaUtil.getTableAvroSchema
   private val tableStructSchema = AvroConversionUtils.convertAvroSchemaToStructType(tableAvroSchema)
   private val mergeType = optParams.getOrElse(
-    DataSourceReadOptions.REALTIME_MERGE_OPT_KEY,
-    DataSourceReadOptions.DEFAULT_REALTIME_MERGE_OPT_VAL)
+    DataSourceReadOptions.REALTIME_MERGE_OPT_KEY.key,
+    DataSourceReadOptions.REALTIME_MERGE_OPT_KEY.defaultValue)
   private val maxCompactionMemoryInBytes = getMaxCompactionMemoryInBytes(jobConf)
   private val fileIndex = buildFileIndex()
   private val preCombineField = {
