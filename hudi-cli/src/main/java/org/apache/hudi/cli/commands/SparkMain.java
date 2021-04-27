@@ -363,8 +363,8 @@ public class SparkMain {
     properties.setProperty("hoodie.bootstrap.full.input.provider", fullBootstrapInputProvider);
     properties.setProperty("hoodie.bootstrap.parallelism", parallelism);
     properties.setProperty("hoodie.bootstrap.mode.selector", selectorClass);
-    properties.setProperty(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY(), recordKeyCols);
-    properties.setProperty(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY(), partitionFields);
+    properties.setProperty(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY().key(), recordKeyCols);
+    properties.setProperty(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY().key(), partitionFields);
 
     HoodieDeltaStreamer.Config cfg = new HoodieDeltaStreamer.Config();
     cfg.targetTableName = tableName;

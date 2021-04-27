@@ -76,10 +76,10 @@ object HoodieDataSourceExample {
     val df = spark.read.json(spark.sparkContext.parallelize(inserts, 1))
     df.write.format("org.apache.hudi").
         options(getQuickstartWriteConfigs).
-        option(PRECOMBINE_FIELD_OPT_KEY, "ts").
-        option(RECORDKEY_FIELD_OPT_KEY, "uuid").
-        option(PARTITIONPATH_FIELD_OPT_KEY, "partitionpath").
-        option(TABLE_NAME, tableName).
+        option(PRECOMBINE_FIELD_OPT_KEY.key, "ts").
+        option(RECORDKEY_FIELD_OPT_KEY.key, "uuid").
+        option(PARTITIONPATH_FIELD_OPT_KEY.key, "partitionpath").
+        option(TABLE_NAME.key, tableName).
         mode(Overwrite).
         save(tablePath)
   }
@@ -121,10 +121,10 @@ object HoodieDataSourceExample {
     val df = spark.read.json(spark.sparkContext.parallelize(updates, 1))
     df.write.format("org.apache.hudi").
         options(getQuickstartWriteConfigs).
-        option(PRECOMBINE_FIELD_OPT_KEY, "ts").
-        option(RECORDKEY_FIELD_OPT_KEY, "uuid").
-        option(PARTITIONPATH_FIELD_OPT_KEY, "partitionpath").
-        option(TABLE_NAME, tableName).
+        option(PRECOMBINE_FIELD_OPT_KEY.key, "ts").
+        option(RECORDKEY_FIELD_OPT_KEY.key, "uuid").
+        option(PARTITIONPATH_FIELD_OPT_KEY.key, "partitionpath").
+        option(TABLE_NAME.key, tableName).
         mode(Append).
         save(tablePath)
   }
