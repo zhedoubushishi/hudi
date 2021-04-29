@@ -35,28 +35,29 @@ public class HoodieWriteCommitCallbackConfig extends DefaultHoodieConfig {
   public static final ConfigOption<Boolean> CALLBACK_ON = ConfigOption
       .key(CALLBACK_PREFIX + "on")
       .defaultValue(false)
-      .withDescription("");
+      .withDescription("Turn callback on/off. off by default.");
 
   public static final ConfigOption<String> CALLBACK_CLASS_PROP = ConfigOption
       .key(CALLBACK_PREFIX + "class")
       .defaultValue("org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback")
-      .withDescription("");
+      .withDescription("Full path of callback class and must be a subclass of HoodieWriteCommitCallback class, "
+          + "org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback by default");
 
   // ***** HTTP callback configs *****
   public static final ConfigOption<String> CALLBACK_HTTP_URL_PROP = ConfigOption
       .key(CALLBACK_PREFIX + "http.url")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Callback host to be sent along with callback messages");
 
   public static final ConfigOption<String> CALLBACK_HTTP_API_KEY = ConfigOption
       .key(CALLBACK_PREFIX + "http.api.key")
       .defaultValue("hudi_write_commit_http_callback")
-      .withDescription("");
+      .withDescription("Http callback API key. hudi_write_commit_http_callback by default");
 
   public static final ConfigOption<Integer> CALLBACK_HTTP_TIMEOUT_SECONDS = ConfigOption
       .key(CALLBACK_PREFIX + "http.timeout.seconds")
       .defaultValue(3)
-      .withDescription("");
+      .withDescription("Callback timeout in seconds. 3 by default");
 
   private HoodieWriteCommitCallbackConfig(Properties props) {
     super(props);
