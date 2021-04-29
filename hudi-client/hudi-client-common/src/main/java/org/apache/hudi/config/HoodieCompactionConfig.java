@@ -87,7 +87,8 @@ public class HoodieCompactionConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> CLEANER_COMMITS_RETAINED_PROP = ConfigOption
       .key("hoodie.cleaner.commits.retained")
       .defaultValue("10")
-      .withDescription("");
+      .withDescription("Number of commits to retain. So data will be retained for num_of_commits * time_between_commits "
+          + "(scheduled). This also directly translates into how much you can incrementally pull on this table");
 
   public static final ConfigOption<String> CLEANER_INCREMENTAL_MODE = ConfigOption
       .key("hoodie.cleaner.incremental.mode")
@@ -97,17 +98,21 @@ public class HoodieCompactionConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> MAX_COMMITS_TO_KEEP_PROP = ConfigOption
       .key("hoodie.keep.max.commits")
       .defaultValue("30")
-      .withDescription("");
+      .withDescription("Each commit is a small file in the .hoodie directory. Since DFS typically does not favor lots of "
+          + "small files, Hudi archives older commits into a sequential log. A commit is published atomically "
+          + "by a rename of the commit file.");
 
   public static final ConfigOption<String> MIN_COMMITS_TO_KEEP_PROP = ConfigOption
       .key("hoodie.keep.min.commits")
       .defaultValue("20")
-      .withDescription("");
+      .withDescription("Each commit is a small file in the .hoodie directory. Since DFS typically does not favor lots of "
+          + "small files, Hudi archives older commits into a sequential log. A commit is published atomically "
+          + "by a rename of the commit file.");
 
   public static final ConfigOption<String> COMMITS_ARCHIVAL_BATCH_SIZE_PROP = ConfigOption
       .key("hoodie.commits.archival.batch")
       .defaultValue(String.valueOf(10))
-      .withDescription("");
+      .withDescription("This controls the number of commit instants read in memory as a batch and archived together.");
 
   public static final ConfigOption<String> CLEANER_BOOTSTRAP_BASE_FILE_ENABLED = ConfigOption
       .key("hoodie.cleaner.delete.bootstrap.base.file")
@@ -130,44 +135,54 @@ public class HoodieCompactionConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> CLEANER_PARALLELISM = ConfigOption
       .key("hoodie.cleaner.parallelism")
       .defaultValue("200")
-      .withDescription("");
+      .withDescription("Increase this if cleaning becomes slow.");
 
+  // 500GB of target IO per compaction (both read and write
   public static final ConfigOption<String> TARGET_IO_PER_COMPACTION_IN_MB_PROP = ConfigOption
       .key("hoodie.compaction.target.io")
       .defaultValue(String.valueOf(500 * 1024))
-      .withDescription("500GB of target IO per compaction (both read and write");
+      .withDescription("Amount of MBs to spend during compaction run for the LogFileSizeBasedCompactionStrategy. "
+          + "This value helps bound ingestion latency while compaction is run inline mode.");
 
   public static final ConfigOption<String> COMPACTION_STRATEGY_PROP = ConfigOption
       .key("hoodie.compaction.strategy")
       .defaultValue(LogFileSizeBasedCompactionStrategy.class.getName())
-      .withDescription("");
+      .withDescription("Compaction strategy decides which file groups are picked up for "
+          + "compaction during each compaction run. By default. Hudi picks the log file "
+          + "with most accumulated unmerged data");
 
   public static final ConfigOption<String> PAYLOAD_CLASS_PROP = ConfigOption
       .key("hoodie.compaction.payload.class")
       .defaultValue(OverwriteWithLatestAvroPayload.class.getName())
-      .withDescription("");
+      .withDescription("This needs to be same as class used during insert/upserts. Just like writing, compaction also uses "
+          + "the record payload class to merge records in the log against each other, merge again with the base file and "
+          + "produce the final record to be written after compaction.");
 
   public static final ConfigOption<String> COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP = ConfigOption
       .key("hoodie.compaction.lazy.block.read")
       .defaultValue("false")
-      .withDescription("Used to choose a trade off between IO vs Memory when performing compaction process."
-          + " Depending on output file_size and memory provided, choose true to avoid OOM for large file"
-          + " size + small memory");
+      .withDescription("When a CompactedLogScanner merges all log files, this config helps to choose whether the logblocks "
+          + "should be read lazily or not. Choose true to use I/O intensive lazy block reading (low memory usage) or false "
+          + "for Memory intensive immediate block read (high memory usage)");
 
   public static final ConfigOption<String> COMPACTION_REVERSE_LOG_READ_ENABLED_PROP = ConfigOption
       .key("hoodie.compaction.reverse.log.read")
       .defaultValue("false")
-      .withDescription("Used to choose whether to enable reverse log reading (reverse log traversal)");
+      .withDescription("HoodieLogFormatReader reads a logfile in the forward direction starting from pos=0 to pos=file_length. "
+          + "If this config is set to true, the Reader reads the logfile in reverse direction, from pos=file_length to pos=0");
 
   public static final ConfigOption<String> FAILED_WRITES_CLEANER_POLICY_PROP = ConfigOption
       .key("hoodie.cleaner.policy.failed.writes")
       .defaultValue(HoodieFailedWritesCleaningPolicy.EAGER.name())
-      .withDescription("");
+      .withDescription("Cleaning policy for failed writes to be used. Hudi will delete any files written by "
+          + "failed writes to re-claim space. Choose to perform this rollback of failed writes eagerly before "
+          + "every writer starts (only supported for single writer) or lazily by the cleaner (required for multi-writers)");
 
   public static final ConfigOption<String> TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP = ConfigOption
       .key("hoodie.compaction.daybased.target.partitions")
       .defaultValue("10")
-      .withDescription("");
+      .withDescription("Used by org.apache.hudi.io.compact.strategy.DayBasedCompactionStrategy to denote the number of "
+          + "latest partitions to compact during a compaction run.");
 
   /**
    * Configs related to specific table types.
@@ -188,8 +203,9 @@ public class HoodieCompactionConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE = ConfigOption
       .key("hoodie.copyonwrite.record.size.estimate")
       .defaultValue(String.valueOf(1024))
-      .withDescription("This value is used as a guesstimate for the record size, if we can't determine this from\n"
-          + "  previous commits");
+      .withDescription("The average record size. If specified, hudi will use this and not compute dynamically "
+          + "based on the last 24 commit’s metadata. No value set as default. This is critical in computing "
+          + "the insert parallelism and bin-packing inserts into small files. See above.");
 
   private HoodieCompactionConfig(Properties props) {
     super(props);
