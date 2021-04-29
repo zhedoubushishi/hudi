@@ -36,13 +36,13 @@ public final class HoodieMetadataConfig extends DefaultHoodieConfig {
   public static final ConfigOption<Boolean> METADATA_ENABLE_PROP = ConfigOption
       .key(METADATA_PREFIX + ".enable")
       .defaultValue(false)
-      .withDescription("");
+      .withDescription("Enable the internal Metadata Table which stores table level metadata such as file listings");
 
   // Validate contents of Metadata Table on each access against the actual filesystem
   public static final ConfigOption<Boolean> METADATA_VALIDATE_PROP = ConfigOption
       .key(METADATA_PREFIX + ".validate")
       .defaultValue(false)
-      .withDescription("");
+      .withDescription("Validate contents of Metadata Table on each access against the actual listings from DFS");
 
   public static final boolean DEFAULT_METADATA_ENABLE_FOR_READERS = false;
 
@@ -56,7 +56,7 @@ public final class HoodieMetadataConfig extends DefaultHoodieConfig {
   public static final ConfigOption<Integer> METADATA_INSERT_PARALLELISM_PROP = ConfigOption
       .key(METADATA_PREFIX + ".insert.parallelism")
       .defaultValue(1)
-      .withDescription("");
+      .withDescription("Parallelism to use when writing to the metadata table");
 
   // Async clean
   public static final ConfigOption<Boolean> METADATA_ASYNC_CLEAN_PROP = ConfigOption
@@ -68,18 +68,18 @@ public final class HoodieMetadataConfig extends DefaultHoodieConfig {
   public static final ConfigOption<Integer> METADATA_COMPACT_NUM_DELTA_COMMITS_PROP = ConfigOption
       .key(METADATA_PREFIX + ".compact.max.delta.commits")
       .defaultValue(24)
-      .withDescription("");
+      .withDescription("Controls how often the metadata table is compacted.");
 
   // Archival settings
   public static final ConfigOption<Integer> MIN_COMMITS_TO_KEEP_PROP = ConfigOption
       .key(METADATA_PREFIX + ".keep.min.commits")
       .defaultValue(20)
-      .withDescription("");
+      .withDescription("Controls the archival of the metadata table’s timeline");
 
   public static final ConfigOption<Integer> MAX_COMMITS_TO_KEEP_PROP = ConfigOption
       .key(METADATA_PREFIX + ".keep.max.commits")
       .defaultValue(30)
-      .withDescription("");
+      .withDescription("Controls the archival of the metadata table’s timeline");
 
   // Cleaner commits retained
   public static final ConfigOption<Integer> CLEANER_COMMITS_RETAINED_PROP = ConfigOption
@@ -91,7 +91,7 @@ public final class HoodieMetadataConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> ENABLE_FALLBACK_PROP = ConfigOption
       .key(METADATA_PREFIX + ".fallback.enable")
       .defaultValue("true")
-      .withDescription("");
+      .withDescription("Fallback to listing from DFS, if there are any errors in fetching from metadata table");
 
   // Regex to filter out matching directories during bootstrap
   public static final ConfigOption<String> DIRECTORY_FILTER_REGEX = ConfigOption
@@ -102,7 +102,8 @@ public final class HoodieMetadataConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> HOODIE_ASSUME_DATE_PARTITIONING_PROP = ConfigOption
       .key("hoodie.assume.date.partitioning")
       .defaultValue("false")
-      .withDescription("");
+      .withDescription("Should HoodieWriteClient assume the data is partitioned by dates, i.e three levels from base path. "
+          + "This is a stop-gap to support tables created by versions < 0.3.1. Will be removed eventually");
 
   public static final ConfigOption<Integer> FILE_LISTING_PARALLELISM_PROP = ConfigOption
       .key("hoodie.file.listing.parallelism")

@@ -65,7 +65,7 @@ public class HoodieTableConfig extends DefaultHoodieConfig implements Serializab
   public static final ConfigOption<HoodieTableType> HOODIE_TABLE_TYPE_PROP_NAME = ConfigOption
       .key("hoodie.table.type")
       .defaultValue(HoodieTableType.COPY_ON_WRITE)
-      .withDescription("");
+      .withDescription("The table type for the underlying data, for this write. This can’t change between writes.");
 
   public static final ConfigOption<HoodieTableVersion> HOODIE_TABLE_VERSION_PROP_NAME = ConfigOption
       .key("hoodie.table.version")
@@ -75,12 +75,14 @@ public class HoodieTableConfig extends DefaultHoodieConfig implements Serializab
   public static final ConfigOption<String> HOODIE_TABLE_PRECOMBINE_FIELD = ConfigOption
       .key("hoodie.table.precombine.field")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Field used in preCombining before actual write. When two records have the same key value, "
+          + "we will pick the one with the largest value for the precombine field, determined by Object.compareTo(..)");
 
   public static final ConfigOption<String> HOODIE_TABLE_PARTITION_COLUMNS = ConfigOption
       .key("hoodie.table.partition.columns")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Partition path field. Value to be used at the partitionPath component of HoodieKey. "
+          + "Actual value ontained by invoking .toString()");
 
   public static final ConfigOption<HoodieFileFormat> HOODIE_BASE_FILE_FORMAT_PROP_NAME = ConfigOption
       .key("hoodie.table.base.file.format")

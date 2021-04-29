@@ -40,47 +40,50 @@ public class HoodieMetricsDatadogConfig extends DefaultHoodieConfig {
   public static final ConfigOption<Integer> DATADOG_REPORT_PERIOD_SECONDS = ConfigOption
       .key(DATADOG_PREFIX + ".report.period.seconds")
       .defaultValue(30)
-      .withDescription("");
+      .withDescription("Datadog report period in seconds. Default to 30.");
 
   public static final ConfigOption<String> DATADOG_API_SITE = ConfigOption
       .key(DATADOG_PREFIX + ".api.site")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Datadog API site: EU or US");
 
   public static final ConfigOption<String> DATADOG_API_KEY = ConfigOption
       .key(DATADOG_PREFIX + ".api.key")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Datadog API key");
 
   public static final ConfigOption<Boolean> DATADOG_API_KEY_SKIP_VALIDATION = ConfigOption
       .key(DATADOG_PREFIX + ".api.key.skip.validation")
       .defaultValue(false)
-      .withDescription("");
+      .withDescription("Before sending metrics via Datadog API, whether to skip validating Datadog API key or not. "
+          + "Default to false.");
 
   public static final ConfigOption<String> DATADOG_API_KEY_SUPPLIER = ConfigOption
       .key(DATADOG_PREFIX + ".api.key.supplier")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Datadog API key supplier to supply the API key at runtime. "
+          + "This will take effect if hoodie.metrics.datadog.api.key is not set.");
 
   public static final ConfigOption<Integer> DATADOG_API_TIMEOUT_SECONDS = ConfigOption
       .key(DATADOG_PREFIX + ".api.timeout.seconds")
       .defaultValue(3)
-      .withDescription("");
+      .withDescription("Datadog API timeout in seconds. Default to 3.");
 
   public static final ConfigOption<String> DATADOG_METRIC_PREFIX = ConfigOption
       .key(DATADOG_PREFIX + ".metric.prefix")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Datadog metric prefix to be prepended to each metric name with a dot as delimiter. "
+          + "For example, if it is set to foo, foo. will be prepended.");
 
   public static final ConfigOption<String> DATADOG_METRIC_HOST = ConfigOption
       .key(DATADOG_PREFIX + ".metric.host")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Datadog metric host to be sent along with metrics data.");
 
   public static final ConfigOption<String> DATADOG_METRIC_TAGS = ConfigOption
       .key(DATADOG_PREFIX + ".metric.tags")
       .noDefaultValue()
-      .withDescription("");
+      .withDescription("Datadog metric tags (comma-delimited) to be sent along with metrics data.");
 
   private HoodieMetricsDatadogConfig(Properties props) {
     super(props);

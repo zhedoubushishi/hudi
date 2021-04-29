@@ -35,7 +35,9 @@ public class ConsistencyGuardConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> CONSISTENCY_CHECK_ENABLED_PROP = ConfigOption
       .key("hoodie.consistency.check.enabled")
       .defaultValue("false")
-      .withDescription("");
+      .withDescription("Should HoodieWriteClient perform additional checks to ensure written files’ are listable "
+          + "on the underlying filesystem/storage. Set this to true, to workaround S3’s eventual consistency model "
+          + "and ensure all data written as a part of a commit is faithfully available for queries.");
 
   public static final ConfigOption<Long> INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP = ConfigOption
       .key("hoodie.consistency.check.initial_interval_ms")
