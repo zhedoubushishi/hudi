@@ -56,20 +56,15 @@ public class HoodieLockConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> LOCK_PROVIDER_CLASS_PROP = ConfigOption
       .key(LOCK_PREFIX + "provider")
       .defaultValue(ZookeeperBasedLockProvider.class.getName())
-      .withDescription("");
+      .withDescription("Lock provider class name, user can provide their own implementation of LockProvider "
+          + "which should be subclass of org.apache.hudi.common.lock.LockProvider");
 
   // Pluggable strategies to use when resolving conflicts
   public static final ConfigOption<String> WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP = ConfigOption
       .key(LOCK_PREFIX + "conflict.resolution.strategy")
       .defaultValue(SimpleConcurrentFileWritesConflictResolutionStrategy.class.getName())
-      .withDescription("");
-  // public static final String LOCK_PROVIDER_CLASS_PROP = LOCK_PREFIX + "provider";
-  // public static final String DEFAULT_LOCK_PROVIDER_CLASS = ZookeeperBasedLockProvider.class.getName();
-  // Pluggable strategies to use when resolving conflicts
-  // public static final String WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP =
-  //     LOCK_PREFIX + "conflict.resolution.strategy";
-  // public static final String DEFAULT_WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS =
-  //     SimpleConcurrentFileWritesConflictResolutionStrategy.class.getName();
+      .withDescription("Lock provider class name, this should be subclass of "
+          + "org.apache.hudi.client.transaction.ConflictResolutionStrategy");
 
   private HoodieLockConfig(Properties props) {
     super(props);

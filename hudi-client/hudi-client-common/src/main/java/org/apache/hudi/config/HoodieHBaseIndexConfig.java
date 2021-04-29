@@ -53,7 +53,8 @@ public class HoodieHBaseIndexConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> HBASE_ZK_ZNODEPARENT = ConfigOption
       .key("hoodie.index.hbase.zknode.path")
       .noDefaultValue()
-      .withDescription("Only applies if index type is HBASE. This is the root znode that will contain all the znodes created/used by HBase");
+      .withDescription("Only applies if index type is HBASE. This is the root znode that will contain "
+          + "all the znodes created/used by HBase");
 
   public static final ConfigOption<Integer> HBASE_PUT_BATCH_SIZE_PROP = ConfigOption
       .key("hoodie.index.hbase.put.batch.size")
