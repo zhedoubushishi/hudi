@@ -22,12 +22,17 @@ import org.apache.hudi.common.util.Option;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Properties;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 /**
  * Default Way to load Hoodie config through a {@link java.util.Properties}.
  */
 public class DefaultHoodieConfig implements Serializable {
+
+  private static final Logger LOG = LogManager.getLogger(DefaultHoodieConfig.class);
 
   protected Properties props;
 
@@ -53,15 +58,25 @@ public class DefaultHoodieConfig implements Serializable {
 
   public static void setDefaultValue(Properties props, ConfigOption configOption) {
     if (!contains(props, configOption)) {
-      String inferValue = null;
+      Option<String> inferValue = Option.empty();
       if (configOption.getInferFunc() != null) {
-        inferValue = configOption.getInferFunc().apply(props).toString();
+        inferValue = (Option<String>) configOption.getInferFunc().apply(props);
       }
-      props.setProperty(configOption.key(), inferValue != null ? inferValue : configOption.defaultValue().toString());
+      props.setProperty(configOption.key(), inferValue.isPresent() ? inferValue.get() : configOption.defaultValue().toString());
     }
   }
 
-  public static boolean contains(Properties props, ConfigOption configOption) {
+  public static void setDefaultValue(Map<String, String> props, ConfigOption configOption) {
+    if (!contains(props, configOption)) {
+      Option<String> inferValue = Option.empty();
+      if (configOption.getInferFunc() != null) {
+        inferValue = (Option<String>) configOption.getInferFunc().apply(props);
+      }
+      props.put(configOption.key(), inferValue.isPresent() ? inferValue.get() : configOption.defaultValue().toString());
+    }
+  }
+
+  public static boolean contains(Map props, ConfigOption configOption) {
     if (props.containsKey(configOption.key())) {
       return true;
     }
