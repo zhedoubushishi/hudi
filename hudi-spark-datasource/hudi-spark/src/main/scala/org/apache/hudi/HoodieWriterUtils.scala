@@ -19,7 +19,7 @@ package org.apache.hudi
 
 import scala.collection.JavaConverters._
 import org.apache.hudi.DataSourceWriteOptions._
-import org.apache.hudi.common.config.TypedProperties
+import org.apache.hudi.common.config.{DefaultHoodieConfig, TypedProperties}
 
 import scala.collection.JavaConversions.mapAsJavaMap
 import scala.collection.JavaConverters.mapAsScalaMapConverter
@@ -43,36 +43,37 @@ object HoodieWriterUtils {
     * @return
     */
   def parametersWithWriteDefaults(parameters: Map[String, String]): Map[String, String] = {
-    Map(OPERATION_OPT_KEY.key -> OPERATION_OPT_KEY.defaultValue,
-      TABLE_TYPE_OPT_KEY.key -> TABLE_TYPE_OPT_KEY.defaultValue,
-      PRECOMBINE_FIELD_OPT_KEY.key -> PRECOMBINE_FIELD_OPT_KEY.defaultValue,
-      PAYLOAD_CLASS_OPT_KEY.key -> PAYLOAD_CLASS_OPT_KEY.defaultValue,
-      RECORDKEY_FIELD_OPT_KEY.key -> RECORDKEY_FIELD_OPT_KEY.defaultValue,
-      PARTITIONPATH_FIELD_OPT_KEY.key -> PARTITIONPATH_FIELD_OPT_KEY.defaultValue,
-      KEYGENERATOR_CLASS_OPT_KEY.key -> DEFAULT_KEYGENERATOR_CLASS_OPT_VAL,
-      METADATA_ENABLE_PROP.key -> METADATA_ENABLE_PROP.defaultValue.toString,
-      METADATA_VALIDATE_PROP.key -> METADATA_VALIDATE_PROP.defaultValue.toString,
-      COMMIT_METADATA_KEYPREFIX_OPT_KEY.key -> COMMIT_METADATA_KEYPREFIX_OPT_KEY.defaultValue,
-      INSERT_DROP_DUPS_OPT_KEY.key -> INSERT_DROP_DUPS_OPT_KEY.defaultValue,
-      STREAMING_RETRY_CNT_OPT_KEY.key -> STREAMING_RETRY_CNT_OPT_KEY.defaultValue,
-      STREAMING_RETRY_INTERVAL_MS_OPT_KEY.key -> STREAMING_RETRY_INTERVAL_MS_OPT_KEY.defaultValue,
-      STREAMING_IGNORE_FAILED_BATCH_OPT_KEY.key -> STREAMING_IGNORE_FAILED_BATCH_OPT_KEY.defaultValue,
-      META_SYNC_CLIENT_TOOL_CLASS.key -> META_SYNC_CLIENT_TOOL_CLASS.defaultValue,
-      HIVE_SYNC_ENABLED_OPT_KEY.key -> HIVE_SYNC_ENABLED_OPT_KEY.defaultValue,
-      META_SYNC_ENABLED_OPT_KEY.key -> META_SYNC_ENABLED_OPT_KEY.defaultValue,
-      HIVE_DATABASE_OPT_KEY.key -> HIVE_DATABASE_OPT_KEY.defaultValue,
-      HIVE_TABLE_OPT_KEY.key -> HIVE_TABLE_OPT_KEY.defaultValue,
-      HIVE_BASE_FILE_FORMAT_OPT_KEY.key -> HIVE_BASE_FILE_FORMAT_OPT_KEY.defaultValue,
-      HIVE_USER_OPT_KEY.key -> HIVE_USER_OPT_KEY.defaultValue,
-      HIVE_PASS_OPT_KEY.key -> HIVE_PASS_OPT_KEY.defaultValue,
-      HIVE_URL_OPT_KEY.key -> HIVE_URL_OPT_KEY.defaultValue,
-      HIVE_PARTITION_FIELDS_OPT_KEY.key -> HIVE_PARTITION_FIELDS_OPT_KEY.defaultValue,
-      HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY.key -> HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY.defaultValue,
-      HIVE_STYLE_PARTITIONING_OPT_KEY.key -> HIVE_STYLE_PARTITIONING_OPT_KEY.defaultValue,
-      HIVE_USE_JDBC_OPT_KEY.key -> HIVE_USE_JDBC_OPT_KEY.defaultValue,
-      ASYNC_COMPACT_ENABLE_OPT_KEY.key -> ASYNC_COMPACT_ENABLE_OPT_KEY.defaultValue,
-      ENABLE_ROW_WRITER_OPT_KEY.key -> ENABLE_ROW_WRITER_OPT_KEY.defaultValue
-    ) ++ translateStorageTypeToTableType(parameters)
+    val javaMapParameters: java.util.HashMap[String, String] = new java.util.HashMap(parameters)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, OPERATION_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, TABLE_TYPE_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, PRECOMBINE_FIELD_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, PAYLOAD_CLASS_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, RECORDKEY_FIELD_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, PARTITIONPATH_FIELD_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, KEYGENERATOR_CLASS_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, METADATA_ENABLE_PROP)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, METADATA_VALIDATE_PROP)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, COMMIT_METADATA_KEYPREFIX_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, INSERT_DROP_DUPS_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, STREAMING_RETRY_CNT_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, STREAMING_RETRY_INTERVAL_MS_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, STREAMING_IGNORE_FAILED_BATCH_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, META_SYNC_CLIENT_TOOL_CLASS)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_SYNC_ENABLED_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, META_SYNC_ENABLED_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_DATABASE_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_TABLE_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_BASE_FILE_FORMAT_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_USER_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_PASS_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_URL_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_PARTITION_FIELDS_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_STYLE_PARTITIONING_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, HIVE_USE_JDBC_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, ASYNC_COMPACT_ENABLE_OPT_KEY)
+    DefaultHoodieConfig.setDefaultValue(javaMapParameters, ENABLE_ROW_WRITER_OPT_KEY)
+    Map() ++ javaMapParameters.asScala ++ translateStorageTypeToTableType(parameters)
   }
 
   def toProperties(params: Map[String, String]): TypedProperties = {

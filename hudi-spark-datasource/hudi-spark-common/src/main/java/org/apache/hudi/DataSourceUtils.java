@@ -89,7 +89,7 @@ public class DataSourceUtils {
    */
   public static KeyGenerator createKeyGenerator(TypedProperties props) throws IOException {
     String keyGeneratorClass = props.getString(DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY().key(),
-        DataSourceWriteOptions.DEFAULT_KEYGENERATOR_CLASS_OPT_VAL());
+        DataSourceWriteOptions.KEYGENERATOR_CLASS_OPT_KEY().defaultValue());
     try {
       return (KeyGenerator) ReflectionUtils.loadClass(keyGeneratorClass, props);
     } catch (Throwable e) {
