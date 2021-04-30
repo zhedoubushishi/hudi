@@ -18,10 +18,12 @@
 
 package org.apache.hudi.common.config;
 
+import org.apache.hudi.common.util.Option;
+
 import java.io.Serializable;
 import java.util.function.Function;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 
 /**
  * ConfigOption describes a configuration parameter. It contains the configuration
@@ -42,9 +44,9 @@ public class ConfigOption<T> implements Serializable {
   private final String[] deprecatedNames;
 
   // provide the ability to infer config value based on other configs
-  private final Function<Properties, T> inferFunction;
+  private final Function<Map, Option<T>> inferFunction;
 
-  ConfigOption(String key, T defaultValue, String description, Function<Properties, T> inferFunc, String... deprecatedNames) {
+  ConfigOption(String key, T defaultValue, String description, Function<Map, Option<T>> inferFunc, String... deprecatedNames) {
     this.key = Objects.requireNonNull(key);
     this.defaultValue = defaultValue;
     this.description = description;
@@ -60,7 +62,7 @@ public class ConfigOption<T> implements Serializable {
     return defaultValue;
   }
 
-  Function<Properties, T> getInferFunc() {
+  Function<Map, Option<T>> getInferFunc() {
     return inferFunction;
   }
 
@@ -76,7 +78,7 @@ public class ConfigOption<T> implements Serializable {
     return new ConfigOption<>(key, defaultValue, description, inferFunction, deprecatedNames);
   }
 
-  public ConfigOption<T> withInferFunction(Function<Properties, T> inferFunction) {
+  public ConfigOption<T> withInferFunction(Function<Map, Option<T>> inferFunction) {
     return new ConfigOption<>(key, defaultValue, description, inferFunction, deprecatedNames);
   }
 
