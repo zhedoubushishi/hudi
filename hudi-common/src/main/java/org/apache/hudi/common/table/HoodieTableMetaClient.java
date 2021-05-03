@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -600,6 +601,7 @@ public class HoodieTableMetaClient implements Serializable {
     private String partitionColumns;
     private String bootstrapIndexClass;
     private String bootstrapBasePath;
+    private Map<String, String> additionalProps;
 
     private PropertyBuilder() {
 
@@ -660,6 +662,11 @@ public class HoodieTableMetaClient implements Serializable {
 
     public PropertyBuilder setBootstrapBasePath(String bootstrapBasePath) {
       this.bootstrapBasePath = bootstrapBasePath;
+      return this;
+    }
+
+    public PropertyBuilder setAdditionalProps(Map<String, String> additionalProps) {
+      this.additionalProps = additionalProps;
       return this;
     }
 
@@ -751,6 +758,10 @@ public class HoodieTableMetaClient implements Serializable {
 
       if (null != partitionColumns) {
         properties.put(HoodieTableConfig.HOODIE_TABLE_PARTITION_COLUMNS.key(), partitionColumns);
+      }
+
+      if (null != additionalProps && !additionalProps.isEmpty()) {
+        properties.putAll(additionalProps);
       }
       return properties;
     }

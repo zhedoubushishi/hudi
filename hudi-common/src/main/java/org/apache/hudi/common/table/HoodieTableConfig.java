@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -121,10 +122,13 @@ public class HoodieTableConfig extends DefaultHoodieConfig implements Serializab
       .noDefaultValue()
       .withDescription("Base path of the dataset that needs to be bootstrapped as a Hudi table");
 
+  private String propertyPathStr;
+
   public HoodieTableConfig(FileSystem fs, String metaPath, String payloadClassName) {
     super();
     Properties props = new Properties();
     Path propertyPath = new Path(metaPath, HOODIE_PROPERTIES_FILE);
+    this.propertyPathStr = propertyPath.toString();
     LOG.info("Loading table properties from " + propertyPath);
     try {
       try (FSDataInputStream inputStream = fs.open(propertyPath)) {
@@ -287,5 +291,29 @@ public class HoodieTableConfig extends DefaultHoodieConfig implements Serializab
 
   public Properties getProperties() {
     return props;
+  }
+
+  /**
+   * Update Hudi table property file if find any table config changed.
+   * @param fs
+   * @param additionalConfigs
+   */
+  public void updatePropFile(FileSystem fs, Map<String, String> additionalConfigs) {
+    if (additionalConfigs == null || additionalConfigs.isEmpty()) {
+      return;
+    }
+    Map<String, String> overrideProps = new HashMap<>(getMapProps());
+    overrideProps.putAll(additionalConfigs);
+    Path propertyPath = new Path(propertyPathStr);
+    // If catch new changes, update the hoodie property file with the latest configs
+    if (!overrideProps.equals(getMapProps())) {
+      try (FSDataOutputStream outputStream = fs.create(propertyPath)) {
+        Properties updatedProps = new Properties();
+        updatedProps.putAll(overrideProps);
+        updatedProps.store(outputStream, "Properties saved on " + new Date(System.currentTimeMillis()));
+      } catch (IOException e) {
+        throw new HoodieIOException("Could not update Hoodie properties in " + propertyPath, e);
+      }
+    }
   }
 }

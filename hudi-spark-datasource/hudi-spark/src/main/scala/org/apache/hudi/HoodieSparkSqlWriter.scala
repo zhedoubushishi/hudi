@@ -102,7 +102,7 @@ private[hudi] object HoodieSparkSqlWriter {
     val instantTime = HoodieActiveTimeline.createNewInstantTime()
     val fs = basePath.getFileSystem(sparkContext.hadoopConfiguration)
     tableExists = fs.exists(new Path(basePath, HoodieTableMetaClient.METAFOLDER_NAME))
-    var tableConfig = getHoodieTableConfig(sparkContext, path.get, hoodieTableConfigOpt)
+    var tableConfig = HoodieWriterUtils.getHoodieTableConfig(sparkContext, tableExists, path.get, hoodieTableConfigOpt)
     val keyGenerator = DataSourceUtils.createKeyGenerator(toProperties(parameters))
 
     if (mode == SaveMode.Ignore && tableExists) {
@@ -111,6 +111,7 @@ private[hudi] object HoodieSparkSqlWriter {
     } else {
       // Handle various save modes
       handleSaveModes(mode, basePath, tableConfig, tblName, operation, fs)
+      val additionalConfigs = additionalConfigsForTablePropFile(parameters)
       // Create the table if not present
       if (!tableExists) {
         val archiveLogFolder = parameters.getOrElse(
@@ -125,8 +126,11 @@ private[hudi] object HoodieSparkSqlWriter {
           .setPayloadClassName(parameters(PAYLOAD_CLASS_OPT_KEY.key))
           .setPreCombineField(parameters.getOrDefault(PRECOMBINE_FIELD_OPT_KEY.key, null))
           .setPartitionColumns(partitionColumns)
+          .setAdditionalProps(additionalConfigs)
           .initTable(sparkContext.hadoopConfiguration, path.get)
         tableConfig = tableMetaClient.getTableConfig
+      } else {
+        tableConfig.updatePropFile(fs, additionalConfigs)
       }
 
       val commitActionType = CommitUtils.getCommitActionType(operation, tableConfig.getTableType)
@@ -276,7 +280,7 @@ private[hudi] object HoodieSparkSqlWriter {
     val basePath = new Path(path)
     val fs = basePath.getFileSystem(sparkContext.hadoopConfiguration)
     tableExists = fs.exists(new Path(basePath, HoodieTableMetaClient.METAFOLDER_NAME))
-    val tableConfig = getHoodieTableConfig(sparkContext, path, hoodieTableConfigOpt)
+    val tableConfig = HoodieWriterUtils.getHoodieTableConfig(sparkContext, tableExists, path, hoodieTableConfigOpt)
 
     // Handle various save modes
     if (mode == SaveMode.Ignore && tableExists) {
@@ -299,6 +303,7 @@ private[hudi] object HoodieSparkSqlWriter {
           .setBootstrapIndexClass(bootstrapIndexClass)
           .setBootstrapBasePath(bootstrapBasePath)
           .setPartitionColumns(partitionColumns)
+          .setAdditionalProps(additionalConfigsForTablePropFile(parameters))
           .initTable(sparkContext.hadoopConfiguration, path)
     }
 
@@ -603,15 +608,19 @@ private[hudi] object HoodieSparkSqlWriter {
     }
   }
 
-  private def getHoodieTableConfig(sparkContext: SparkContext,
-                                   tablePath: String,
-                                   hoodieTableConfigOpt: Option[HoodieTableConfig]): HoodieTableConfig = {
-    if (tableExists) {
-      hoodieTableConfigOpt.getOrElse(
-        HoodieTableMetaClient.builder().setConf(sparkContext.hadoopConfiguration).setBasePath(tablePath)
-          .build().getTableConfig)
-    } else {
-      null
+  /**
+   * Save additional configs to the table config file (hoodie.properties)
+   * which can be reused in the following operations
+   * @param parameters
+   * @return Map
+   */
+  private def additionalConfigsForTablePropFile(parameters: Map[String, String]): scala.collection.mutable.Map[String, String] = {
+    val additionalProps = scala.collection.mutable.Map[String, String]()
+    for (configOption <- HoodieWriterUtils.ADDITIONAL_CONFIG_SAVED_IN_TABLE_CONFIG_FILE) {
+      if (parameters.contains(configOption.key)) {
+        additionalProps(configOption.key) = parameters(configOption.key)
+      }
     }
+    additionalProps
   }
 }

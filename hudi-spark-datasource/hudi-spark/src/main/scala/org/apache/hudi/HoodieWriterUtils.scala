@@ -23,14 +23,34 @@ import org.apache.hudi.common.config.{DefaultHoodieConfig, TypedProperties}
 
 import scala.collection.JavaConversions.mapAsJavaMap
 import scala.collection.JavaConverters.mapAsScalaMapConverter
+import org.apache.hadoop.fs.Path
 import org.apache.hudi.common.config.HoodieMetadataConfig.METADATA_ENABLE_PROP
 import org.apache.hudi.common.config.HoodieMetadataConfig.METADATA_VALIDATE_PROP
+import org.apache.hudi.common.table.{HoodieTableConfig, HoodieTableMetaClient}
+import org.apache.hudi.common.table.HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME
+import org.apache.hudi.config.HoodieBootstrapConfig.{BOOTSTRAP_BASE_PATH_PROP, BOOTSTRAP_INDEX_CLASS_PROP}
+import org.apache.hudi.exception.HoodieException
 import org.apache.hudi.keygen.{BaseKeyGenerator, CustomAvroKeyGenerator, CustomKeyGenerator, KeyGenerator}
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
 
 /**
  * WriterUtils to assist in write path in Datasource and tests.
  */
 object HoodieWriterUtils {
+
+  // configs can be saved in table config file
+  val ADDITIONAL_CONFIG_SAVED_IN_TABLE_CONFIG_FILE = List(
+    RECORDKEY_FIELD_OPT_KEY,
+    KEYGENERATOR_CLASS_OPT_KEY,
+    META_SYNC_ENABLED_OPT_KEY,
+    HIVE_SYNC_ENABLED_OPT_KEY,
+    HIVE_DATABASE_OPT_KEY,
+    HIVE_TABLE_OPT_KEY,
+    HIVE_PARTITION_FIELDS_OPT_KEY,
+    HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY,
+    HIVE_STYLE_PARTITIONING_OPT_KEY
+  )
 
   def javaParametersWithWriteDefaults(parameters: java.util.Map[String, String]): java.util.Map[String, String] = {
     mapAsJavaMap(parametersWithWriteDefaults(parameters.asScala.toMap))
@@ -107,6 +127,56 @@ object HoodieWriterUtils {
 
       case b: BaseKeyGenerator => b.getPartitionPathFields.asScala.mkString(",")
       case _=> null
+    }
+  }
+
+  def getHoodieTableConfig(sparkContext: SparkContext,
+                           tableExists: Boolean,
+                           tablePath: String,
+                           hoodieTableConfigOpt: Option[HoodieTableConfig]): HoodieTableConfig = {
+    if (tableExists) {
+      hoodieTableConfigOpt.getOrElse(
+        HoodieTableMetaClient.builder().setConf(sparkContext.hadoopConfiguration).setBasePath(tablePath)
+          .build().getTableConfig)
+    } else {
+      null
+    }
+  }
+
+  def addConfigsFromTableConfigFile(sqlContext: SQLContext,
+                                    options: Map[String, String]): Map[String, String] = {
+    val path = options("path")
+    if (path.isEmpty) {
+      throw new HoodieException("'path' must be set.")
+    }
+    val basePath = new Path(path)
+    val fs = basePath.getFileSystem(sqlContext.sparkContext.hadoopConfiguration)
+    val tableExists = fs.exists(new Path(basePath, HoodieTableMetaClient.METAFOLDER_NAME))
+    if (tableExists) {
+      val hudiTableConfig = HoodieWriterUtils.getHoodieTableConfig(sqlContext.sparkContext, tableExists, path, Option.empty)
+      val hudiTableConfigMap = hudiTableConfig.getMapProps
+      val tableConfig = scala.collection.mutable.Map(
+        TABLE_NAME_OPT_KEY.key -> hudiTableConfig.getTableName,
+        TABLE_TYPE_OPT_KEY.key -> hudiTableConfig.getTableType.name,
+        PRECOMBINE_FIELD_OPT_KEY.key -> hudiTableConfig.getPreCombineField,
+        HOODIE_ARCHIVELOG_FOLDER_PROP_NAME.key -> hudiTableConfig.getArchivelogFolder,
+        PAYLOAD_CLASS_OPT_KEY.key -> hudiTableConfig.getPayloadClass,
+        BOOTSTRAP_INDEX_CLASS_PROP.key -> hudiTableConfig.getBootstrapIndexClass
+      )
+      if (hudiTableConfig.getPartitionColumns.isPresent) {
+        tableConfig(PARTITIONPATH_FIELD_OPT_KEY.key) = hudiTableConfig.getPartitionColumns.get.mkString(",")
+      }
+      if (hudiTableConfig.getBootstrapBasePath.isPresent) {
+        tableConfig(BOOTSTRAP_BASE_PATH_PROP.key) = hudiTableConfig.getBootstrapBasePath.get
+      }
+      for (configOption <- ADDITIONAL_CONFIG_SAVED_IN_TABLE_CONFIG_FILE) {
+        if (hudiTableConfigMap.containsKey(configOption.key)) {
+          tableConfig(configOption.key) = hudiTableConfigMap.get(configOption.key)
+        }
+      }
+      tableConfig.toMap ++ options
+    } else {
+      options
     }
   }
 }
