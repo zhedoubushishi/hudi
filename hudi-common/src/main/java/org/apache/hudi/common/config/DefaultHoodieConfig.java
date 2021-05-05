@@ -19,13 +19,13 @@
 package org.apache.hudi.common.config;
 
 import org.apache.hudi.common.util.Option;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 /**
  * Default Way to load Hoodie config through a {@link java.util.Properties}.
@@ -56,7 +56,11 @@ public class DefaultHoodieConfig implements Serializable {
     }
   }
 
-  public static void setDefaultValue(Properties props, ConfigOption configOption) {
+  public static <T> void set(Properties props, ConfigOption<T> cfg, String val) {
+    props.setProperty(cfg.key(), val);
+  }
+
+  public static <T> void setDefaultValue(Properties props, ConfigOption<T> configOption) {
     if (!contains(props, configOption)) {
       Option<String> inferValue = Option.empty();
       if (configOption.getInferFunc() != null) {
@@ -66,7 +70,7 @@ public class DefaultHoodieConfig implements Serializable {
     }
   }
 
-  public static void setDefaultValue(Map<String, String> props, ConfigOption configOption) {
+  public static <T> void setDefaultValue(Map<String, String> props, ConfigOption<T> configOption) {
     if (!contains(props, configOption)) {
       Option<String> inferValue = Option.empty();
       if (configOption.getInferFunc() != null) {
@@ -76,35 +80,69 @@ public class DefaultHoodieConfig implements Serializable {
     }
   }
 
-  public static boolean contains(Map props, ConfigOption configOption) {
+  public static <T> boolean contains(Map props, ConfigOption<T> configOption) {
     if (props.containsKey(configOption.key())) {
       return true;
     }
-    return Arrays.stream(configOption.getDeprecatedNames()).anyMatch(props::containsKey);
+    return Arrays.stream(configOption.getAlternatives()).anyMatch(props::containsKey);
   }
 
-  public static Option<Object> getRawValue(Properties props, ConfigOption configOption) {
+  public static <T> Option<Object> getRawValue(Map props, ConfigOption<T> configOption) {
     if (props.containsKey(configOption.key())) {
-      return Option.of(props.get(configOption.key()));
+      return Option.ofNullable(props.get(configOption.key()));
     }
-    for (String deprecateName : configOption.getDeprecatedNames()) {
-      if (props.containsKey(deprecateName)) {
-        return Option.of(props.get(deprecateName));
+    for (String alternative : configOption.getAlternatives()) {
+      if (props.containsKey(alternative)) {
+        LOG.warn(String.format("The configuration key '%s' has been deprecated "
+                + "and may be removed in the future. Please use the new key '%s' instead.",
+            alternative, configOption.key()));
+        return Option.ofNullable(props.get(alternative));
       }
     }
     return Option.empty();
   }
 
-  public static String getString(Properties props, ConfigOption configOption) {
+  public static <T> String getString(Map props, ConfigOption<T> configOption) {
     Option<Object> rawValue = getRawValue(props, configOption);
-    if (rawValue.isPresent()) {
-      return rawValue.get().toString();
-    }
-    return configOption.defaultValue().toString();
+    return rawValue.map(Object::toString).orElse(null);
+  }
+
+  public static <T> Integer getInt(Map props, ConfigOption<T> configOption) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    return rawValue.map(v -> Integer.parseInt(v.toString())).orElse(null);
+  }
+
+  public static <T> Boolean getBoolean(Map props, ConfigOption<T> configOption) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    return rawValue.map(v -> Boolean.parseBoolean(v.toString())).orElse(null);
+  }
+
+  public static <T> Long getLong(Map props, ConfigOption<T> configOption) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    return rawValue.map(v -> Long.parseLong(v.toString())).orElse(null);
+  }
+
+  public static <T> Float getFloat(Map props, ConfigOption<T> configOption) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    return rawValue.map(v -> Float.parseFloat(v.toString())).orElse(null);
+  }
+
+  public static <T> Double getDouble(Map props, ConfigOption<T> configOption) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    return rawValue.map(v -> Double.parseDouble(v.toString())).orElse(null);
+  }
+
+  public static <T> String getStringOrDefault(Map props, ConfigOption<T> configOption) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    return rawValue.orElse(configOption.defaultValue().toString()).toString();
+  }
+
+  public static <T> String getStringOrElse(Map props, ConfigOption<T> configOption, String defaultVal) {
+    Option<Object> rawValue = getRawValue(props, configOption);
+    return rawValue.orElse(defaultVal).toString();
   }
 
   public Properties getProps() {
     return props;
   }
-
 }

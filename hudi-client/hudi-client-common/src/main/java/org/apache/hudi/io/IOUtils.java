@@ -18,6 +18,7 @@
 
 package org.apache.hudi.io;
 
+import org.apache.hudi.common.config.DefaultHoodieConfig;
 import org.apache.hudi.common.engine.EngineProperty;
 import org.apache.hudi.common.engine.TaskContextSupplier;
 import org.apache.hudi.common.util.Option;
@@ -55,18 +56,18 @@ public class IOUtils {
   }
 
   public static long getMaxMemoryPerPartitionMerge(TaskContextSupplier context, Properties properties) {
-    if (properties.containsKey(MAX_MEMORY_FOR_MERGE_PROP.key())) {
-      return Long.parseLong(properties.getProperty(MAX_MEMORY_FOR_MERGE_PROP.key()));
+    if (DefaultHoodieConfig.contains(properties, MAX_MEMORY_FOR_MERGE_PROP)) {
+      return DefaultHoodieConfig.getLong(properties, MAX_MEMORY_FOR_MERGE_PROP);
     }
-    String fraction = properties.getProperty(MAX_MEMORY_FRACTION_FOR_MERGE_PROP.key(), MAX_MEMORY_FRACTION_FOR_MERGE_PROP.defaultValue());
+    String fraction = DefaultHoodieConfig.getStringOrDefault(properties, MAX_MEMORY_FRACTION_FOR_MERGE_PROP);
     return getMaxMemoryAllowedForMerge(context, fraction);
   }
 
   public static long getMaxMemoryPerCompaction(TaskContextSupplier context, Properties properties) {
-    if (properties.containsKey(MAX_MEMORY_FOR_COMPACTION_PROP.key())) {
-      return Long.parseLong(properties.getProperty(MAX_MEMORY_FOR_COMPACTION_PROP.key()));
+    if (DefaultHoodieConfig.contains(properties, MAX_MEMORY_FOR_COMPACTION_PROP)) {
+      return DefaultHoodieConfig.getLong(properties, MAX_MEMORY_FOR_COMPACTION_PROP);
     }
-    String fraction = properties.getProperty(MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP.key(), MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP.defaultValue());
+    String fraction = DefaultHoodieConfig.getStringOrDefault(properties, MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP);
     return getMaxMemoryAllowedForMerge(context, fraction);
   }
 }
