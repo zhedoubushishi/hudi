@@ -35,11 +35,13 @@ public class HoodieWriteCommitCallbackConfig extends DefaultHoodieConfig {
   public static final ConfigOption<Boolean> CALLBACK_ON = ConfigOption
       .key(CALLBACK_PREFIX + "on")
       .defaultValue(false)
+      .withVersion("0.6.0")
       .withDescription("Turn callback on/off. off by default.");
 
   public static final ConfigOption<String> CALLBACK_CLASS_PROP = ConfigOption
       .key(CALLBACK_PREFIX + "class")
       .defaultValue("org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback")
+      .withVersion("0.6.0")
       .withDescription("Full path of callback class and must be a subclass of HoodieWriteCommitCallback class, "
           + "org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback by default");
 
@@ -47,16 +49,19 @@ public class HoodieWriteCommitCallbackConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> CALLBACK_HTTP_URL_PROP = ConfigOption
       .key(CALLBACK_PREFIX + "http.url")
       .noDefaultValue()
+      .withVersion("0.6.0")
       .withDescription("Callback host to be sent along with callback messages");
 
   public static final ConfigOption<String> CALLBACK_HTTP_API_KEY = ConfigOption
       .key(CALLBACK_PREFIX + "http.api.key")
       .defaultValue("hudi_write_commit_http_callback")
+      .withVersion("0.6.0")
       .withDescription("Http callback API key. hudi_write_commit_http_callback by default");
 
   public static final ConfigOption<Integer> CALLBACK_HTTP_TIMEOUT_SECONDS = ConfigOption
       .key(CALLBACK_PREFIX + "http.timeout.seconds")
       .defaultValue(3)
+      .withVersion("0.6.0")
       .withDescription("Callback timeout in seconds. 3 by default");
 
   private HoodieWriteCommitCallbackConfig(Properties props) {
@@ -84,27 +89,27 @@ public class HoodieWriteCommitCallbackConfig extends DefaultHoodieConfig {
     }
 
     public HoodieWriteCommitCallbackConfig.Builder writeCommitCallbackOn(String callbackOn) {
-      props.setProperty(CALLBACK_ON.key(), callbackOn);
+      set(props, CALLBACK_ON, callbackOn);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackClass(String callbackClass) {
-      props.setProperty(CALLBACK_CLASS_PROP.key(), callbackClass);
+      set(props, CALLBACK_CLASS_PROP, callbackClass);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackHttpUrl(String url) {
-      props.setProperty(CALLBACK_HTTP_URL_PROP.key(), url);
+      set(props, CALLBACK_HTTP_URL_PROP, url);
       return this;
     }
 
     public Builder withCallbackHttpTimeoutSeconds(String timeoutSeconds) {
-      props.setProperty(CALLBACK_HTTP_TIMEOUT_SECONDS.key(), timeoutSeconds);
+      set(props, CALLBACK_HTTP_TIMEOUT_SECONDS, timeoutSeconds);
       return this;
     }
 
     public Builder withCallbackHttpApiKey(String apiKey) {
-      props.setProperty(CALLBACK_HTTP_API_KEY.key(), apiKey);
+      set(props, CALLBACK_HTTP_API_KEY, apiKey);
       return this;
     }
 

@@ -127,57 +127,57 @@ public class HoodieStorageConfig extends DefaultHoodieConfig {
     }
 
     public Builder parquetMaxFileSize(long maxFileSize) {
-      props.setProperty(PARQUET_FILE_MAX_BYTES.key(), String.valueOf(maxFileSize));
+      set(props, PARQUET_FILE_MAX_BYTES, String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder parquetBlockSize(int blockSize) {
-      props.setProperty(PARQUET_BLOCK_SIZE_BYTES.key(), String.valueOf(blockSize));
+      set(props, PARQUET_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
       return this;
     }
 
     public Builder parquetPageSize(int pageSize) {
-      props.setProperty(PARQUET_PAGE_SIZE_BYTES.key(), String.valueOf(pageSize));
+      set(props, PARQUET_PAGE_SIZE_BYTES, String.valueOf(pageSize));
       return this;
     }
 
     public Builder hfileMaxFileSize(long maxFileSize) {
-      props.setProperty(HFILE_FILE_MAX_BYTES.key(), String.valueOf(maxFileSize));
+      set(props, HFILE_FILE_MAX_BYTES, String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder hfileBlockSize(int blockSize) {
-      props.setProperty(HFILE_BLOCK_SIZE_BYTES.key(), String.valueOf(blockSize));
+      set(props, HFILE_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
       return this;
     }
 
     public Builder logFileDataBlockMaxSize(int dataBlockSize) {
-      props.setProperty(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES.key(), String.valueOf(dataBlockSize));
+      set(props, LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES, String.valueOf(dataBlockSize));
       return this;
     }
 
     public Builder logFileMaxSize(int logFileSize) {
-      props.setProperty(LOGFILE_SIZE_MAX_BYTES.key(), String.valueOf(logFileSize));
+      set(props, LOGFILE_SIZE_MAX_BYTES, String.valueOf(logFileSize));
       return this;
     }
 
     public Builder parquetCompressionRatio(double parquetCompressionRatio) {
-      props.setProperty(PARQUET_COMPRESSION_RATIO.key(), String.valueOf(parquetCompressionRatio));
+      set(props, PARQUET_COMPRESSION_RATIO, String.valueOf(parquetCompressionRatio));
       return this;
     }
 
     public Builder parquetCompressionCodec(String parquetCompressionCodec) {
-      props.setProperty(PARQUET_COMPRESSION_CODEC.key(), parquetCompressionCodec);
+      set(props, PARQUET_COMPRESSION_CODEC, parquetCompressionCodec);
       return this;
     }
 
     public Builder hfileCompressionAlgorithm(String hfileCompressionAlgorithm) {
-      props.setProperty(HFILE_COMPRESSION_ALGORITHM.key(), hfileCompressionAlgorithm);
+      set(props, HFILE_COMPRESSION_ALGORITHM, hfileCompressionAlgorithm);
       return this;
     }
 
     public Builder logFileToParquetCompressionRatio(double logFileToParquetCompressionRatio) {
-      props.setProperty(LOGFILE_TO_PARQUET_COMPRESSION_RATIO.key(), String.valueOf(logFileToParquetCompressionRatio));
+      set(props, LOGFILE_TO_PARQUET_COMPRESSION_RATIO, String.valueOf(logFileToParquetCompressionRatio));
       return this;
     }
 

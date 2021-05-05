@@ -171,102 +171,102 @@ public class HoodieHBaseIndexConfig extends DefaultHoodieConfig {
     }
 
     public HoodieHBaseIndexConfig.Builder hbaseZkQuorum(String zkString) {
-      props.setProperty(HBASE_ZKQUORUM_PROP.key(), zkString);
+      set(props, HBASE_ZKQUORUM_PROP, zkString);
       return this;
     }
 
     public HoodieHBaseIndexConfig.Builder hbaseZkPort(int port) {
-      props.setProperty(HBASE_ZKPORT_PROP.key(), String.valueOf(port));
+      set(props, HBASE_ZKPORT_PROP, String.valueOf(port));
       return this;
     }
 
     public HoodieHBaseIndexConfig.Builder hbaseTableName(String tableName) {
-      props.setProperty(HBASE_TABLENAME_PROP.key(), tableName);
+      set(props, HBASE_TABLENAME_PROP, tableName);
       return this;
     }
 
     public Builder hbaseZkZnodeQPSPath(String zkZnodeQPSPath) {
-      props.setProperty(HBASE_ZK_PATH_QPS_ROOT.key(), zkZnodeQPSPath);
+      set(props, HBASE_ZK_PATH_QPS_ROOT, zkZnodeQPSPath);
       return this;
     }
 
     public Builder hbaseIndexGetBatchSize(int getBatchSize) {
-      props.setProperty(HBASE_GET_BATCH_SIZE_PROP.key(), String.valueOf(getBatchSize));
+      set(props, HBASE_GET_BATCH_SIZE_PROP, String.valueOf(getBatchSize));
       return this;
     }
 
     public Builder hbaseIndexPutBatchSize(int putBatchSize) {
-      props.setProperty(HBASE_PUT_BATCH_SIZE_PROP.key(), String.valueOf(putBatchSize));
+      set(props, HBASE_PUT_BATCH_SIZE_PROP, String.valueOf(putBatchSize));
       return this;
     }
 
     public Builder hbaseIndexPutBatchSizeAutoCompute(boolean putBatchSizeAutoCompute) {
-      props.setProperty(HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP.key(), String.valueOf(putBatchSizeAutoCompute));
+      set(props, HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP, String.valueOf(putBatchSizeAutoCompute));
       return this;
     }
 
     public Builder hbaseIndexDesiredPutsTime(int desiredPutsTime) {
-      props.setProperty(HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS.key(), String.valueOf(desiredPutsTime));
+      set(props, HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS, String.valueOf(desiredPutsTime));
       return this;
     }
 
     public Builder hbaseIndexShouldComputeQPSDynamically(boolean shouldComputeQPsDynamically) {
-      props.setProperty(HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY.key(), String.valueOf(shouldComputeQPsDynamically));
+      set(props, HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY, String.valueOf(shouldComputeQPsDynamically));
       return this;
     }
 
     public Builder hbaseIndexQPSFraction(float qpsFraction) {
-      props.setProperty(HBASE_QPS_FRACTION_PROP.key(), String.valueOf(qpsFraction));
+      set(props, HBASE_QPS_FRACTION_PROP, String.valueOf(qpsFraction));
       return this;
     }
 
     public Builder hbaseIndexMinQPSFraction(float minQPSFraction) {
-      props.setProperty(HBASE_MIN_QPS_FRACTION_PROP.key(), String.valueOf(minQPSFraction));
+      set(props, HBASE_MIN_QPS_FRACTION_PROP, String.valueOf(minQPSFraction));
       return this;
     }
 
     public Builder hbaseIndexMaxQPSFraction(float maxQPSFraction) {
-      props.setProperty(HBASE_MAX_QPS_FRACTION_PROP.key(), String.valueOf(maxQPSFraction));
+      set(props, HBASE_MAX_QPS_FRACTION_PROP, String.valueOf(maxQPSFraction));
       return this;
     }
 
     public Builder hbaseIndexSleepMsBetweenPutBatch(int sleepMsBetweenPutBatch) {
-      props.setProperty(HBASE_SLEEP_MS_PUT_BATCH_PROP.key(), String.valueOf(sleepMsBetweenPutBatch));
+      set(props, HBASE_SLEEP_MS_PUT_BATCH_PROP, String.valueOf(sleepMsBetweenPutBatch));
       return this;
     }
 
     public Builder hbaseIndexSleepMsBetweenGetBatch(int sleepMsBetweenGetBatch) {
-      props.setProperty(HBASE_SLEEP_MS_GET_BATCH_PROP.key(), String.valueOf(sleepMsBetweenGetBatch));
+      set(props, HBASE_SLEEP_MS_GET_BATCH_PROP, String.valueOf(sleepMsBetweenGetBatch));
       return this;
     }
 
     public Builder hbaseIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      props.setProperty(HBASE_INDEX_UPDATE_PARTITION_PATH.key(), String.valueOf(updatePartitionPath));
+      set(props, HBASE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 
     public Builder hbaseIndexRollbackSync(boolean rollbackSync) {
-      props.setProperty(HBASE_INDEX_ROLLBACK_SYNC.key(), String.valueOf(rollbackSync));
+      set(props, HBASE_INDEX_ROLLBACK_SYNC, String.valueOf(rollbackSync));
       return this;
     }
 
     public Builder withQPSResourceAllocatorType(String qpsResourceAllocatorClass) {
-      props.setProperty(HBASE_INDEX_QPS_ALLOCATOR_CLASS.key(), qpsResourceAllocatorClass);
+      set(props, HBASE_INDEX_QPS_ALLOCATOR_CLASS, qpsResourceAllocatorClass);
       return this;
     }
 
     public Builder hbaseIndexZkSessionTimeout(int zkSessionTimeout) {
-      props.setProperty(HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS.key(), String.valueOf(zkSessionTimeout));
+      set(props, HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS, String.valueOf(zkSessionTimeout));
       return this;
     }
 
     public Builder hbaseIndexZkConnectionTimeout(int zkConnectionTimeout) {
-      props.setProperty(HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS.key(), String.valueOf(zkConnectionTimeout));
+      set(props, HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS, String.valueOf(zkConnectionTimeout));
       return this;
     }
 
     public Builder hbaseZkZnodeParent(String zkZnodeParent) {
-      props.setProperty(HBASE_ZK_ZNODEPARENT.key(), zkZnodeParent);
+      set(props, HBASE_ZK_ZNODEPARENT, zkZnodeParent);
       return this;
     }
 
@@ -282,7 +282,7 @@ public class HoodieHBaseIndexConfig extends DefaultHoodieConfig {
      */
     public HoodieHBaseIndexConfig.Builder hbaseIndexMaxQPSPerRegionServer(int maxQPSPerRegionServer) {
       // This should be same across various jobs
-      props.setProperty(HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP.key(),
+      set(props, HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP,
           String.valueOf(maxQPSPerRegionServer));
       return this;
     }

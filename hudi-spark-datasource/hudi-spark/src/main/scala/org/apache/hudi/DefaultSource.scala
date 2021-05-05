@@ -69,7 +69,7 @@ class DefaultSource extends RelationProvider
                               optParams: Map[String, String],
                               schema: StructType): BaseRelation = {
     // Add default options for unspecified read options keys.
-    val parameters = translateViewTypesToQueryTypes(optParams)
+    val parameters = DataSourceOptionsHelper.translateConfigurations(optParams)
 
     val path = parameters.get("path")
     val readPathsStr = parameters.get(DataSourceReadOptions.READ_PATHS_OPT_KEY.key)
@@ -103,7 +103,7 @@ class DefaultSource extends RelationProvider
     val metaClient = HoodieTableMetaClient.builder().setConf(fs.getConf).setBasePath(tablePath).build()
     val isBootstrappedTable = metaClient.getTableConfig.getBootstrapBasePath.isPresent
     val tableType = metaClient.getTableType
-    val queryType = parameters(QUERY_TYPE_OPT_KEY.key)
+    val queryType = parameters.getOrElse(QUERY_TYPE_OPT_KEY.key, QUERY_TYPE_OPT_KEY.defaultValue)
     log.info(s"Is bootstrapped table => $isBootstrappedTable, tableType is: $tableType")
 
     (tableType, queryType, isBootstrappedTable) match {

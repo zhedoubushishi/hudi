@@ -38,41 +38,49 @@ public class HoodieBootstrapConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> BOOTSTRAP_BASE_PATH_PROP = ConfigOption
       .key("hoodie.bootstrap.base.path")
       .noDefaultValue()
+      .withVersion("0.6.0")
       .withDescription("Base path of the dataset that needs to be bootstrapped as a Hudi table");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR = ConfigOption
       .key("hoodie.bootstrap.mode.selector")
       .defaultValue(MetadataOnlyBootstrapModeSelector.class.getCanonicalName())
+      .withVersion("0.6.0")
       .withDescription("Selects the mode in which each file/partition in the bootstrapped dataset gets bootstrapped");
 
   public static final ConfigOption<String> FULL_BOOTSTRAP_INPUT_PROVIDER = ConfigOption
       .key("hoodie.bootstrap.full.input.provider")
       .defaultValue("org.apache.hudi.bootstrap.SparkParquetBootstrapDataProvider")
+      .withVersion("0.6.0")
       .withDescription("Class to use for reading the bootstrap dataset partitions/files, for Bootstrap mode FULL_RECORD");
 
   public static final ConfigOption<String> BOOTSTRAP_KEYGEN_CLASS = ConfigOption
       .key("hoodie.bootstrap.keygen.class")
       .noDefaultValue()
+      .withVersion("0.6.0")
       .withDescription("Key generator implementation to be used for generating keys from the bootstrapped dataset");
 
   public static final ConfigOption<String> BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS = ConfigOption
       .key("hoodie.bootstrap.partitionpath.translator.class")
       .defaultValue(IdentityBootstrapPartitionPathTranslator.class.getName())
+      .withVersion("0.6.0")
       .withDescription("Translates the partition paths from the bootstrapped data into how is laid out as a Hudi table.");
 
   public static final ConfigOption<String> BOOTSTRAP_PARALLELISM = ConfigOption
       .key("hoodie.bootstrap.parallelism")
       .defaultValue("1500")
+      .withVersion("0.6.0")
       .withDescription("Parallelism value to be used to bootstrap data into hudi");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR_REGEX = ConfigOption
       .key("hoodie.bootstrap.mode.selector.regex")
       .defaultValue(".*")
+      .withVersion("0.6.0")
       .withDescription("Matches each bootstrap dataset partition against this regex and applies the mode below to it.");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR_REGEX_MODE = ConfigOption
       .key("hoodie.bootstrap.mode.selector.regex.mode")
       .defaultValue(BootstrapMode.METADATA_ONLY.name())
+      .withVersion("0.6.0")
       .withDescription("Bootstrap mode to apply for partition paths, that match regex above. "
           + "METADATA_ONLY will generate just skeleton base files with keys/footers, avoiding full cost of rewriting the dataset. "
           + "FULL_RECORD will perform a full copy/rewrite of the data as a Hudi table.");
@@ -80,6 +88,7 @@ public class HoodieBootstrapConfig extends DefaultHoodieConfig {
   public static final ConfigOption<String> BOOTSTRAP_INDEX_CLASS_PROP = ConfigOption
       .key("hoodie.bootstrap.index.class")
       .defaultValue(HFileBootstrapIndex.class.getName())
+      .withVersion("0.6.0")
       .withDescription("");
 
   public HoodieBootstrapConfig(Properties props) {
@@ -102,42 +111,42 @@ public class HoodieBootstrapConfig extends DefaultHoodieConfig {
     }
 
     public Builder withBootstrapBasePath(String basePath) {
-      props.setProperty(BOOTSTRAP_BASE_PATH_PROP.key(), basePath);
+      set(props, BOOTSTRAP_BASE_PATH_PROP, basePath);
       return this;
     }
 
     public Builder withBootstrapModeSelector(String partitionSelectorClass) {
-      props.setProperty(BOOTSTRAP_MODE_SELECTOR.key(), partitionSelectorClass);
+      set(props, BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
       return this;
     }
 
     public Builder withFullBootstrapInputProvider(String partitionSelectorClass) {
-      props.setProperty(FULL_BOOTSTRAP_INPUT_PROVIDER.key(), partitionSelectorClass);
+      set(props, FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
       return this;
     }
 
     public Builder withBootstrapKeyGenClass(String keyGenClass) {
-      props.setProperty(BOOTSTRAP_KEYGEN_CLASS.key(), keyGenClass);
+      set(props, BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
       return this;
     }
 
     public Builder withBootstrapPartitionPathTranslatorClass(String partitionPathTranslatorClass) {
-      props.setProperty(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS.key(), partitionPathTranslatorClass);
+      set(props, BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, partitionPathTranslatorClass);
       return this;
     }
 
     public Builder withBootstrapParallelism(int parallelism) {
-      props.setProperty(BOOTSTRAP_PARALLELISM.key(), String.valueOf(parallelism));
+      set(props, BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withBootstrapModeSelectorRegex(String regex) {
-      props.setProperty(BOOTSTRAP_MODE_SELECTOR_REGEX.key(), regex);
+      set(props, BOOTSTRAP_MODE_SELECTOR_REGEX, regex);
       return this;
     }
 
     public Builder withBootstrapModeForRegexMatch(BootstrapMode modeForRegexMatch) {
-      props.setProperty(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE.key(), modeForRegexMatch.name());
+      set(props, BOOTSTRAP_MODE_SELECTOR_REGEX_MODE, modeForRegexMatch.name());
       return this;
     }
 

@@ -232,133 +232,133 @@ public class HoodieCompactionConfig extends DefaultHoodieConfig {
     }
 
     public Builder withAutoClean(Boolean autoClean) {
-      props.setProperty(AUTO_CLEAN_PROP.key(), String.valueOf(autoClean));
+      set(props, AUTO_CLEAN_PROP, String.valueOf(autoClean));
       return this;
     }
 
     public Builder withAsyncClean(Boolean asyncClean) {
-      props.setProperty(ASYNC_CLEAN_PROP.key(), String.valueOf(asyncClean));
+      set(props, ASYNC_CLEAN_PROP, String.valueOf(asyncClean));
       return this;
     }
 
     public Builder withIncrementalCleaningMode(Boolean incrementalCleaningMode) {
-      props.setProperty(CLEANER_INCREMENTAL_MODE.key(), String.valueOf(incrementalCleaningMode));
+      set(props, CLEANER_INCREMENTAL_MODE, String.valueOf(incrementalCleaningMode));
       return this;
     }
 
     public Builder withInlineCompaction(Boolean inlineCompaction) {
-      props.setProperty(INLINE_COMPACT_PROP.key(), String.valueOf(inlineCompaction));
+      set(props, INLINE_COMPACT_PROP, String.valueOf(inlineCompaction));
       return this;
     }
 
     public Builder withInlineCompactionTriggerStrategy(CompactionTriggerStrategy compactionTriggerStrategy) {
-      props.setProperty(INLINE_COMPACT_TRIGGER_STRATEGY_PROP.key(), compactionTriggerStrategy.name());
+      set(props, INLINE_COMPACT_TRIGGER_STRATEGY_PROP, compactionTriggerStrategy.name());
       return this;
     }
 
     public Builder withCleanerPolicy(HoodieCleaningPolicy policy) {
-      props.setProperty(CLEANER_POLICY_PROP.key(), policy.name());
+      set(props, CLEANER_POLICY_PROP, policy.name());
       return this;
     }
 
     public Builder retainFileVersions(int fileVersionsRetained) {
-      props.setProperty(CLEANER_FILE_VERSIONS_RETAINED_PROP.key(), String.valueOf(fileVersionsRetained));
+      set(props, CLEANER_FILE_VERSIONS_RETAINED_PROP, String.valueOf(fileVersionsRetained));
       return this;
     }
 
     public Builder retainCommits(int commitsRetained) {
-      props.setProperty(CLEANER_COMMITS_RETAINED_PROP.key(), String.valueOf(commitsRetained));
+      set(props, CLEANER_COMMITS_RETAINED_PROP, String.valueOf(commitsRetained));
       return this;
     }
 
     public Builder archiveCommitsWith(int minToKeep, int maxToKeep) {
-      props.setProperty(MIN_COMMITS_TO_KEEP_PROP.key(), String.valueOf(minToKeep));
-      props.setProperty(MAX_COMMITS_TO_KEEP_PROP.key(), String.valueOf(maxToKeep));
+      set(props, MIN_COMMITS_TO_KEEP_PROP, String.valueOf(minToKeep));
+      set(props, MAX_COMMITS_TO_KEEP_PROP, String.valueOf(maxToKeep));
       return this;
     }
 
     public Builder compactionSmallFileSize(long smallFileLimitBytes) {
-      props.setProperty(PARQUET_SMALL_FILE_LIMIT_BYTES.key(), String.valueOf(smallFileLimitBytes));
+      set(props, PARQUET_SMALL_FILE_LIMIT_BYTES, String.valueOf(smallFileLimitBytes));
       return this;
     }
 
     public Builder compactionRecordSizeEstimateThreshold(double threshold) {
-      props.setProperty(RECORD_SIZE_ESTIMATION_THRESHOLD_PROP.key(), String.valueOf(threshold));
+      set(props, RECORD_SIZE_ESTIMATION_THRESHOLD_PROP, String.valueOf(threshold));
       return this;
     }
 
     public Builder insertSplitSize(int insertSplitSize) {
-      props.setProperty(COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE.key(), String.valueOf(insertSplitSize));
+      set(props, COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE, String.valueOf(insertSplitSize));
       return this;
     }
 
     public Builder autoTuneInsertSplits(boolean autoTuneInsertSplits) {
-      props.setProperty(COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS.key(), String.valueOf(autoTuneInsertSplits));
+      set(props, COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS, String.valueOf(autoTuneInsertSplits));
       return this;
     }
 
     public Builder approxRecordSize(int recordSizeEstimate) {
-      props.setProperty(COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE.key(), String.valueOf(recordSizeEstimate));
+      set(props, COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE, String.valueOf(recordSizeEstimate));
       return this;
     }
 
     public Builder withCleanerParallelism(int cleanerParallelism) {
-      props.setProperty(CLEANER_PARALLELISM.key(), String.valueOf(cleanerParallelism));
+      set(props, CLEANER_PARALLELISM, String.valueOf(cleanerParallelism));
       return this;
     }
 
     public Builder withCompactionStrategy(CompactionStrategy compactionStrategy) {
-      props.setProperty(COMPACTION_STRATEGY_PROP.key(), compactionStrategy.getClass().getName());
+      set(props, COMPACTION_STRATEGY_PROP, compactionStrategy.getClass().getName());
       return this;
     }
 
     public Builder withPayloadClass(String payloadClassName) {
-      props.setProperty(PAYLOAD_CLASS_PROP.key(), payloadClassName);
+      set(props, PAYLOAD_CLASS_PROP, payloadClassName);
       return this;
     }
 
     public Builder withTargetIOPerCompactionInMB(long targetIOPerCompactionInMB) {
-      props.setProperty(TARGET_IO_PER_COMPACTION_IN_MB_PROP.key(), String.valueOf(targetIOPerCompactionInMB));
+      set(props, TARGET_IO_PER_COMPACTION_IN_MB_PROP, String.valueOf(targetIOPerCompactionInMB));
       return this;
     }
 
     public Builder withMaxNumDeltaCommitsBeforeCompaction(int maxNumDeltaCommitsBeforeCompaction) {
-      props.setProperty(INLINE_COMPACT_NUM_DELTA_COMMITS_PROP.key(), String.valueOf(maxNumDeltaCommitsBeforeCompaction));
+      set(props, INLINE_COMPACT_NUM_DELTA_COMMITS_PROP, String.valueOf(maxNumDeltaCommitsBeforeCompaction));
       return this;
     }
 
     public Builder withMaxDeltaSecondsBeforeCompaction(int maxDeltaSecondsBeforeCompaction) {
-      props.setProperty(INLINE_COMPACT_TIME_DELTA_SECONDS_PROP.key(), String.valueOf(maxDeltaSecondsBeforeCompaction));
+      set(props, INLINE_COMPACT_TIME_DELTA_SECONDS_PROP, String.valueOf(maxDeltaSecondsBeforeCompaction));
       return this;
     }
 
     public Builder withCompactionLazyBlockReadEnabled(Boolean compactionLazyBlockReadEnabled) {
-      props.setProperty(COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP.key(), String.valueOf(compactionLazyBlockReadEnabled));
+      set(props, COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP, String.valueOf(compactionLazyBlockReadEnabled));
       return this;
     }
 
     public Builder withCompactionReverseLogReadEnabled(Boolean compactionReverseLogReadEnabled) {
-      props.setProperty(COMPACTION_REVERSE_LOG_READ_ENABLED_PROP.key(), String.valueOf(compactionReverseLogReadEnabled));
+      set(props, COMPACTION_REVERSE_LOG_READ_ENABLED_PROP, String.valueOf(compactionReverseLogReadEnabled));
       return this;
     }
 
     public Builder withTargetPartitionsPerDayBasedCompaction(int targetPartitionsPerCompaction) {
-      props.setProperty(TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP.key(), String.valueOf(targetPartitionsPerCompaction));
+      set(props, TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP, String.valueOf(targetPartitionsPerCompaction));
       return this;
     }
 
     public Builder withCommitsArchivalBatchSize(int batchSize) {
-      props.setProperty(COMMITS_ARCHIVAL_BATCH_SIZE_PROP.key(), String.valueOf(batchSize));
+      set(props, COMMITS_ARCHIVAL_BATCH_SIZE_PROP, String.valueOf(batchSize));
       return this;
     }
 
     public Builder withCleanBootstrapBaseFileEnabled(Boolean cleanBootstrapSourceFileEnabled) {
-      props.setProperty(CLEANER_BOOTSTRAP_BASE_FILE_ENABLED.key(), String.valueOf(cleanBootstrapSourceFileEnabled));
+      set(props, CLEANER_BOOTSTRAP_BASE_FILE_ENABLED, String.valueOf(cleanBootstrapSourceFileEnabled));
       return this;
     }
 
     public Builder withFailedWritesCleaningPolicy(HoodieFailedWritesCleaningPolicy failedWritesPolicy) {
-      props.setProperty(FAILED_WRITES_CLEANER_POLICY_PROP.key(), failedWritesPolicy.name());
+      set(props, FAILED_WRITES_CLEANER_POLICY_PROP, failedWritesPolicy.name());
       return this;
     }
 
@@ -391,14 +391,14 @@ public class HoodieCompactionConfig extends DefaultHoodieConfig {
       setDefaultValue(props, COMMITS_ARCHIVAL_BATCH_SIZE_PROP);
       setDefaultValue(props, CLEANER_BOOTSTRAP_BASE_FILE_ENABLED);
       setDefaultValue(props, FAILED_WRITES_CLEANER_POLICY_PROP);
-      HoodieCleaningPolicy.valueOf(props.getProperty(CLEANER_POLICY_PROP.key()));
+      HoodieCleaningPolicy.valueOf(getString(props, CLEANER_POLICY_PROP));
 
       // Ensure minInstantsToKeep > cleanerCommitsRetained, otherwise we will archive some
       // commit instant on timeline, that still has not been cleaned. Could miss some data via incr pull
-      int minInstantsToKeep = Integer.parseInt(getString(props, HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP));
-      int maxInstantsToKeep = Integer.parseInt(getString(props, HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP));
+      int minInstantsToKeep = Integer.parseInt(getStringOrDefault(props, HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP));
+      int maxInstantsToKeep = Integer.parseInt(getStringOrDefault(props, HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP));
       int cleanerCommitsRetained =
-          Integer.parseInt(getString(props, HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP));
+          Integer.parseInt(getStringOrDefault(props, HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP));
       ValidationUtils.checkArgument(maxInstantsToKeep > minInstantsToKeep,
           String.format(
               "Increase %s=%d to be greater than %s=%d.",
