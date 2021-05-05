@@ -18,6 +18,7 @@
 
 package org.apache.hudi.common.model;
 
+import org.apache.hudi.common.config.DefaultHoodieConfig;
 import org.apache.hudi.common.util.Option;
 
 import org.apache.avro.Schema;
@@ -65,8 +66,9 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
      * NOTE: Deletes sent via EmptyHoodieRecordPayload and/or Delete operation type do not hit this code path
      * and need to be dealt with separately.
      */
-    Object persistedOrderingVal = getNestedFieldVal((GenericRecord) currentValue, properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP.key()), true);
-    Comparable incomingOrderingVal = (Comparable) getNestedFieldVal(incomingRecord, properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP.key()), false);
+    Object persistedOrderingVal = getNestedFieldVal((GenericRecord) currentValue,
+        DefaultHoodieConfig.getString(properties, HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), true);
+    Comparable incomingOrderingVal = (Comparable) getNestedFieldVal(incomingRecord, DefaultHoodieConfig.getString(properties, HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), false);
 
     // Null check is needed here to support schema evolution. The record in storage may be from old schema where
     // the new ordering column might not be present and hence returns null.
@@ -77,7 +79,7 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
     /*
      * We reached a point where the value is disk is older than the incoming record.
      */
-    eventTime = Option.ofNullable(getNestedFieldVal(incomingRecord, properties.getProperty(HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP.key()), true));
+    eventTime = Option.ofNullable(getNestedFieldVal(incomingRecord, DefaultHoodieConfig.getString(properties, HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP), true));
 
     /*
      * Now check if the incoming record is a delete record.

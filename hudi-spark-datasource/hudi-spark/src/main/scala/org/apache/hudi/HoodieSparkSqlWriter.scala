@@ -19,6 +19,7 @@ package org.apache.hudi
 
 import java.util
 import java.util.Properties
+
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericRecord
 import org.apache.hadoop.conf.Configuration
@@ -28,7 +29,7 @@ import org.apache.hudi.DataSourceWriteOptions._
 import org.apache.hudi.avro.HoodieAvroUtils
 import org.apache.hudi.client.HoodieWriteResult
 import org.apache.hudi.client.SparkRDDWriteClient
-import org.apache.hudi.common.config.{HoodieMetadataConfig, TypedProperties}
+import org.apache.hudi.common.config.{DefaultHoodieConfig, HoodieMetadataConfig, TypedProperties}
 import org.apache.hudi.common.model.{HoodieRecordPayload, HoodieTableType, WriteOperationType}
 import org.apache.hudi.common.table.{HoodieTableConfig, HoodieTableMetaClient}
 import org.apache.hudi.common.table.timeline.HoodieActiveTimeline
@@ -113,9 +114,8 @@ private[hudi] object HoodieSparkSqlWriter {
       handleSaveModes(mode, basePath, tableConfig, tblName, operation, fs)
       // Create the table if not present
       if (!tableExists) {
-        val archiveLogFolder = parameters.getOrElse(
-          HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME.key, "archived")
-
+        val archiveLogFolder = DefaultHoodieConfig.getStringOrElse(parameters,
+          HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME, "archived")
         val partitionColumns = HoodieWriterUtils.getPartitionColumns(keyGenerator)
 
         val tableMetaClient = HoodieTableMetaClient.withPropertyBuilder()
@@ -260,10 +260,10 @@ private[hudi] object HoodieSparkSqlWriter {
     val tableName = parameters.getOrElse(HoodieWriteConfig.TABLE_NAME.key,
       throw new HoodieException(s"'${HoodieWriteConfig.TABLE_NAME.key}' must be set."))
     val tableType = parameters(TABLE_TYPE_OPT_KEY.key)
-    val bootstrapBasePath = parameters.getOrElse(BOOTSTRAP_BASE_PATH_PROP.key(),
-      throw new HoodieException(s"'${BOOTSTRAP_BASE_PATH_PROP.key()}' is required for '${BOOTSTRAP_OPERATION_OPT_VAL}'" +
+    val bootstrapBasePath = parameters.getOrElse(BOOTSTRAP_BASE_PATH_PROP.key,
+      throw new HoodieException(s"'${BOOTSTRAP_BASE_PATH_PROP.key}' is required for '${BOOTSTRAP_OPERATION_OPT_VAL}'" +
         " operation'"))
-    val bootstrapIndexClass = parameters.getOrDefault(BOOTSTRAP_INDEX_CLASS_PROP.key(), BOOTSTRAP_INDEX_CLASS_PROP.defaultValue())
+    val bootstrapIndexClass = DefaultHoodieConfig.getStringOrDefault(parameters, BOOTSTRAP_INDEX_CLASS_PROP)
 
     var schema: String = null
     if (df.schema.nonEmpty) {
@@ -423,13 +423,11 @@ private[hudi] object HoodieSparkSqlWriter {
     hiveSyncConfig.ignoreExceptions = parameters.get(HIVE_IGNORE_EXCEPTIONS_OPT_KEY.key).exists(r => r.toBoolean)
     hiveSyncConfig.supportTimestamp = parameters.get(HIVE_SUPPORT_TIMESTAMP.key).exists(r => r.toBoolean)
     hiveSyncConfig.autoCreateDatabase = parameters.get(HIVE_AUTO_CREATE_DATABASE_OPT_KEY.key).exists(r => r.toBoolean)
-    hiveSyncConfig.decodePartition = parameters.getOrElse(URL_ENCODE_PARTITIONING_OPT_KEY.key,
-      URL_ENCODE_PARTITIONING_OPT_KEY.defaultValue).toBoolean
+    hiveSyncConfig.decodePartition = DefaultHoodieConfig.getStringOrDefault(parameters, URL_ENCODE_PARTITIONING_OPT_KEY).toBoolean
 
-    val syncAsDtaSourceTable = parameters.getOrElse(DataSourceWriteOptions.HIVE_SYNC_AS_DATA_SOURCE_TABLE.key,
-      DataSourceWriteOptions.HIVE_SYNC_AS_DATA_SOURCE_TABLE.defaultValue).toBoolean
+    val syncAsDtaSourceTable = DefaultHoodieConfig.getStringOrDefault(parameters, DataSourceWriteOptions.HIVE_SYNC_AS_DATA_SOURCE_TABLE).toBoolean
     if (syncAsDtaSourceTable) {
-      hiveSyncConfig.tableProperties = parameters.getOrElse(HIVE_TABLE_PROPERTIES.key, null)
+      hiveSyncConfig.tableProperties = DefaultHoodieConfig.getStringOrElse(parameters, HIVE_TABLE_PROPERTIES, null)
       hiveSyncConfig.serdeProperties = createSqlTableSerdeProperties(parameters, basePath.toString)
     }
     hiveSyncConfig

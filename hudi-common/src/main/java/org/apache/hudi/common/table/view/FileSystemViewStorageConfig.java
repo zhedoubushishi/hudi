@@ -116,70 +116,70 @@ public class FileSystemViewStorageConfig extends DefaultHoodieConfig {
   }
 
   public FileSystemViewStorageType getStorageType() {
-    return FileSystemViewStorageType.valueOf(props.getProperty(FILESYSTEM_VIEW_STORAGE_TYPE.key()));
+    return FileSystemViewStorageType.valueOf(getString(props, FILESYSTEM_VIEW_STORAGE_TYPE));
   }
 
   public boolean isIncrementalTimelineSyncEnabled() {
-    return Boolean.parseBoolean(props.getProperty(FILESYSTEM_VIEW_INCREMENTAL_SYNC_MODE.key()));
+    return getBoolean(props, FILESYSTEM_VIEW_INCREMENTAL_SYNC_MODE);
   }
 
   public String getRemoteViewServerHost() {
-    return props.getProperty(FILESYSTEM_VIEW_REMOTE_HOST.key());
+    return getString(props, FILESYSTEM_VIEW_REMOTE_HOST);
   }
 
   public Integer getRemoteViewServerPort() {
-    return Integer.parseInt(props.getProperty(FILESYSTEM_VIEW_REMOTE_PORT.key()));
+    return getInt(props, FILESYSTEM_VIEW_REMOTE_PORT);
   }
 
   public Integer getRemoteTimelineClientTimeoutSecs() {
-    return Integer.parseInt(props.getProperty(FILESTYSTEM_REMOTE_TIMELINE_CLIENT_TIMEOUT_SECS.key()));
+    return getInt(props, FILESTYSTEM_REMOTE_TIMELINE_CLIENT_TIMEOUT_SECS);
   }
 
   public long getMaxMemoryForFileGroupMap() {
-    long totalMemory = Long.parseLong(props.getProperty(FILESYSTEM_VIEW_SPILLABLE_MEM.key()));
+    long totalMemory = getLong(props, FILESYSTEM_VIEW_SPILLABLE_MEM);
     return totalMemory - getMaxMemoryForPendingCompaction() - getMaxMemoryForBootstrapBaseFile();
   }
 
   public long getMaxMemoryForPendingCompaction() {
-    long totalMemory = Long.parseLong(props.getProperty(FILESYSTEM_VIEW_SPILLABLE_MEM.key()));
-    return new Double(totalMemory * Double.parseDouble(props.getProperty(FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION.key())))
+    long totalMemory = getLong(props, FILESYSTEM_VIEW_SPILLABLE_MEM);
+    return new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION))
         .longValue();
   }
 
   public long getMaxMemoryForBootstrapBaseFile() {
-    long totalMemory = Long.parseLong(props.getProperty(FILESYSTEM_VIEW_SPILLABLE_MEM.key()));
+    long totalMemory = getLong(props, FILESYSTEM_VIEW_SPILLABLE_MEM);
     long reservedForExternalDataFile =
-        new Double(totalMemory * Double.parseDouble(props.getProperty(FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION.key())))
+        new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION))
             .longValue();
     return reservedForExternalDataFile;
   }
 
   public long getMaxMemoryForReplacedFileGroups() {
-    long totalMemory = Long.parseLong(props.getProperty(FILESYSTEM_VIEW_SPILLABLE_MEM.key()));
-    return new Double(totalMemory * Double.parseDouble(props.getProperty(FILESYSTEM_VIEW_REPLACED_MEM_FRACTION.key())))
+    long totalMemory = getLong(props, FILESYSTEM_VIEW_SPILLABLE_MEM);
+    return new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_REPLACED_MEM_FRACTION))
         .longValue();
   }
 
   public long getMaxMemoryForPendingClusteringFileGroups() {
-    long totalMemory = Long.parseLong(props.getProperty(FILESYSTEM_VIEW_SPILLABLE_MEM.key()));
-    return new Double(totalMemory * Double.parseDouble(props.getProperty(FILESYSTEM_VIEW_PENDING_CLUSTERING_MEM_FRACTION.key())))
+    long totalMemory = getLong(props, FILESYSTEM_VIEW_SPILLABLE_MEM);
+    return new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_PENDING_CLUSTERING_MEM_FRACTION))
         .longValue();
   }
 
   public String getSpillableDir() {
-    return props.getProperty(FILESYSTEM_VIEW_SPILLABLE_DIR.key());
+    return getString(props, FILESYSTEM_VIEW_SPILLABLE_DIR);
   }
 
   public FileSystemViewStorageType getSecondaryStorageType() {
-    return FileSystemViewStorageType.valueOf(props.getProperty(FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE.key()));
+    return FileSystemViewStorageType.valueOf(getString(props, FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE));
   }
 
   public boolean shouldEnableBackupForRemoteFileSystemView() {
-    return Boolean.parseBoolean(props.getProperty(REMOTE_BACKUP_VIEW_HANDLER_ENABLE.key()));
+    return getBoolean(props, REMOTE_BACKUP_VIEW_HANDLER_ENABLE);
   }
 
   public String getRocksdbBasePath() {
-    return props.getProperty(ROCKSDB_BASE_PATH_PROP.key());
+    return getString(props, ROCKSDB_BASE_PATH_PROP);
   }
 
   /**
@@ -202,62 +202,62 @@ public class FileSystemViewStorageConfig extends DefaultHoodieConfig {
     }
 
     public Builder withStorageType(FileSystemViewStorageType storageType) {
-      props.setProperty(FILESYSTEM_VIEW_STORAGE_TYPE.key(), storageType.name());
+      set(props, FILESYSTEM_VIEW_STORAGE_TYPE, storageType.name());
       return this;
     }
 
     public Builder withSecondaryStorageType(FileSystemViewStorageType storageType) {
-      props.setProperty(FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE.key(), storageType.name());
+      set(props, FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE, storageType.name());
       return this;
     }
 
     public Builder withIncrementalTimelineSync(boolean enableIncrTimelineSync) {
-      props.setProperty(FILESYSTEM_VIEW_INCREMENTAL_SYNC_MODE.key(), Boolean.toString(enableIncrTimelineSync));
+      set(props, FILESYSTEM_VIEW_INCREMENTAL_SYNC_MODE, Boolean.toString(enableIncrTimelineSync));
       return this;
     }
 
     public Builder withRemoteServerHost(String remoteServerHost) {
-      props.setProperty(FILESYSTEM_VIEW_REMOTE_HOST.key(), remoteServerHost);
+      set(props, FILESYSTEM_VIEW_REMOTE_HOST, remoteServerHost);
       return this;
     }
 
     public Builder withRemoteServerPort(Integer remoteServerPort) {
-      props.setProperty(FILESYSTEM_VIEW_REMOTE_PORT.key(), remoteServerPort.toString());
+      set(props, FILESYSTEM_VIEW_REMOTE_PORT, remoteServerPort.toString());
       return this;
     }
 
     public Builder withMaxMemoryForView(Long maxMemoryForView) {
-      props.setProperty(FILESYSTEM_VIEW_SPILLABLE_MEM.key(), maxMemoryForView.toString());
+      set(props, FILESYSTEM_VIEW_SPILLABLE_MEM, maxMemoryForView.toString());
       return this;
     }
 
     public Builder withRemoteTimelineClientTimeoutSecs(Long timelineClientTimeoutSecs) {
-      props.setProperty(FILESTYSTEM_REMOTE_TIMELINE_CLIENT_TIMEOUT_SECS.key(), timelineClientTimeoutSecs.toString());
+      set(props, FILESTYSTEM_REMOTE_TIMELINE_CLIENT_TIMEOUT_SECS, timelineClientTimeoutSecs.toString());
       return this;
     }
 
     public Builder withMemFractionForPendingCompaction(Double memFractionForPendingCompaction) {
-      props.setProperty(FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION.key(), memFractionForPendingCompaction.toString());
+      set(props, FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION, memFractionForPendingCompaction.toString());
       return this;
     }
 
     public Builder withMemFractionForExternalDataFile(Double memFractionForExternalDataFile) {
-      props.setProperty(FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION.key(), memFractionForExternalDataFile.toString());
+      set(props, FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION, memFractionForExternalDataFile.toString());
       return this;
     }
 
     public Builder withBaseStoreDir(String baseStorePath) {
-      props.setProperty(FILESYSTEM_VIEW_SPILLABLE_DIR.key(), baseStorePath);
+      set(props, FILESYSTEM_VIEW_SPILLABLE_DIR, baseStorePath);
       return this;
     }
 
     public Builder withRocksDBPath(String basePath) {
-      props.setProperty(ROCKSDB_BASE_PATH_PROP.key(), basePath);
+      set(props, ROCKSDB_BASE_PATH_PROP, basePath);
       return this;
     }
 
     public Builder withEnableBackupForRemoteFileSystemView(boolean enable) {
-      props.setProperty(REMOTE_BACKUP_VIEW_HANDLER_ENABLE.key(), Boolean.toString(enable));
+      set(props, REMOTE_BACKUP_VIEW_HANDLER_ENABLE, Boolean.toString(enable));
       return this;
     }
 
@@ -278,9 +278,9 @@ public class FileSystemViewStorageConfig extends DefaultHoodieConfig {
       setDefaultValue(props, REMOTE_BACKUP_VIEW_HANDLER_ENABLE);
 
       // Validations
-      FileSystemViewStorageType.valueOf(props.getProperty(FILESYSTEM_VIEW_STORAGE_TYPE.key()));
-      FileSystemViewStorageType.valueOf(props.getProperty(FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE.key()));
-      ValidationUtils.checkArgument(Integer.parseInt(props.getProperty(FILESYSTEM_VIEW_REMOTE_PORT.key())) > 0);
+      FileSystemViewStorageType.valueOf(getString(props, FILESYSTEM_VIEW_STORAGE_TYPE));
+      FileSystemViewStorageType.valueOf(getString(props, FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE));
+      ValidationUtils.checkArgument(getInt(props, FILESYSTEM_VIEW_REMOTE_PORT) > 0);
       return new FileSystemViewStorageConfig(props);
     }
   }
