@@ -24,6 +24,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.client.WriteStatus;
+import org.apache.hudi.common.config.DefaultHoodieConfig;
 import org.apache.hudi.common.model.FileSlice;
 import org.apache.hudi.common.model.HoodieFileGroup;
 import org.apache.hudi.common.model.HoodieLogFile;
@@ -417,6 +418,6 @@ public class TestUpgradeDowngrade extends HoodieClientTestBase {
     Properties prop = new Properties();
     prop.load(fsDataInputStream);
     fsDataInputStream.close();
-    assertEquals(Integer.toString(expectedVersion.versionCode()), prop.getProperty(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME.key()));
+    assertEquals(Integer.toString(expectedVersion.versionCode()), DefaultHoodieConfig.getString(prop, HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
   }
 }

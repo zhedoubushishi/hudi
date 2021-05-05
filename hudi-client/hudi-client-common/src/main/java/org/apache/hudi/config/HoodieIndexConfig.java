@@ -225,12 +225,12 @@ public class HoodieIndexConfig extends DefaultHoodieConfig {
     }
 
     public Builder withIndexType(HoodieIndex.IndexType indexType) {
-      props.setProperty(INDEX_TYPE_PROP.key(), indexType.name());
+      set(props, INDEX_TYPE_PROP, indexType.name());
       return this;
     }
 
     public Builder withIndexClass(String indexClass) {
-      props.setProperty(INDEX_CLASS_PROP.key(), indexClass);
+      set(props, INDEX_CLASS_PROP, indexClass);
       return this;
     }
 
@@ -240,77 +240,77 @@ public class HoodieIndexConfig extends DefaultHoodieConfig {
     }
 
     public Builder bloomFilterNumEntries(int numEntries) {
-      props.setProperty(BLOOM_FILTER_NUM_ENTRIES.key(), String.valueOf(numEntries));
+      set(props, BLOOM_FILTER_NUM_ENTRIES, String.valueOf(numEntries));
       return this;
     }
 
     public Builder bloomFilterFPP(double fpp) {
-      props.setProperty(BLOOM_FILTER_FPP.key(), String.valueOf(fpp));
+      set(props, BLOOM_FILTER_FPP, String.valueOf(fpp));
       return this;
     }
 
     public Builder bloomIndexParallelism(int parallelism) {
-      props.setProperty(BLOOM_INDEX_PARALLELISM_PROP.key(), String.valueOf(parallelism));
+      set(props, BLOOM_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder bloomIndexPruneByRanges(boolean pruneRanges) {
-      props.setProperty(BLOOM_INDEX_PRUNE_BY_RANGES_PROP.key(), String.valueOf(pruneRanges));
+      set(props, BLOOM_INDEX_PRUNE_BY_RANGES_PROP, String.valueOf(pruneRanges));
       return this;
     }
 
     public Builder bloomIndexUseCaching(boolean useCaching) {
-      props.setProperty(BLOOM_INDEX_USE_CACHING_PROP.key(), String.valueOf(useCaching));
+      set(props, BLOOM_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
       return this;
     }
 
     public Builder bloomIndexTreebasedFilter(boolean useTreeFilter) {
-      props.setProperty(BLOOM_INDEX_TREE_BASED_FILTER_PROP.key(), String.valueOf(useTreeFilter));
+      set(props, BLOOM_INDEX_TREE_BASED_FILTER_PROP, String.valueOf(useTreeFilter));
       return this;
     }
 
     public Builder bloomIndexBucketizedChecking(boolean bucketizedChecking) {
-      props.setProperty(BLOOM_INDEX_BUCKETIZED_CHECKING_PROP.key(), String.valueOf(bucketizedChecking));
+      set(props, BLOOM_INDEX_BUCKETIZED_CHECKING_PROP, String.valueOf(bucketizedChecking));
       return this;
     }
 
     public Builder bloomIndexKeysPerBucket(int keysPerBucket) {
-      props.setProperty(BLOOM_INDEX_KEYS_PER_BUCKET_PROP.key(), String.valueOf(keysPerBucket));
+      set(props, BLOOM_INDEX_KEYS_PER_BUCKET_PROP, String.valueOf(keysPerBucket));
       return this;
     }
 
     public Builder withBloomIndexInputStorageLevel(String level) {
-      props.setProperty(BLOOM_INDEX_INPUT_STORAGE_LEVEL.key(), level);
+      set(props, BLOOM_INDEX_INPUT_STORAGE_LEVEL, level);
       return this;
     }
 
     public Builder withBloomIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      props.setProperty(BLOOM_INDEX_UPDATE_PARTITION_PATH.key(), String.valueOf(updatePartitionPath));
+      set(props, BLOOM_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 
     public Builder withSimpleIndexParallelism(int parallelism) {
-      props.setProperty(SIMPLE_INDEX_PARALLELISM_PROP.key(), String.valueOf(parallelism));
+      set(props, SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder simpleIndexUseCaching(boolean useCaching) {
-      props.setProperty(SIMPLE_INDEX_USE_CACHING_PROP.key(), String.valueOf(useCaching));
+      set(props, SIMPLE_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
       return this;
     }
 
     public Builder withSimpleIndexInputStorageLevel(String level) {
-      props.setProperty(SIMPLE_INDEX_INPUT_STORAGE_LEVEL.key(), level);
+      set(props, SIMPLE_INDEX_INPUT_STORAGE_LEVEL, level);
       return this;
     }
 
     public Builder withGlobalSimpleIndexParallelism(int parallelism) {
-      props.setProperty(GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP.key(), String.valueOf(parallelism));
+      set(props, GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withGlobalSimpleIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      props.setProperty(SIMPLE_INDEX_UPDATE_PARTITION_PATH.key(), String.valueOf(updatePartitionPath));
+      set(props, SIMPLE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 
@@ -342,7 +342,7 @@ public class HoodieIndexConfig extends DefaultHoodieConfig {
       setDefaultValue(props, SIMPLE_INDEX_UPDATE_PARTITION_PATH);
 
       // Throws IllegalArgumentException if the value set is not a known Hoodie Index Type
-      HoodieIndex.IndexType.valueOf(props.getProperty(INDEX_TYPE_PROP.key()));
+      HoodieIndex.IndexType.valueOf(getString(props, INDEX_TYPE_PROP));
       return config;
     }
 

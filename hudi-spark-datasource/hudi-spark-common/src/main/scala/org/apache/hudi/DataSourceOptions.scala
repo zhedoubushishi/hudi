@@ -18,8 +18,10 @@
 package org.apache.hudi
 
 import org.apache.hudi.common.config.ConfigOption
+import org.apache.hudi.common.fs.ConsistencyGuardConfig
 import org.apache.hudi.common.model.HoodieTableType
 import org.apache.hudi.common.model.WriteOperationType
+import org.apache.hudi.common.table.HoodieTableConfig
 import org.apache.hudi.config.HoodieWriteConfig
 import org.apache.hudi.hive.HiveSyncTool
 import org.apache.hudi.hive.SlashEncodedDayPartitionValueExtractor
@@ -55,7 +57,7 @@ object DataSourceReadOptions {
   val QUERY_TYPE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.query.type")
     .defaultValue(QUERY_TYPE_SNAPSHOT_OPT_VAL)
-    .withDeprecatedNames("hoodie.datasource.view.type")
+    .withAlternatives("hoodie.datasource.view.type")
     .withDescription("Whether data needs to be read, in incremental mode (new data since an instantTime) " +
       "(or) Read Optimized mode (obtain latest view, based on columnar data) (or) Snapshot mode " +
       "(obtain latest view, based on row & columnar data)")
@@ -75,7 +77,6 @@ object DataSourceReadOptions {
     .noDefaultValue()
     .withDescription("")
 
-  // TODO modify this when refactor HoodieWriteConfig
   val READ_PRE_COMBINE_FIELD = HoodieWriteConfig.PRECOMBINE_FIELD_PROP
 
   val ENABLE_HOODIE_FILE_INDEX: ConfigOption[Boolean] = ConfigOption
@@ -93,25 +94,6 @@ object DataSourceReadOptions {
   val VIEW_TYPE_REALTIME_OPT_VAL = "realtime"
   @Deprecated
   val DEFAULT_VIEW_TYPE_OPT_VAL = VIEW_TYPE_READ_OPTIMIZED_OPT_VAL
-
-  /**
-    * This eases migration from old configs to new configs.
-    */
-  def translateViewTypesToQueryTypes(optParams: Map[String, String]) : Map[String, String] = {
-    val translation = Map(VIEW_TYPE_READ_OPTIMIZED_OPT_VAL -> QUERY_TYPE_SNAPSHOT_OPT_VAL,
-                          VIEW_TYPE_INCREMENTAL_OPT_VAL -> QUERY_TYPE_INCREMENTAL_OPT_VAL,
-                          VIEW_TYPE_REALTIME_OPT_VAL -> QUERY_TYPE_SNAPSHOT_OPT_VAL)
-    if (!optParams.contains(QUERY_TYPE_OPT_KEY.key)) {
-      if (optParams.contains(VIEW_TYPE_OPT_KEY)) {
-        log.warn(VIEW_TYPE_OPT_KEY + " is deprecated and will be removed in a later release. Please use " + QUERY_TYPE_OPT_KEY)
-        optParams ++ Map(QUERY_TYPE_OPT_KEY.key -> translation(optParams(VIEW_TYPE_OPT_KEY)))
-      } else {
-        optParams ++ Map(QUERY_TYPE_OPT_KEY.key -> QUERY_TYPE_OPT_KEY.defaultValue)
-      }
-    } else {
-      optParams
-    }
-  }
 
   /**
     * Instant time to start incrementally pulling data from. The instanttime here need not
@@ -209,7 +191,7 @@ object DataSourceWriteOptions {
   val TABLE_TYPE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.table.type")
     .defaultValue(COW_TABLE_TYPE_OPT_VAL)
-    .withDeprecatedNames("hoodie.datasource.write.storage.type")
+    .withAlternatives("hoodie.datasource.write.storage.type")
     .withDescription("The table type for the underlying data, for this write. This can’t change between writes.")
 
   @Deprecated
@@ -220,15 +202,6 @@ object DataSourceWriteOptions {
   val MOR_STORAGE_TYPE_OPT_VAL = HoodieTableType.MERGE_ON_READ.name
   @Deprecated
   val DEFAULT_STORAGE_TYPE_OPT_VAL = COW_STORAGE_TYPE_OPT_VAL
-
-  def translateStorageTypeToTableType(optParams: Map[String, String]) : Map[String, String] = {
-    if (optParams.contains(STORAGE_TYPE_OPT_KEY) && !optParams.contains(TABLE_TYPE_OPT_KEY.key)) {
-      log.warn(STORAGE_TYPE_OPT_KEY + " is deprecated and will be removed in a later release; Please use " + TABLE_TYPE_OPT_KEY.key)
-      optParams ++ Map(TABLE_TYPE_OPT_KEY.key -> optParams(STORAGE_TYPE_OPT_KEY))
-    } else {
-      optParams
-    }
-  }
 
   /**
     * Translate spark parameters to hudi parameters
@@ -503,4 +476,53 @@ object DataSourceWriteOptions {
     .noDefaultValue()
     .withDescription("")
 
+}
+
+object DataSourceOptionsHelper {
+
+  private val log = LogManager.getLogger(DataSourceOptionsHelper.getClass)
+
+  // put all the configs with alternatives here
+  val allConfigsWithAlternatives = List(
+    DataSourceReadOptions.QUERY_TYPE_OPT_KEY,
+    DataSourceWriteOptions.TABLE_TYPE_OPT_KEY,
+    HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME,
+    HoodieTableConfig.HOODIE_LOG_FILE_FORMAT_PROP_NAME
+  )
+
+  // put all the deprecated configs here
+  val allDeprecatedConfigs: Set[String] = Set(
+    ConsistencyGuardConfig.CONSISTENCY_CHECK_ENABLED_PROP.key
+  )
+
+  // maps the deprecated config name to its latest name
+  val allAlternatives: Map[String, String] = {
+    val alterMap = scala.collection.mutable.Map[String, String]()
+    allConfigsWithAlternatives.foreach(cfg => cfg.getAlternatives.foreach(alternative => alterMap(alternative) = cfg.key))
+    alterMap.toMap
+  }
+
+  val viewTypeValueMap: Map[String, String] = Map(
+    DataSourceReadOptions.VIEW_TYPE_READ_OPTIMIZED_OPT_VAL -> DataSourceReadOptions.QUERY_TYPE_SNAPSHOT_OPT_VAL,
+    DataSourceReadOptions.VIEW_TYPE_INCREMENTAL_OPT_VAL -> DataSourceReadOptions.QUERY_TYPE_INCREMENTAL_OPT_VAL,
+    DataSourceReadOptions.VIEW_TYPE_REALTIME_OPT_VAL -> DataSourceReadOptions.QUERY_TYPE_SNAPSHOT_OPT_VAL)
+
+  def translateConfigurations(optParams: Map[String, String]): Map[String, String] = {
+    val translatedOpt = scala.collection.mutable.Map[String, String]() ++= optParams
+    optParams.keySet.foreach(opt => {
+      if (allAlternatives.contains(opt) && !optParams.contains(allAlternatives(opt))) {
+        log.warn(opt + " is deprecated and will be removed in a later release; Please use " + allAlternatives(opt))
+        if (opt == DataSourceReadOptions.VIEW_TYPE_OPT_KEY) {
+          // special handle for VIEW_TYPE_OPT_KEY, also need to translate its values
+          translatedOpt ++= Map(allAlternatives(opt) -> viewTypeValueMap(optParams(opt)))
+        } else {
+          translatedOpt ++= Map(allAlternatives(opt) -> optParams(opt))
+        }
+      }
+      if (allDeprecatedConfigs.contains(opt)) {
+        log.warn(opt + " is deprecated and should never be used anymore")
+      }
+    })
+    translatedOpt.toMap
+  }
 }

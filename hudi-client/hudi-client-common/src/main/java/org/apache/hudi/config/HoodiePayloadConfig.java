@@ -58,12 +58,12 @@ public class HoodiePayloadConfig extends DefaultHoodieConfig {
     }
 
     public Builder withPayloadOrderingField(String payloadOrderingField) {
-      props.setProperty(PAYLOAD_ORDERING_FIELD_PROP.key(), String.valueOf(payloadOrderingField));
+      set(props, PAYLOAD_ORDERING_FIELD_PROP, String.valueOf(payloadOrderingField));
       return this;
     }
 
     public Builder withPayloadEventTimeField(String payloadEventTimeField) {
-      props.setProperty(PAYLOAD_EVENT_TIME_FIELD_PROP.key(), String.valueOf(payloadEventTimeField));
+      set(props, PAYLOAD_EVENT_TIME_FIELD_PROP, String.valueOf(payloadEventTimeField));
       return this;
     }
 
