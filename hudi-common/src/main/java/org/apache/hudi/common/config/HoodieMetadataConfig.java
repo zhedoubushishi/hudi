@@ -28,7 +28,7 @@ import java.util.Properties;
  * Configurations used by the HUDI Metadata Table.
  */
 @Immutable
-public final class HoodieMetadataConfig extends DefaultHoodieConfig {
+public final class HoodieMetadataConfig extends HoodieConfig {
 
   public static final String METADATA_PREFIX = "hoodie.metadata";
 

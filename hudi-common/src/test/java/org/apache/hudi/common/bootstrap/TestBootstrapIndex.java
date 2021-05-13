@@ -91,12 +91,10 @@ public class TestBootstrapIndex extends HoodieCommonTestHarness {
 
   @Test
   public void testNoOpBootstrapIndex() throws IOException {
-    Map<String, String> props = metaClient.getTableConfig().getProps();
+    Properties props = metaClient.getTableConfig().getProps();
     props.put(HoodieTableConfig.HOODIE_BOOTSTRAP_INDEX_ENABLE.key(), "false");
     Properties properties = new Properties();
-    for (Map.Entry<String, String> prop : props.entrySet()) {
-      properties.setProperty(prop.getKey(), prop.getValue());
-    }
+    properties.putAll(props);
     HoodieTableConfig.createHoodieProperties(metaClient.getFs(), new Path(metaClient.getMetaPath()), properties);
 
     metaClient = HoodieTableMetaClient.builder().setConf(metaClient.getHadoopConf()).setBasePath(basePath).build();

@@ -31,6 +31,7 @@ import org.apache.hudi.common.table.HoodieTableVersion;
 import org.apache.hudi.common.table.timeline.versioning.TimelineLayoutVersion;
 import org.apache.hudi.common.util.Option;
 import org.apache.hudi.common.util.StringUtils;
+import org.apache.hudi.config.HoodieBootstrapConfig;
 import org.apache.hudi.config.HoodieIndexConfig;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.exception.HoodieSavepointException;
@@ -358,11 +359,11 @@ public class SparkMain {
     TypedProperties properties = propsFilePath == null ? UtilHelpers.buildProperties(configs)
         : UtilHelpers.readConfig(FSUtils.getFs(propsFilePath, jsc.hadoopConfiguration()), new Path(propsFilePath), configs).getConfig();
 
-    properties.setProperty("hoodie.bootstrap.base.path", sourcePath);
-    properties.setProperty("hoodie.bootstrap.keygen.class", keyGeneratorClass);
-    properties.setProperty("hoodie.bootstrap.full.input.provider", fullBootstrapInputProvider);
-    properties.setProperty("hoodie.bootstrap.parallelism", parallelism);
-    properties.setProperty("hoodie.bootstrap.mode.selector", selectorClass);
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP.key(), sourcePath);
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS.key(), keyGeneratorClass);
+    properties.setProperty(HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER.key(), fullBootstrapInputProvider);
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM.key(), parallelism);
+    properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR.key(), selectorClass);
     properties.setProperty(DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY().key(), recordKeyCols);
     properties.setProperty(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY().key(), partitionFields);
 

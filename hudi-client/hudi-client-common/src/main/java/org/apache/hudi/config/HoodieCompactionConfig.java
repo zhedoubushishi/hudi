@@ -19,7 +19,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.model.HoodieCleaningPolicy;
 import org.apache.hudi.common.model.HoodieFailedWritesCleaningPolicy;
 import org.apache.hudi.common.model.OverwriteWithLatestAvroPayload;
@@ -39,7 +39,7 @@ import java.util.Properties;
  * Compaction related config.
  */
 @Immutable
-public class HoodieCompactionConfig extends DefaultHoodieConfig {
+public class HoodieCompactionConfig extends HoodieConfig {
 
   public static final ConfigOption<String> CLEANER_POLICY_PROP = ConfigOption
       .key("hoodie.cleaner.policy")

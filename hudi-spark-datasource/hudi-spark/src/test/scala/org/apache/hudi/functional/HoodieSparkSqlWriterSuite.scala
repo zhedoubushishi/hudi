@@ -26,7 +26,7 @@ import org.apache.hudi.DataSourceWriteOptions._
 import org.apache.hudi.client.{SparkRDDWriteClient, TestBootstrap}
 import org.apache.hudi.common.model.{HoodieRecord, HoodieRecordPayload}
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator
-import org.apache.hudi.config.HoodieWriteConfig
+import org.apache.hudi.config.{HoodieBootstrapConfig, HoodieWriteConfig}
 import org.apache.hudi.exception.HoodieException
 import org.apache.hudi.keygen.{NonpartitionedKeyGenerator, SimpleKeyGenerator}
 import org.apache.hudi.hive.HiveSyncConfig
@@ -370,14 +370,14 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
             .save(srcPath.toAbsolutePath.toString)
 
           val fooTableModifier = Map("path" -> path.toAbsolutePath.toString,
-            "hoodie.bootstrap.base.path" -> srcPath.toAbsolutePath.toString,
+            HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP.key -> srcPath.toAbsolutePath.toString,
             HoodieWriteConfig.TABLE_NAME.key -> hoodieFooTableName,
             DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key -> tableType,
-            "hoodie.bootstrap.parallelism" -> "4",
+            HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM.key -> "4",
             DataSourceWriteOptions.OPERATION_OPT_KEY.key -> DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL,
             DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY.key -> "_row_key",
             DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key -> "partition",
-            "hoodie.bootstrap.keygen.class" -> classOf[NonpartitionedKeyGenerator].getCanonicalName)
+            HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS.key -> classOf[NonpartitionedKeyGenerator].getCanonicalName)
           val fooTableParams = HoodieWriterUtils.parametersWithWriteDefaults(fooTableModifier)
 
           val client = spy(DataSourceUtils.createHoodieClient(
@@ -543,8 +543,8 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
     val basePath = "/tmp/hoodie_test"
     val params = Map(
       "path" -> basePath,
-      DataSourceWriteOptions.TABLE_NAME_OPT_KEY -> "test_hoodie",
-      DataSourceWriteOptions.HIVE_PARTITION_FIELDS_OPT_KEY -> "partition"
+      DataSourceWriteOptions.TABLE_NAME_OPT_KEY.key -> "test_hoodie",
+      DataSourceWriteOptions.HIVE_PARTITION_FIELDS_OPT_KEY.key -> "partition"
     )
     val parameters = HoodieWriterUtils.parametersWithWriteDefaults(params)
     val newParams = addSqlTablePropertiesMethod.invoke(HoodieSparkSqlWriter,

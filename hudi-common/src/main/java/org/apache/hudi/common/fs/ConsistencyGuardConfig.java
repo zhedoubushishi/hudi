@@ -19,7 +19,7 @@
 package org.apache.hudi.common.fs;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import java.io.File;
 import java.io.FileReader;
@@ -29,7 +29,7 @@ import java.util.Properties;
 /**
  * The consistency guard relevant config options.
  */
-public class ConsistencyGuardConfig extends DefaultHoodieConfig {
+public class ConsistencyGuardConfig extends HoodieConfig {
 
   // time between successive attempts to ensure written data's metadata is consistent on storage
   @Deprecated

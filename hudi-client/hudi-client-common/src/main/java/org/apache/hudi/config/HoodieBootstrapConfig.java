@@ -23,7 +23,7 @@ import org.apache.hudi.client.bootstrap.selector.MetadataOnlyBootstrapModeSelect
 import org.apache.hudi.client.bootstrap.translator.IdentityBootstrapPartitionPathTranslator;
 import org.apache.hudi.common.bootstrap.index.HFileBootstrapIndex;
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.table.HoodieTableConfig;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import java.util.Properties;
 /**
  * Bootstrap specific configs.
  */
-public class HoodieBootstrapConfig extends DefaultHoodieConfig {
+public class HoodieBootstrapConfig extends HoodieConfig {
 
   public static final ConfigOption<String> BOOTSTRAP_BASE_PATH_PROP = ConfigOption
       .key("hoodie.bootstrap.base.path")
@@ -163,8 +163,7 @@ public class HoodieBootstrapConfig extends DefaultHoodieConfig {
       setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR);
       setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR_REGEX);
       setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR_REGEX_MODE);
-      setDefaultOnCondition(props, !props.containsKey(BOOTSTRAP_INDEX_CLASS_PROP.key()), BOOTSTRAP_INDEX_CLASS_PROP.key(),
-          HoodieTableConfig.getDefaultBootstrapIndexClass(props));
+      setDefaultValue(props, BOOTSTRAP_INDEX_CLASS_PROP, HoodieTableConfig.getDefaultBootstrapIndexClass(props));
       setDefaultValue(props, FULL_BOOTSTRAP_INPUT_PROVIDER);
       return config;
     }

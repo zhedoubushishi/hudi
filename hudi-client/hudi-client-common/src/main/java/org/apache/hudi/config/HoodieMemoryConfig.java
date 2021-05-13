@@ -19,7 +19,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -32,7 +32,7 @@ import java.util.Properties;
  * Memory related config.
  */
 @Immutable
-public class HoodieMemoryConfig extends DefaultHoodieConfig {
+public class HoodieMemoryConfig extends HoodieConfig {
 
   // Default max memory fraction during hash-merge, excess spills to disk
   public static final ConfigOption<String> MAX_MEMORY_FRACTION_FOR_MERGE_PROP = ConfigOption

@@ -19,7 +19,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.metrics.MetricsReporterType;
 
 import javax.annotation.concurrent.Immutable;
@@ -33,7 +33,7 @@ import java.util.Properties;
  * Fetch the configurations used by the Metrics system.
  */
 @Immutable
-public class HoodieMetricsConfig extends DefaultHoodieConfig {
+public class HoodieMetricsConfig extends HoodieConfig {
 
   public static final String METRIC_PREFIX = "hoodie.metrics";
 
