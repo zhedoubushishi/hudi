@@ -19,13 +19,13 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import java.util.Properties;
 
 import static org.apache.hudi.config.HoodieMetricsConfig.METRIC_PREFIX;
 
-public class HoodieMetricsPrometheusConfig extends DefaultHoodieConfig {
+public class HoodieMetricsPrometheusConfig extends HoodieConfig {
 
   // Prometheus PushGateWay
   public static final String PUSHGATEWAY_PREFIX = METRIC_PREFIX + ".pushgateway";

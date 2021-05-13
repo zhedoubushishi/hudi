@@ -19,7 +19,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import java.io.File;
 import java.io.FileReader;
@@ -29,7 +29,7 @@ import java.util.Properties;
 /**
  * Clustering specific configs.
  */
-public class HoodieClusteringConfig extends DefaultHoodieConfig {
+public class HoodieClusteringConfig extends HoodieConfig {
 
   public static final ConfigOption<String> CLUSTERING_PLAN_STRATEGY_CLASS = ConfigOption
       .key("hoodie.clustering.plan.strategy.class")

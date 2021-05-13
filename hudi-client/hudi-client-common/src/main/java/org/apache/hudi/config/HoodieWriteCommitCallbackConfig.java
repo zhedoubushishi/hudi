@@ -18,7 +18,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import java.io.File;
 import java.io.FileReader;
@@ -28,7 +28,7 @@ import java.util.Properties;
 /**
  * Write callback related config.
  */
-public class HoodieWriteCommitCallbackConfig extends DefaultHoodieConfig {
+public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
 
   public static final String CALLBACK_PREFIX = "hoodie.write.commit.callback.";
 

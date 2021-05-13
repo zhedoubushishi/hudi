@@ -19,7 +19,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -32,7 +32,7 @@ import java.util.Properties;
  * Storage related config.
  */
 @Immutable
-public class HoodieStorageConfig extends DefaultHoodieConfig {
+public class HoodieStorageConfig extends HoodieConfig {
 
   public static final ConfigOption<String> PARQUET_FILE_MAX_BYTES = ConfigOption
       .key("hoodie.parquet.max.file.size")

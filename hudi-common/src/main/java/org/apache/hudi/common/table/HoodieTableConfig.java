@@ -21,7 +21,7 @@ package org.apache.hudi.common.table;
 import org.apache.hudi.common.bootstrap.index.HFileBootstrapIndex;
 import org.apache.hudi.common.bootstrap.index.NoOpBootstrapIndex;
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.model.HoodieFileFormat;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.model.OverwriteWithLatestAvroPayload;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  * @see HoodieTableMetaClient
  * @since 0.3.0
  */
-public class HoodieTableConfig extends DefaultHoodieConfig implements Serializable {
+public class HoodieTableConfig extends HoodieConfig implements Serializable {
 
   private static final Logger LOG = LogManager.getLogger(HoodieTableConfig.class);
 
@@ -128,8 +128,6 @@ public class HoodieTableConfig extends DefaultHoodieConfig implements Serializab
       .withDescription("Base path of the dataset that needs to be bootstrapped as a Hudi table");
 
   public static final String NO_OP_BOOTSTRAP_INDEX_CLASS = NoOpBootstrapIndex.class.getName();
-
-  private Properties props;
 
   public HoodieTableConfig(FileSystem fs, String metaPath, String payloadClassName) {
     super();
@@ -251,7 +249,7 @@ public class HoodieTableConfig extends DefaultHoodieConfig implements Serializab
   public String getBootstrapIndexClass() {
     // There could be tables written with payload class from com.uber.hoodie. Need to transparently
     // change to org.apache.hudi
-    return getStringOrDefault(props, HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME);
+    return getStringOrDefault(props, HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME, getDefaultBootstrapIndexClass(props));
   }
 
   public static String getDefaultBootstrapIndexClass(Properties props) {

@@ -19,7 +19,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.index.hbase.DefaultHBaseQPSResourceAllocator;
 
 import java.io.File;
@@ -27,7 +27,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-public class HoodieHBaseIndexConfig extends DefaultHoodieConfig {
+public class HoodieHBaseIndexConfig extends HoodieConfig {
 
   public static final ConfigOption<String> HBASE_ZKQUORUM_PROP = ConfigOption
       .key("hoodie.index.hbase.zkquorum")

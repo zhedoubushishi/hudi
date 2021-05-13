@@ -18,7 +18,7 @@
 
 package org.apache.hudi.config;
 
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import java.io.File;
 import java.io.FileReader;
@@ -31,7 +31,7 @@ import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_ORDERING_F
 /**
  * Hoodie payload related configs.
  */
-public class HoodiePayloadConfig extends DefaultHoodieConfig {
+public class HoodiePayloadConfig extends HoodieConfig {
 
   public HoodiePayloadConfig(Properties props) {
     super(props);

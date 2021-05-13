@@ -46,7 +46,7 @@ class TestDataSourceForBootstrap {
     HoodieWriteConfig.DELETE_PARALLELISM.key -> "4",
     HoodieWriteConfig.BULKINSERT_PARALLELISM.key -> "4",
     HoodieWriteConfig.FINALIZE_WRITE_PARALLELISM.key -> "4",
-    "hoodie.bootstrap.parallelism" -> "4",
+    HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM.key -> "4",
     DataSourceWriteOptions.RECORDKEY_FIELD_OPT_KEY.key -> "_row_key",
     DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key -> "partition",
     DataSourceWriteOptions.PRECOMBINE_FIELD_OPT_KEY.key -> "timestamp",
@@ -430,10 +430,10 @@ class TestDataSourceForBootstrap {
       .options(commonOpts)
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL)
       .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, "datestr")
-      .option("hoodie.bootstrap.base.path", srcPath)
-      .option("hoodie.bootstrap.keygen.class", classOf[SimpleKeyGenerator].getName)
-      .option("hoodie.bootstrap.mode.selector", classOf[FullRecordBootstrapModeSelector].getName)
-      .option("hoodie.bootstrap.full.input.provider", classOf[SparkParquetBootstrapDataProvider].getName)
+      .option(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP.key, srcPath)
+      .option(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS.key, classOf[SimpleKeyGenerator].getName)
+      .option(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR.key, classOf[FullRecordBootstrapModeSelector].getName)
+      .option(HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER.key, classOf[SparkParquetBootstrapDataProvider].getName)
       .mode(SaveMode.Overwrite)
       .save(basePath)
 
@@ -481,8 +481,8 @@ class TestDataSourceForBootstrap {
       .option(DataSourceWriteOptions.OPERATION_OPT_KEY.key, DataSourceWriteOptions.BOOTSTRAP_OPERATION_OPT_VAL)
       .option(DataSourceWriteOptions.TABLE_TYPE_OPT_KEY.key, tableType)
       .option(DataSourceWriteOptions.PARTITIONPATH_FIELD_OPT_KEY.key, partitionColumns.getOrElse(""))
-      .option("hoodie.bootstrap.base.path", srcPath)
-      .option("hoodie.bootstrap.keygen.class", classOf[SimpleKeyGenerator].getName)
+      .option(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP.key, srcPath)
+      .option(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS.key, classOf[SimpleKeyGenerator].getName)
       .mode(SaveMode.Overwrite)
       .save(basePath)
 

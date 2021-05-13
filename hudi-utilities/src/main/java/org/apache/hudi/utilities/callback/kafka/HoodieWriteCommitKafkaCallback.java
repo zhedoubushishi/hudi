@@ -20,7 +20,7 @@ package org.apache.hudi.utilities.callback.kafka;
 import org.apache.hudi.callback.HoodieWriteCommitCallback;
 import org.apache.hudi.callback.common.HoodieWriteCommitCallbackMessage;
 import org.apache.hudi.callback.util.HoodieWriteCommitCallbackUtil;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.util.StringUtils;
 import org.apache.hudi.common.util.ValidationUtils;
 import org.apache.hudi.config.HoodieWriteConfig;
@@ -55,8 +55,8 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
 
   public HoodieWriteCommitKafkaCallback(HoodieWriteConfig config) {
     this.props = config.getProps();
-    this.bootstrapServers = DefaultHoodieConfig.getString(props, CALLBACK_KAFKA_BOOTSTRAP_SERVERS);
-    this.topic = DefaultHoodieConfig.getString(props, CALLBACK_KAFKA_TOPIC);
+    this.bootstrapServers = HoodieConfig.getString(props, CALLBACK_KAFKA_BOOTSTRAP_SERVERS);
+    this.topic = HoodieConfig.getString(props, CALLBACK_KAFKA_TOPIC);
     validateKafkaConfig();
   }
 
@@ -84,9 +84,11 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
     // bootstrap.servers
     kafkaProducerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
     // default "all" to ensure no message loss
-    kafkaProducerProps.setProperty(ProducerConfig.ACKS_CONFIG, DefaultHoodieConfig.getString(props, CALLBACK_KAFKA_ACKS));
+    kafkaProducerProps.setProperty(ProducerConfig.ACKS_CONFIG, HoodieConfig
+        .getString(props, CALLBACK_KAFKA_ACKS));
     // retries 3 times by default
-    kafkaProducerProps.setProperty(ProducerConfig.RETRIES_CONFIG, DefaultHoodieConfig.getString(props, CALLBACK_KAFKA_RETRIES));
+    kafkaProducerProps.setProperty(ProducerConfig.RETRIES_CONFIG, HoodieConfig
+        .getString(props, CALLBACK_KAFKA_RETRIES));
     kafkaProducerProps.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
         "org.apache.kafka.common.serialization.StringSerializer");
     kafkaProducerProps.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
@@ -107,12 +109,13 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
    * @return Callback {@link ProducerRecord}
    */
   private ProducerRecord<String, String> buildProducerRecord(Properties props, String callbackMsg) {
-    String partition = DefaultHoodieConfig.getString(props, CALLBACK_KAFKA_PARTITION);
+    String partition = HoodieConfig.getString(props, CALLBACK_KAFKA_PARTITION);
     if (null != partition) {
-      return new ProducerRecord<String, String>(topic, Integer.valueOf(partition), DefaultHoodieConfig.getString(props, TABLE_NAME),
+      return new ProducerRecord<String, String>(topic, Integer.valueOf(partition), HoodieConfig
+          .getString(props, TABLE_NAME),
           callbackMsg);
     } else {
-      return new ProducerRecord<String, String>(topic, DefaultHoodieConfig.getString(props, TABLE_NAME), callbackMsg);
+      return new ProducerRecord<String, String>(topic, HoodieConfig.getString(props, TABLE_NAME), callbackMsg);
     }
   }
 
