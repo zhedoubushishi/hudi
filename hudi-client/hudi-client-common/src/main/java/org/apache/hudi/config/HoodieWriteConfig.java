@@ -23,7 +23,7 @@ import org.apache.hudi.client.WriteStatus;
 import org.apache.hudi.client.bootstrap.BootstrapMode;
 import org.apache.hudi.client.transaction.ConflictResolutionStrategy;
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.config.HoodieMetadataConfig;
 import org.apache.hudi.common.config.LockConfiguration;
 import org.apache.hudi.common.engine.EngineType;
@@ -65,7 +65,7 @@ import static org.apache.hudi.common.config.LockConfiguration.HIVE_TABLE_NAME_PR
  * Class storing configs for the HoodieWriteClient.
  */
 @Immutable
-public class HoodieWriteConfig extends DefaultHoodieConfig {
+public class HoodieWriteConfig extends HoodieConfig {
 
   private static final long serialVersionUID = 0L;
 
@@ -904,7 +904,8 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public boolean isExecutorMetricsEnabled() {
-    return Boolean.parseBoolean(getStringOrElse(props, HoodieMetricsConfig.ENABLE_EXECUTOR_METRICS, "false"));
+    return Boolean.parseBoolean(
+        getStringOrDefault(props, HoodieMetricsConfig.ENABLE_EXECUTOR_METRICS, "false"));
   }
 
   public MetricsReporterType getMetricsReporterType() {
@@ -966,7 +967,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
   }
 
   public List<String> getDatadogMetricTags() {
-    return Arrays.stream(getStringOrElse(props,
+    return Arrays.stream(getStringOrDefault(props,
         HoodieMetricsDatadogConfig.DATADOG_METRIC_TAGS, ",").split("\\s*,\\s*")).collect(Collectors.toList());
   }
 
@@ -1528,8 +1529,7 @@ public class HoodieWriteConfig extends DefaultHoodieConfig {
           HoodieLockConfig.newBuilder().fromProperties(props).build());
 
       setDefaultValue(props, EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION);
-      setDefaultOnCondition(props, !props.containsKey(TIMELINE_LAYOUT_VERSION.key()), TIMELINE_LAYOUT_VERSION.key(),
-          String.valueOf(TimelineLayoutVersion.CURR_VERSION));
+      setDefaultValue(props, TIMELINE_LAYOUT_VERSION, String.valueOf(TimelineLayoutVersion.CURR_VERSION));
 
     }
 

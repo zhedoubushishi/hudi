@@ -28,29 +28,23 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Default Way to load Hoodie config through a {@link java.util.Properties}.
+ * This class deals with {@link org.apache.hudi.common.config.ConfigOption} and provides get/set functionalities.
  */
-public class DefaultHoodieConfig implements Serializable {
+public class HoodieConfig implements Serializable {
 
-  private static final Logger LOG = LogManager.getLogger(DefaultHoodieConfig.class);
+  private static final Logger LOG = LogManager.getLogger(HoodieConfig.class);
 
   protected Properties props;
 
-  public DefaultHoodieConfig() {
+  public HoodieConfig() {
     this.props = new Properties();
   }
 
-  public DefaultHoodieConfig(Properties props) {
+  public HoodieConfig(Properties props) {
     this.props = props;
   }
 
-  public static void setDefaultOnCondition(Properties props, boolean condition, String propName, String defaultValue) {
-    if (condition) {
-      props.setProperty(propName, defaultValue);
-    }
-  }
-
-  public static void setDefaultOnCondition(Properties props, boolean condition, DefaultHoodieConfig config) {
+  public static void setDefaultOnCondition(Properties props, boolean condition, HoodieConfig config) {
     if (condition) {
       props.putAll(config.getProps());
     }
@@ -62,21 +56,17 @@ public class DefaultHoodieConfig implements Serializable {
 
   public static <T> void setDefaultValue(Properties props, ConfigOption<T> configOption) {
     if (!contains(props, configOption)) {
-      Option<String> inferValue = Option.empty();
-      if (configOption.getInferFunc() != null) {
-        inferValue = (Option<String>) configOption.getInferFunc().apply(props);
+      Option<T> inferValue = Option.empty();
+      if (configOption.getInferFunc().isPresent()) {
+        inferValue = configOption.getInferFunc().get().apply(props);
       }
-      props.setProperty(configOption.key(), inferValue.isPresent() ? inferValue.get() : configOption.defaultValue().toString());
+      props.setProperty(configOption.key(), inferValue.isPresent() ? inferValue.get().toString() : configOption.defaultValue().toString());
     }
   }
 
-  public static <T> void setDefaultValue(Map<String, String> props, ConfigOption<T> configOption) {
+  public static <T> void setDefaultValue(Properties props, ConfigOption<T> configOption, T defaultVal) {
     if (!contains(props, configOption)) {
-      Option<String> inferValue = Option.empty();
-      if (configOption.getInferFunc() != null) {
-        inferValue = (Option<String>) configOption.getInferFunc().apply(props);
-      }
-      props.put(configOption.key(), inferValue.isPresent() ? inferValue.get() : configOption.defaultValue().toString());
+      props.setProperty(configOption.key(), defaultVal.toString());
     }
   }
 
@@ -133,11 +123,10 @@ public class DefaultHoodieConfig implements Serializable {
   }
 
   public static <T> String getStringOrDefault(Map props, ConfigOption<T> configOption) {
-    Option<Object> rawValue = getRawValue(props, configOption);
-    return rawValue.orElse(configOption.defaultValue().toString()).toString();
+    return getStringOrDefault(props, configOption, configOption.defaultValue().toString());
   }
 
-  public static <T> String getStringOrElse(Map props, ConfigOption<T> configOption, String defaultVal) {
+  public static <T> String getStringOrDefault(Map props, ConfigOption<T> configOption, String defaultVal) {
     Option<Object> rawValue = getRawValue(props, configOption);
     return rawValue.orElse(defaultVal).toString();
   }

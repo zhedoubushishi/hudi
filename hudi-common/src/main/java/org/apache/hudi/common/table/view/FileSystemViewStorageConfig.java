@@ -19,7 +19,7 @@
 package org.apache.hudi.common.table.view;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.util.ValidationUtils;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.Properties;
 /**
  * File System View Storage Configurations.
  */
-public class FileSystemViewStorageConfig extends DefaultHoodieConfig {
+public class FileSystemViewStorageConfig extends HoodieConfig {
 
   // Property Names
   public static final ConfigOption<FileSystemViewStorageType> FILESYSTEM_VIEW_STORAGE_TYPE = ConfigOption

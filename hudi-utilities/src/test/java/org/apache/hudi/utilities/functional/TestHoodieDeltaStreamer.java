@@ -22,7 +22,7 @@ import java.util.ConcurrentModificationException;
 import java.util.concurrent.ExecutorService;
 import org.apache.hudi.DataSourceWriteOptions;
 import org.apache.hudi.common.config.DFSPropertiesConfiguration;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.model.HoodieCommitMetadata;
@@ -1171,7 +1171,7 @@ public class TestHoodieDeltaStreamer extends UtilitiesTestBase {
       props.load(inputStream);
     }
 
-    assertEquals(DefaultHoodieConfig.getString(props, HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME), DummyAvroPayload.class.getName());
+    assertEquals(HoodieConfig.getString(props, HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME), DummyAvroPayload.class.getName());
   }
 
   @Test

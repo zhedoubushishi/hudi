@@ -42,20 +42,20 @@ public class TestConfigOption {
   @Test
   public void testGetTypedValue() {
     Properties props1 = new Properties();
-    assertNull(DefaultHoodieConfig.getInt(props1, FAKE_STRING_CONFIG));
-    DefaultHoodieConfig.set(props1, FAKE_STRING_CONFIG, "5");
-    assertEquals(5, DefaultHoodieConfig.getInt(props1, FAKE_STRING_CONFIG));
+    assertNull(HoodieConfig.getInt(props1, FAKE_STRING_CONFIG));
+    HoodieConfig.set(props1, FAKE_STRING_CONFIG, "5");
+    assertEquals(5, HoodieConfig.getInt(props1, FAKE_STRING_CONFIG));
 
-    assertNull(DefaultHoodieConfig.getBoolean(props1, FAKE_BOOLEAN_CONFIG));
-    DefaultHoodieConfig.set(props1, FAKE_BOOLEAN_CONFIG, "true");
-    assertEquals(true, DefaultHoodieConfig.getBoolean(props1, FAKE_BOOLEAN_CONFIG));
+    assertNull(HoodieConfig.getBoolean(props1, FAKE_BOOLEAN_CONFIG));
+    HoodieConfig.set(props1, FAKE_BOOLEAN_CONFIG, "true");
+    assertEquals(true, HoodieConfig.getBoolean(props1, FAKE_BOOLEAN_CONFIG));
   }
 
   @Test
   public void testGetOrDefault() {
     Map<String, String> props1 = new HashMap<>();
     props1.put("test.unknown.config", "abc");
-    assertEquals("1", DefaultHoodieConfig.getStringOrDefault(props1, FAKE_STRING_CONFIG));
-    assertEquals("2", DefaultHoodieConfig.getStringOrElse(props1, FAKE_STRING_CONFIG, "2"));
+    assertEquals("1", HoodieConfig.getStringOrDefault(props1, FAKE_STRING_CONFIG));
+    assertEquals("2", HoodieConfig.getStringOrDefault(props1, FAKE_STRING_CONFIG, "2"));
   }
 }

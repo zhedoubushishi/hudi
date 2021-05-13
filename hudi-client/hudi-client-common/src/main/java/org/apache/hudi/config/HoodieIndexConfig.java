@@ -20,7 +20,7 @@ package org.apache.hudi.config;
 
 import org.apache.hudi.common.bloom.BloomFilterTypeCode;
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.engine.EngineType;
 import org.apache.hudi.exception.HoodieNotSupportedException;
 import org.apache.hudi.index.HoodieIndex;
@@ -36,7 +36,7 @@ import java.util.Properties;
  * Indexing related config.
  */
 @Immutable
-public class HoodieIndexConfig extends DefaultHoodieConfig {
+public class HoodieIndexConfig extends HoodieConfig {
 
   public static final ConfigOption<String> INDEX_TYPE_PROP = ConfigOption
       .key("hoodie.index.type")
@@ -321,7 +321,7 @@ public class HoodieIndexConfig extends DefaultHoodieConfig {
 
     public HoodieIndexConfig build() {
       HoodieIndexConfig config = new HoodieIndexConfig(engineType, props);
-      setDefaultOnCondition(props, !props.containsKey(INDEX_TYPE_PROP.key()), INDEX_TYPE_PROP.key(), getDefaultIndexType(engineType));
+      setDefaultValue(props, INDEX_TYPE_PROP, getDefaultIndexType(engineType));
       setDefaultValue(props, INDEX_CLASS_PROP);
       setDefaultValue(props, BLOOM_FILTER_NUM_ENTRIES);
       setDefaultValue(props, BLOOM_FILTER_FPP);

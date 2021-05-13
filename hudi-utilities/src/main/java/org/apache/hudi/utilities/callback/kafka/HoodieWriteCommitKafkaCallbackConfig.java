@@ -21,7 +21,7 @@ import org.apache.hudi.common.config.ConfigOption;
 
 import java.util.Properties;
 
-import static org.apache.hudi.common.config.DefaultHoodieConfig.setDefaultValue;
+import static org.apache.hudi.common.config.HoodieConfig.setDefaultValue;
 import static org.apache.hudi.config.HoodieWriteCommitCallbackConfig.CALLBACK_PREFIX;
 
 /**

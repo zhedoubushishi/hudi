@@ -19,7 +19,7 @@
 package org.apache.hudi.config;
 
 import org.apache.hudi.common.config.ConfigOption;
-import org.apache.hudi.common.config.DefaultHoodieConfig;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -33,7 +33,7 @@ import static org.apache.hudi.config.HoodieMetricsConfig.METRIC_PREFIX;
  * {@link org.apache.hudi.metrics.MetricsReporterType#DATADOG}
  */
 @Immutable
-public class HoodieMetricsDatadogConfig extends DefaultHoodieConfig {
+public class HoodieMetricsDatadogConfig extends HoodieConfig {
 
   public static final String DATADOG_PREFIX = METRIC_PREFIX + ".datadog";
 
