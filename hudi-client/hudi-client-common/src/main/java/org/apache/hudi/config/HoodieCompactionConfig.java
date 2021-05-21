@@ -207,8 +207,8 @@ public class HoodieCompactionConfig extends HoodieConfig {
           + "based on the last 24 commit’s metadata. No value set as default. This is critical in computing "
           + "the insert parallelism and bin-packing inserts into small files. See above.");
 
-  private HoodieCompactionConfig(Properties props) {
-    super(props);
+  private HoodieCompactionConfig() {
+    super();
   }
 
   public static HoodieCompactionConfig.Builder newBuilder() {
@@ -217,188 +217,187 @@ public class HoodieCompactionConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieCompactionConfig compactionConfig = new HoodieCompactionConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.compactionConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.compactionConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder withAutoClean(Boolean autoClean) {
-      set(props, AUTO_CLEAN_PROP, String.valueOf(autoClean));
+      compactionConfig.set(AUTO_CLEAN_PROP, String.valueOf(autoClean));
       return this;
     }
 
     public Builder withAsyncClean(Boolean asyncClean) {
-      set(props, ASYNC_CLEAN_PROP, String.valueOf(asyncClean));
+      compactionConfig.set(ASYNC_CLEAN_PROP, String.valueOf(asyncClean));
       return this;
     }
 
     public Builder withIncrementalCleaningMode(Boolean incrementalCleaningMode) {
-      set(props, CLEANER_INCREMENTAL_MODE, String.valueOf(incrementalCleaningMode));
+      compactionConfig.set(CLEANER_INCREMENTAL_MODE, String.valueOf(incrementalCleaningMode));
       return this;
     }
 
     public Builder withInlineCompaction(Boolean inlineCompaction) {
-      set(props, INLINE_COMPACT_PROP, String.valueOf(inlineCompaction));
+      compactionConfig.set(INLINE_COMPACT_PROP, String.valueOf(inlineCompaction));
       return this;
     }
 
     public Builder withInlineCompactionTriggerStrategy(CompactionTriggerStrategy compactionTriggerStrategy) {
-      set(props, INLINE_COMPACT_TRIGGER_STRATEGY_PROP, compactionTriggerStrategy.name());
+      compactionConfig.set(INLINE_COMPACT_TRIGGER_STRATEGY_PROP, compactionTriggerStrategy.name());
       return this;
     }
 
     public Builder withCleanerPolicy(HoodieCleaningPolicy policy) {
-      set(props, CLEANER_POLICY_PROP, policy.name());
+      compactionConfig.set(CLEANER_POLICY_PROP, policy.name());
       return this;
     }
 
     public Builder retainFileVersions(int fileVersionsRetained) {
-      set(props, CLEANER_FILE_VERSIONS_RETAINED_PROP, String.valueOf(fileVersionsRetained));
+      compactionConfig.set(CLEANER_FILE_VERSIONS_RETAINED_PROP, String.valueOf(fileVersionsRetained));
       return this;
     }
 
     public Builder retainCommits(int commitsRetained) {
-      set(props, CLEANER_COMMITS_RETAINED_PROP, String.valueOf(commitsRetained));
+      compactionConfig.set(CLEANER_COMMITS_RETAINED_PROP, String.valueOf(commitsRetained));
       return this;
     }
 
     public Builder archiveCommitsWith(int minToKeep, int maxToKeep) {
-      set(props, MIN_COMMITS_TO_KEEP_PROP, String.valueOf(minToKeep));
-      set(props, MAX_COMMITS_TO_KEEP_PROP, String.valueOf(maxToKeep));
+      compactionConfig.set(MIN_COMMITS_TO_KEEP_PROP, String.valueOf(minToKeep));
+      compactionConfig.set(MAX_COMMITS_TO_KEEP_PROP, String.valueOf(maxToKeep));
       return this;
     }
 
     public Builder compactionSmallFileSize(long smallFileLimitBytes) {
-      set(props, PARQUET_SMALL_FILE_LIMIT_BYTES, String.valueOf(smallFileLimitBytes));
+      compactionConfig.set(PARQUET_SMALL_FILE_LIMIT_BYTES, String.valueOf(smallFileLimitBytes));
       return this;
     }
 
     public Builder compactionRecordSizeEstimateThreshold(double threshold) {
-      set(props, RECORD_SIZE_ESTIMATION_THRESHOLD_PROP, String.valueOf(threshold));
+      compactionConfig.set(RECORD_SIZE_ESTIMATION_THRESHOLD_PROP, String.valueOf(threshold));
       return this;
     }
 
     public Builder insertSplitSize(int insertSplitSize) {
-      set(props, COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE, String.valueOf(insertSplitSize));
+      compactionConfig.set(COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE, String.valueOf(insertSplitSize));
       return this;
     }
 
     public Builder autoTuneInsertSplits(boolean autoTuneInsertSplits) {
-      set(props, COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS, String.valueOf(autoTuneInsertSplits));
+      compactionConfig.set(COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS, String.valueOf(autoTuneInsertSplits));
       return this;
     }
 
     public Builder approxRecordSize(int recordSizeEstimate) {
-      set(props, COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE, String.valueOf(recordSizeEstimate));
+      compactionConfig.set(COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE, String.valueOf(recordSizeEstimate));
       return this;
     }
 
     public Builder withCleanerParallelism(int cleanerParallelism) {
-      set(props, CLEANER_PARALLELISM, String.valueOf(cleanerParallelism));
+      compactionConfig.set(CLEANER_PARALLELISM, String.valueOf(cleanerParallelism));
       return this;
     }
 
     public Builder withCompactionStrategy(CompactionStrategy compactionStrategy) {
-      set(props, COMPACTION_STRATEGY_PROP, compactionStrategy.getClass().getName());
+      compactionConfig.set(COMPACTION_STRATEGY_PROP, compactionStrategy.getClass().getName());
       return this;
     }
 
     public Builder withPayloadClass(String payloadClassName) {
-      set(props, PAYLOAD_CLASS_PROP, payloadClassName);
+      compactionConfig.set(PAYLOAD_CLASS_PROP, payloadClassName);
       return this;
     }
 
     public Builder withTargetIOPerCompactionInMB(long targetIOPerCompactionInMB) {
-      set(props, TARGET_IO_PER_COMPACTION_IN_MB_PROP, String.valueOf(targetIOPerCompactionInMB));
+      compactionConfig.set(TARGET_IO_PER_COMPACTION_IN_MB_PROP, String.valueOf(targetIOPerCompactionInMB));
       return this;
     }
 
     public Builder withMaxNumDeltaCommitsBeforeCompaction(int maxNumDeltaCommitsBeforeCompaction) {
-      set(props, INLINE_COMPACT_NUM_DELTA_COMMITS_PROP, String.valueOf(maxNumDeltaCommitsBeforeCompaction));
+      compactionConfig.set(INLINE_COMPACT_NUM_DELTA_COMMITS_PROP, String.valueOf(maxNumDeltaCommitsBeforeCompaction));
       return this;
     }
 
     public Builder withMaxDeltaSecondsBeforeCompaction(int maxDeltaSecondsBeforeCompaction) {
-      set(props, INLINE_COMPACT_TIME_DELTA_SECONDS_PROP, String.valueOf(maxDeltaSecondsBeforeCompaction));
+      compactionConfig.set(INLINE_COMPACT_TIME_DELTA_SECONDS_PROP, String.valueOf(maxDeltaSecondsBeforeCompaction));
       return this;
     }
 
     public Builder withCompactionLazyBlockReadEnabled(Boolean compactionLazyBlockReadEnabled) {
-      set(props, COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP, String.valueOf(compactionLazyBlockReadEnabled));
+      compactionConfig.set(COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP, String.valueOf(compactionLazyBlockReadEnabled));
       return this;
     }
 
     public Builder withCompactionReverseLogReadEnabled(Boolean compactionReverseLogReadEnabled) {
-      set(props, COMPACTION_REVERSE_LOG_READ_ENABLED_PROP, String.valueOf(compactionReverseLogReadEnabled));
+      compactionConfig.set(COMPACTION_REVERSE_LOG_READ_ENABLED_PROP, String.valueOf(compactionReverseLogReadEnabled));
       return this;
     }
 
     public Builder withTargetPartitionsPerDayBasedCompaction(int targetPartitionsPerCompaction) {
-      set(props, TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP, String.valueOf(targetPartitionsPerCompaction));
+      compactionConfig.set(TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP, String.valueOf(targetPartitionsPerCompaction));
       return this;
     }
 
     public Builder withCommitsArchivalBatchSize(int batchSize) {
-      set(props, COMMITS_ARCHIVAL_BATCH_SIZE_PROP, String.valueOf(batchSize));
+      compactionConfig.set(COMMITS_ARCHIVAL_BATCH_SIZE_PROP, String.valueOf(batchSize));
       return this;
     }
 
     public Builder withCleanBootstrapBaseFileEnabled(Boolean cleanBootstrapSourceFileEnabled) {
-      set(props, CLEANER_BOOTSTRAP_BASE_FILE_ENABLED, String.valueOf(cleanBootstrapSourceFileEnabled));
+      compactionConfig.set(CLEANER_BOOTSTRAP_BASE_FILE_ENABLED, String.valueOf(cleanBootstrapSourceFileEnabled));
       return this;
     }
 
     public Builder withFailedWritesCleaningPolicy(HoodieFailedWritesCleaningPolicy failedWritesPolicy) {
-      set(props, FAILED_WRITES_CLEANER_POLICY_PROP, failedWritesPolicy.name());
+      compactionConfig.set(FAILED_WRITES_CLEANER_POLICY_PROP, failedWritesPolicy.name());
       return this;
     }
 
     public HoodieCompactionConfig build() {
-      HoodieCompactionConfig config = new HoodieCompactionConfig(props);
-      setDefaultValue(props, AUTO_CLEAN_PROP);
-      setDefaultValue(props, ASYNC_CLEAN_PROP);
-      setDefaultValue(props, CLEANER_INCREMENTAL_MODE);
-      setDefaultValue(props, INLINE_COMPACT_PROP);
-      setDefaultValue(props, INLINE_COMPACT_NUM_DELTA_COMMITS_PROP);
-      setDefaultValue(props, INLINE_COMPACT_TIME_DELTA_SECONDS_PROP);
-      setDefaultValue(props, INLINE_COMPACT_TRIGGER_STRATEGY_PROP);
-      setDefaultValue(props, CLEANER_POLICY_PROP);
-      setDefaultValue(props, CLEANER_FILE_VERSIONS_RETAINED_PROP);
-      setDefaultValue(props, CLEANER_COMMITS_RETAINED_PROP);
-      setDefaultValue(props, MAX_COMMITS_TO_KEEP_PROP);
-      setDefaultValue(props, MIN_COMMITS_TO_KEEP_PROP);
-      setDefaultValue(props, PARQUET_SMALL_FILE_LIMIT_BYTES);
-      setDefaultValue(props, RECORD_SIZE_ESTIMATION_THRESHOLD_PROP);
-      setDefaultValue(props, COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE);
-      setDefaultValue(props, COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS);
-      setDefaultValue(props, COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE);
-      setDefaultValue(props, CLEANER_PARALLELISM);
-      setDefaultValue(props, COMPACTION_STRATEGY_PROP);
-      setDefaultValue(props, PAYLOAD_CLASS_PROP);
-      setDefaultValue(props, TARGET_IO_PER_COMPACTION_IN_MB_PROP);
-      setDefaultValue(props, COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP);
-      setDefaultValue(props, COMPACTION_REVERSE_LOG_READ_ENABLED_PROP);
-      setDefaultValue(props, TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP);
-      setDefaultValue(props, COMMITS_ARCHIVAL_BATCH_SIZE_PROP);
-      setDefaultValue(props, CLEANER_BOOTSTRAP_BASE_FILE_ENABLED);
-      setDefaultValue(props, FAILED_WRITES_CLEANER_POLICY_PROP);
-      HoodieCleaningPolicy.valueOf(getString(props, CLEANER_POLICY_PROP));
+      compactionConfig.setDefaultValue(AUTO_CLEAN_PROP);
+      compactionConfig.setDefaultValue(ASYNC_CLEAN_PROP);
+      compactionConfig.setDefaultValue(CLEANER_INCREMENTAL_MODE);
+      compactionConfig.setDefaultValue(INLINE_COMPACT_PROP);
+      compactionConfig.setDefaultValue(INLINE_COMPACT_NUM_DELTA_COMMITS_PROP);
+      compactionConfig.setDefaultValue(INLINE_COMPACT_TIME_DELTA_SECONDS_PROP);
+      compactionConfig.setDefaultValue(INLINE_COMPACT_TRIGGER_STRATEGY_PROP);
+      compactionConfig.setDefaultValue(CLEANER_POLICY_PROP);
+      compactionConfig.setDefaultValue(CLEANER_FILE_VERSIONS_RETAINED_PROP);
+      compactionConfig.setDefaultValue(CLEANER_COMMITS_RETAINED_PROP);
+      compactionConfig.setDefaultValue(MAX_COMMITS_TO_KEEP_PROP);
+      compactionConfig.setDefaultValue(MIN_COMMITS_TO_KEEP_PROP);
+      compactionConfig.setDefaultValue(PARQUET_SMALL_FILE_LIMIT_BYTES);
+      compactionConfig.setDefaultValue(RECORD_SIZE_ESTIMATION_THRESHOLD_PROP);
+      compactionConfig.setDefaultValue(COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE);
+      compactionConfig.setDefaultValue(COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS);
+      compactionConfig.setDefaultValue(COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE);
+      compactionConfig.setDefaultValue(CLEANER_PARALLELISM);
+      compactionConfig.setDefaultValue(COMPACTION_STRATEGY_PROP);
+      compactionConfig.setDefaultValue(PAYLOAD_CLASS_PROP);
+      compactionConfig.setDefaultValue(TARGET_IO_PER_COMPACTION_IN_MB_PROP);
+      compactionConfig.setDefaultValue(COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP);
+      compactionConfig.setDefaultValue(COMPACTION_REVERSE_LOG_READ_ENABLED_PROP);
+      compactionConfig.setDefaultValue(TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP);
+      compactionConfig.setDefaultValue(COMMITS_ARCHIVAL_BATCH_SIZE_PROP);
+      compactionConfig.setDefaultValue(CLEANER_BOOTSTRAP_BASE_FILE_ENABLED);
+      compactionConfig.setDefaultValue(FAILED_WRITES_CLEANER_POLICY_PROP);
+      HoodieCleaningPolicy.valueOf(compactionConfig.getString(CLEANER_POLICY_PROP));
 
       // Ensure minInstantsToKeep > cleanerCommitsRetained, otherwise we will archive some
       // commit instant on timeline, that still has not been cleaned. Could miss some data via incr pull
-      int minInstantsToKeep = Integer.parseInt(getStringOrDefault(props, HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP));
-      int maxInstantsToKeep = Integer.parseInt(getStringOrDefault(props, HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP));
+      int minInstantsToKeep = Integer.parseInt(compactionConfig.getStringOrDefault(HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP));
+      int maxInstantsToKeep = Integer.parseInt(compactionConfig.getStringOrDefault(HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP));
       int cleanerCommitsRetained =
-          Integer.parseInt(getStringOrDefault(props, HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP));
+          Integer.parseInt(compactionConfig.getStringOrDefault(HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP));
       ValidationUtils.checkArgument(maxInstantsToKeep > minInstantsToKeep,
           String.format(
               "Increase %s=%d to be greater than %s=%d.",
@@ -410,7 +409,7 @@ public class HoodieCompactionConfig extends HoodieConfig {
                   + "missing data from few instants.",
               HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP.key(), minInstantsToKeep,
               HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP.key(), cleanerCommitsRetained));
-      return config;
+      return compactionConfig;
     }
   }
 }

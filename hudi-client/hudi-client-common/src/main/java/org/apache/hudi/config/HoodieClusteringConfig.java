@@ -108,8 +108,8 @@ public class HoodieClusteringConfig extends HoodieConfig {
       .withVersion("0.7.0")
       .withDescription("Async clustering");
 
-  public HoodieClusteringConfig(Properties props) {
-    super(props);
+  private HoodieClusteringConfig() {
+    super();
   }
 
   public static Builder newBuilder() {
@@ -118,95 +118,93 @@ public class HoodieClusteringConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieClusteringConfig clusteringConfig = new HoodieClusteringConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.clusteringConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder withClusteringPlanStrategyClass(String clusteringStrategyClass) {
-      set(props, CLUSTERING_PLAN_STRATEGY_CLASS, clusteringStrategyClass);
+      clusteringConfig.set(CLUSTERING_PLAN_STRATEGY_CLASS, clusteringStrategyClass);
       return this;
     }
 
     public Builder withClusteringExecutionStrategyClass(String runClusteringStrategyClass) {
-      set(props, CLUSTERING_EXECUTION_STRATEGY_CLASS, runClusteringStrategyClass);
+      clusteringConfig.set(CLUSTERING_EXECUTION_STRATEGY_CLASS, runClusteringStrategyClass);
       return this;
     }
 
     public Builder withClusteringTargetPartitions(int clusteringTargetPartitions) {
-      set(props, CLUSTERING_TARGET_PARTITIONS, String.valueOf(clusteringTargetPartitions));
+      clusteringConfig.set(CLUSTERING_TARGET_PARTITIONS, String.valueOf(clusteringTargetPartitions));
       return this;
     }
 
     public Builder withClusteringPlanSmallFileLimit(long clusteringSmallFileLimit) {
-      set(props, CLUSTERING_PLAN_SMALL_FILE_LIMIT, String.valueOf(clusteringSmallFileLimit));
+      clusteringConfig.set(CLUSTERING_PLAN_SMALL_FILE_LIMIT, String.valueOf(clusteringSmallFileLimit));
       return this;
     }
     
     public Builder withClusteringSortColumns(String sortColumns) {
-      set(props, CLUSTERING_SORT_COLUMNS_PROPERTY, sortColumns);
+      clusteringConfig.set(CLUSTERING_SORT_COLUMNS_PROPERTY, sortColumns);
       return this;
     }
 
     public Builder withClusteringMaxBytesInGroup(long clusteringMaxGroupSize) {
-      set(props, CLUSTERING_MAX_BYTES_PER_GROUP, String.valueOf(clusteringMaxGroupSize));
+      clusteringConfig.set(CLUSTERING_MAX_BYTES_PER_GROUP, String.valueOf(clusteringMaxGroupSize));
       return this;
     }
 
     public Builder withClusteringMaxNumGroups(int maxNumGroups) {
-      set(props, CLUSTERING_MAX_NUM_GROUPS, String.valueOf(maxNumGroups));
+      clusteringConfig.set(CLUSTERING_MAX_NUM_GROUPS, String.valueOf(maxNumGroups));
       return this;
     }
 
     public Builder withClusteringTargetFileMaxBytes(long targetFileSize) {
-      set(props, CLUSTERING_TARGET_FILE_MAX_BYTES, String.valueOf(targetFileSize));
+      clusteringConfig.set(CLUSTERING_TARGET_FILE_MAX_BYTES, String.valueOf(targetFileSize));
       return this;
     }
 
     public Builder withInlineClustering(Boolean inlineClustering) {
-      set(props, INLINE_CLUSTERING_PROP, String.valueOf(inlineClustering));
+      clusteringConfig.set(INLINE_CLUSTERING_PROP, String.valueOf(inlineClustering));
       return this;
     }
 
     public Builder withInlineClusteringNumCommits(int numCommits) {
-      set(props, INLINE_CLUSTERING_MAX_COMMIT_PROP, String.valueOf(numCommits));
+      clusteringConfig.set(INLINE_CLUSTERING_MAX_COMMIT_PROP, String.valueOf(numCommits));
       return this;
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.clusteringConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder withClusteringUpdatesStrategy(String updatesStrategyClass) {
-      set(props, CLUSTERING_UPDATES_STRATEGY_PROP, updatesStrategyClass);
+      clusteringConfig.set(CLUSTERING_UPDATES_STRATEGY_PROP, updatesStrategyClass);
       return this;
     }
 
     public Builder withAsyncClustering(Boolean asyncClustering) {
-      set(props, ASYNC_CLUSTERING_ENABLE_OPT_KEY, String.valueOf(asyncClustering));
+      clusteringConfig.set(ASYNC_CLUSTERING_ENABLE_OPT_KEY, String.valueOf(asyncClustering));
       return this;
     }
 
     public HoodieClusteringConfig build() {
-      HoodieClusteringConfig config = new HoodieClusteringConfig(props);
-
-      setDefaultValue(props, CLUSTERING_PLAN_STRATEGY_CLASS);
-      setDefaultValue(props, CLUSTERING_EXECUTION_STRATEGY_CLASS);
-      setDefaultValue(props, CLUSTERING_MAX_BYTES_PER_GROUP);
-      setDefaultValue(props, CLUSTERING_MAX_NUM_GROUPS);
-      setDefaultValue(props, CLUSTERING_TARGET_FILE_MAX_BYTES);
-      setDefaultValue(props, INLINE_CLUSTERING_PROP);
-      setDefaultValue(props, INLINE_CLUSTERING_MAX_COMMIT_PROP);
-      setDefaultValue(props, CLUSTERING_TARGET_PARTITIONS);
-      setDefaultValue(props, CLUSTERING_PLAN_SMALL_FILE_LIMIT);
-      setDefaultValue(props, CLUSTERING_UPDATES_STRATEGY_PROP);
-      setDefaultValue(props, ASYNC_CLUSTERING_ENABLE_OPT_KEY);
-      return config;
+      clusteringConfig.setDefaultValue(CLUSTERING_PLAN_STRATEGY_CLASS);
+      clusteringConfig.setDefaultValue(CLUSTERING_EXECUTION_STRATEGY_CLASS);
+      clusteringConfig.setDefaultValue(CLUSTERING_MAX_BYTES_PER_GROUP);
+      clusteringConfig.setDefaultValue(CLUSTERING_MAX_NUM_GROUPS);
+      clusteringConfig.setDefaultValue(CLUSTERING_TARGET_FILE_MAX_BYTES);
+      clusteringConfig.setDefaultValue(INLINE_CLUSTERING_PROP);
+      clusteringConfig.setDefaultValue(INLINE_CLUSTERING_MAX_COMMIT_PROP);
+      clusteringConfig.setDefaultValue(CLUSTERING_TARGET_PARTITIONS);
+      clusteringConfig.setDefaultValue(CLUSTERING_PLAN_SMALL_FILE_LIMIT);
+      clusteringConfig.setDefaultValue(CLUSTERING_UPDATES_STRATEGY_PROP);
+      clusteringConfig.setDefaultValue(ASYNC_CLUSTERING_ENABLE_OPT_KEY);
+      return clusteringConfig;
     }
   }
 }

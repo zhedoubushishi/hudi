@@ -33,8 +33,8 @@ import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_ORDERING_F
  */
 public class HoodiePayloadConfig extends HoodieConfig {
 
-  public HoodiePayloadConfig(Properties props) {
-    super(props);
+  private HoodiePayloadConfig() {
+    super();
   }
 
   public static HoodiePayloadConfig.Builder newBuilder() {
@@ -43,35 +43,34 @@ public class HoodiePayloadConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodiePayloadConfig payloadConfig = new HoodiePayloadConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.payloadConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.payloadConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder withPayloadOrderingField(String payloadOrderingField) {
-      set(props, PAYLOAD_ORDERING_FIELD_PROP, String.valueOf(payloadOrderingField));
+      payloadConfig.set(PAYLOAD_ORDERING_FIELD_PROP, String.valueOf(payloadOrderingField));
       return this;
     }
 
     public Builder withPayloadEventTimeField(String payloadEventTimeField) {
-      set(props, PAYLOAD_EVENT_TIME_FIELD_PROP, String.valueOf(payloadEventTimeField));
+      payloadConfig.set(PAYLOAD_EVENT_TIME_FIELD_PROP, String.valueOf(payloadEventTimeField));
       return this;
     }
 
     public HoodiePayloadConfig build() {
-      HoodiePayloadConfig config = new HoodiePayloadConfig(props);
-      setDefaultValue(props, PAYLOAD_ORDERING_FIELD_PROP);
-      setDefaultValue(props, PAYLOAD_EVENT_TIME_FIELD_PROP);
-      return config;
+      payloadConfig.setDefaultValue(PAYLOAD_ORDERING_FIELD_PROP);
+      payloadConfig.setDefaultValue(PAYLOAD_EVENT_TIME_FIELD_PROP);
+      return payloadConfig;
     }
   }
 

@@ -75,8 +75,8 @@ public class HoodieMetricsPrometheusConfig extends HoodieConfig {
       .withVersion("0.6.0")
       .withDescription("");
 
-  public HoodieMetricsPrometheusConfig(Properties props) {
-    super(props);
+  private HoodieMetricsPrometheusConfig() {
+    super();
   }
 
   public static HoodieMetricsPrometheusConfig.Builder newBuilder() {
@@ -90,23 +90,22 @@ public class HoodieMetricsPrometheusConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private Properties props = new Properties();
+    private HoodieMetricsPrometheusConfig hoodieMetricsPrometheusConfig = new HoodieMetricsPrometheusConfig();
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.hoodieMetricsPrometheusConfig.getProps().putAll(props);
       return this;
     }
 
     public HoodieMetricsPrometheusConfig build() {
-      HoodieMetricsPrometheusConfig config = new HoodieMetricsPrometheusConfig(props);
-      setDefaultValue(props, PROMETHEUS_PORT);
-      setDefaultValue(props, PUSHGATEWAY_HOST);
-      setDefaultValue(props, PUSHGATEWAY_PORT);
-      setDefaultValue(props, PUSHGATEWAY_REPORT_PERIOD_SECONDS);
-      setDefaultValue(props, PUSHGATEWAY_DELETE_ON_SHUTDOWN);
-      setDefaultValue(props, PUSHGATEWAY_JOB_NAME);
-      setDefaultValue(props, PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX);
-      return config;
+      hoodieMetricsPrometheusConfig.setDefaultValue(PROMETHEUS_PORT);
+      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_HOST);
+      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_PORT);
+      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_REPORT_PERIOD_SECONDS);
+      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_DELETE_ON_SHUTDOWN);
+      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_JOB_NAME);
+      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX);
+      return hoodieMetricsPrometheusConfig;
     }
   }
 }

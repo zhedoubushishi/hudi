@@ -24,12 +24,12 @@ import org.apache.hudi.client.bootstrap.translator.IdentityBootstrapPartitionPat
 import org.apache.hudi.common.bootstrap.index.HFileBootstrapIndex;
 import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.HoodieConfig;
-import org.apache.hudi.common.table.HoodieTableConfig;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+import org.apache.hudi.common.table.HoodieTableConfig;
 
 /**
  * Bootstrap specific configs.
@@ -92,8 +92,8 @@ public class HoodieBootstrapConfig extends HoodieConfig {
       .withVersion("0.6.0")
       .withDescription("");
 
-  public HoodieBootstrapConfig(Properties props) {
-    super(props);
+  private HoodieBootstrapConfig() {
+    super();
   }
 
   public static Builder newBuilder() {
@@ -102,70 +102,71 @@ public class HoodieBootstrapConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieBootstrapConfig bootstrapConfig = new HoodieBootstrapConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.bootstrapConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder withBootstrapBasePath(String basePath) {
-      set(props, BOOTSTRAP_BASE_PATH_PROP, basePath);
+      bootstrapConfig.set(BOOTSTRAP_BASE_PATH_PROP, basePath);
       return this;
     }
 
     public Builder withBootstrapModeSelector(String partitionSelectorClass) {
-      set(props, BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
+      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
       return this;
     }
 
     public Builder withFullBootstrapInputProvider(String partitionSelectorClass) {
-      set(props, FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
+      bootstrapConfig.set(FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
       return this;
     }
 
     public Builder withBootstrapKeyGenClass(String keyGenClass) {
-      set(props, BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
+      bootstrapConfig.set(BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
       return this;
     }
 
     public Builder withBootstrapPartitionPathTranslatorClass(String partitionPathTranslatorClass) {
-      set(props, BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, partitionPathTranslatorClass);
+      bootstrapConfig
+          .set(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, partitionPathTranslatorClass);
       return this;
     }
 
     public Builder withBootstrapParallelism(int parallelism) {
-      set(props, BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
+      bootstrapConfig.set(BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withBootstrapModeSelectorRegex(String regex) {
-      set(props, BOOTSTRAP_MODE_SELECTOR_REGEX, regex);
+      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX, regex);
       return this;
     }
 
     public Builder withBootstrapModeForRegexMatch(BootstrapMode modeForRegexMatch) {
-      set(props, BOOTSTRAP_MODE_SELECTOR_REGEX_MODE, modeForRegexMatch.name());
+      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE, modeForRegexMatch.name());
       return this;
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.bootstrapConfig.getProps().putAll(props);
       return this;
     }
 
     public HoodieBootstrapConfig build() {
-      HoodieBootstrapConfig config = new HoodieBootstrapConfig(props);
-      setDefaultValue(props, BOOTSTRAP_PARALLELISM);
-      setDefaultValue(props, BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
-      setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR);
-      setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR_REGEX);
-      setDefaultValue(props, BOOTSTRAP_MODE_SELECTOR_REGEX_MODE);
-      setDefaultValue(props, BOOTSTRAP_INDEX_CLASS_PROP, HoodieTableConfig.getDefaultBootstrapIndexClass(props));
-      setDefaultValue(props, FULL_BOOTSTRAP_INPUT_PROVIDER);
-      return config;
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_PARALLELISM);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_INDEX_CLASS_PROP, HoodieTableConfig.getDefaultBootstrapIndexClass(
+          bootstrapConfig.getProps()));
+      bootstrapConfig.setDefaultValue(FULL_BOOTSTRAP_INPUT_PROVIDER);
+      return bootstrapConfig;
     }
   }
 }

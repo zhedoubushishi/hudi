@@ -94,8 +94,8 @@ public class HoodieMetricsDatadogConfig extends HoodieConfig {
       .withVersion("0.6.0")
       .withDescription("Datadog metric tags (comma-delimited) to be sent along with metrics data.");
 
-  private HoodieMetricsDatadogConfig(Properties props) {
-    super(props);
+  private HoodieMetricsDatadogConfig() {
+    super();
   }
 
   public static HoodieMetricsDatadogConfig.Builder newBuilder() {
@@ -104,64 +104,63 @@ public class HoodieMetricsDatadogConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieMetricsDatadogConfig metricsDatadogConfig = new HoodieMetricsDatadogConfig();
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.metricsDatadogConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder withDatadogReportPeriodSeconds(int period) {
-      set(props, DATADOG_REPORT_PERIOD_SECONDS, String.valueOf(period));
+      metricsDatadogConfig.set(DATADOG_REPORT_PERIOD_SECONDS, String.valueOf(period));
       return this;
     }
 
     public Builder withDatadogApiSite(String apiSite) {
-      set(props, DATADOG_API_SITE, apiSite);
+      metricsDatadogConfig.set(DATADOG_API_SITE, apiSite);
       return this;
     }
 
     public Builder withDatadogApiKey(String apiKey) {
-      set(props, DATADOG_API_KEY, apiKey);
+      metricsDatadogConfig.set(DATADOG_API_KEY, apiKey);
       return this;
     }
 
     public Builder withDatadogApiKeySkipValidation(boolean skip) {
-      set(props, DATADOG_API_KEY_SKIP_VALIDATION, String.valueOf(skip));
+      metricsDatadogConfig.set(DATADOG_API_KEY_SKIP_VALIDATION, String.valueOf(skip));
       return this;
     }
 
     public Builder withDatadogApiKeySupplier(String apiKeySupplier) {
-      set(props, DATADOG_API_KEY_SUPPLIER, apiKeySupplier);
+      metricsDatadogConfig.set(DATADOG_API_KEY_SUPPLIER, apiKeySupplier);
       return this;
     }
 
     public Builder withDatadogApiTimeoutSeconds(int timeout) {
-      set(props, DATADOG_API_TIMEOUT_SECONDS, String.valueOf(timeout));
+      metricsDatadogConfig.set(DATADOG_API_TIMEOUT_SECONDS, String.valueOf(timeout));
       return this;
     }
 
     public Builder withDatadogPrefix(String prefix) {
-      set(props, DATADOG_METRIC_PREFIX, prefix);
+      metricsDatadogConfig.set(DATADOG_METRIC_PREFIX, prefix);
       return this;
     }
 
     public Builder withDatadogHost(String host) {
-      set(props, DATADOG_METRIC_HOST, host);
+      metricsDatadogConfig.set(DATADOG_METRIC_HOST, host);
       return this;
     }
 
     public Builder withDatadogTags(String tags) {
-      set(props, DATADOG_METRIC_TAGS, tags);
+      metricsDatadogConfig.set(DATADOG_METRIC_TAGS, tags);
       return this;
     }
 
     public HoodieMetricsDatadogConfig build() {
-      HoodieMetricsDatadogConfig config = new HoodieMetricsDatadogConfig(props);
-      setDefaultValue(props, DATADOG_REPORT_PERIOD_SECONDS);
-      setDefaultValue(props, DATADOG_API_KEY_SKIP_VALIDATION);
-      setDefaultValue(props, DATADOG_API_TIMEOUT_SECONDS);
-      return config;
+      metricsDatadogConfig.setDefaultValue(DATADOG_REPORT_PERIOD_SECONDS);
+      metricsDatadogConfig.setDefaultValue(DATADOG_API_KEY_SKIP_VALIDATION);
+      metricsDatadogConfig.setDefaultValue(DATADOG_API_TIMEOUT_SECONDS);
+      return metricsDatadogConfig;
     }
   }
 }

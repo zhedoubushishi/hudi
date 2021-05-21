@@ -68,8 +68,8 @@ public class HoodieLockConfig extends HoodieConfig {
       .withDescription("Lock provider class name, this should be subclass of "
           + "org.apache.hudi.client.transaction.ConflictResolutionStrategy");
 
-  private HoodieLockConfig(Properties props) {
-    super(props);
+  private HoodieLockConfig() {
+    super();
   }
 
   public static HoodieLockConfig.Builder newBuilder() {
@@ -78,118 +78,117 @@ public class HoodieLockConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieLockConfig lockConfig = new HoodieLockConfig();
 
     public HoodieLockConfig.Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.lockConfig.getProps().load(reader);
         return this;
       }
     }
 
     public HoodieLockConfig.Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.lockConfig.getProps().putAll(props);
       return this;
     }
 
     public HoodieLockConfig.Builder withLockProvider(Class<? extends LockProvider> lockProvider) {
-      set(props, LOCK_PROVIDER_CLASS_PROP, lockProvider.getName());
+      lockConfig.set(LOCK_PROVIDER_CLASS_PROP, lockProvider.getName());
       return this;
     }
 
     public HoodieLockConfig.Builder withHiveDatabaseName(String databaseName) {
-      set(props, HIVE_DATABASE_NAME_PROP, databaseName);
+      lockConfig.set(HIVE_DATABASE_NAME_PROP, databaseName);
       return this;
     }
 
     public HoodieLockConfig.Builder withHiveTableName(String tableName) {
-      set(props, HIVE_TABLE_NAME_PROP, tableName);
+      lockConfig.set(HIVE_TABLE_NAME_PROP, tableName);
       return this;
     }
 
     public HoodieLockConfig.Builder withHiveMetastoreURIs(String hiveMetastoreURIs) {
-      set(props, HIVE_METASTORE_URI_PROP, hiveMetastoreURIs);
+      lockConfig.set(HIVE_METASTORE_URI_PROP, hiveMetastoreURIs);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkQuorum(String zkQuorum) {
-      set(props, ZK_CONNECT_URL_PROP, zkQuorum);
+      lockConfig.set(ZK_CONNECT_URL_PROP, zkQuorum);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkBasePath(String zkBasePath) {
-      set(props, ZK_BASE_PATH_PROP, zkBasePath);
+      lockConfig.set(ZK_BASE_PATH_PROP, zkBasePath);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkPort(String zkPort) {
-      set(props, ZK_PORT_PROP, zkPort);
+      lockConfig.set(ZK_PORT_PROP, zkPort);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkLockKey(String zkLockKey) {
-      set(props, ZK_LOCK_KEY_PROP, zkLockKey);
+      lockConfig.set(ZK_LOCK_KEY_PROP, zkLockKey);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkConnectionTimeoutInMs(Long connectionTimeoutInMs) {
-      set(props, ZK_CONNECTION_TIMEOUT_MS_PROP, String.valueOf(connectionTimeoutInMs));
+      lockConfig.set(ZK_CONNECTION_TIMEOUT_MS_PROP, String.valueOf(connectionTimeoutInMs));
       return this;
     }
 
     public HoodieLockConfig.Builder withZkSessionTimeoutInMs(Long sessionTimeoutInMs) {
-      set(props, ZK_SESSION_TIMEOUT_MS_PROP, String.valueOf(sessionTimeoutInMs));
+      lockConfig.set(ZK_SESSION_TIMEOUT_MS_PROP, String.valueOf(sessionTimeoutInMs));
       return this;
     }
 
     public HoodieLockConfig.Builder withNumRetries(int numRetries) {
-      set(props, LOCK_ACQUIRE_NUM_RETRIES_PROP, String.valueOf(numRetries));
+      lockConfig.set(LOCK_ACQUIRE_NUM_RETRIES_PROP, String.valueOf(numRetries));
       return this;
     }
 
     public HoodieLockConfig.Builder withRetryWaitTimeInMillis(Long retryWaitTimeInMillis) {
-      set(props, LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryWaitTimeInMillis));
+      lockConfig.set(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryWaitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withRetryMaxWaitTimeInMillis(Long retryMaxWaitTimeInMillis) {
-      set(props, LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryMaxWaitTimeInMillis));
+      lockConfig.set(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryMaxWaitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withClientNumRetries(int clientNumRetries) {
-      set(props, LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP, String.valueOf(clientNumRetries));
+      lockConfig.set(LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP, String.valueOf(clientNumRetries));
       return this;
     }
 
     public HoodieLockConfig.Builder withClientRetryWaitTimeInMillis(Long clientRetryWaitTimeInMillis) {
-      set(props, LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(clientRetryWaitTimeInMillis));
+      lockConfig.set(LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(clientRetryWaitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withLockWaitTimeInMillis(Long waitTimeInMillis) {
-      set(props, LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP, String.valueOf(waitTimeInMillis));
+      lockConfig.set(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP, String.valueOf(waitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withConflictResolutionStrategy(ConflictResolutionStrategy conflictResolutionStrategy) {
-      set(props, WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP, conflictResolutionStrategy.getClass().getName());
+      lockConfig.set(WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP, conflictResolutionStrategy.getClass().getName());
       return this;
     }
 
     public HoodieLockConfig build() {
-      HoodieLockConfig config = new HoodieLockConfig(props);
-      setDefaultValue(props, LOCK_PROVIDER_CLASS_PROP);
-      setDefaultValue(props, WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP);
-      setDefaultValue(props, LOCK_ACQUIRE_NUM_RETRIES_PROP);
-      setDefaultValue(props, LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP);
-      setDefaultValue(props, LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP);
-      setDefaultValue(props, LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP);
-      setDefaultValue(props, LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP);
-      setDefaultValue(props, ZK_CONNECTION_TIMEOUT_MS_PROP);
-      setDefaultValue(props, ZK_SESSION_TIMEOUT_MS_PROP);
-      setDefaultValue(props, LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP);
-      return config;
+      lockConfig.setDefaultValue(LOCK_PROVIDER_CLASS_PROP);
+      lockConfig.setDefaultValue(WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP);
+      lockConfig.setDefaultValue(LOCK_ACQUIRE_NUM_RETRIES_PROP);
+      lockConfig.setDefaultValue(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP);
+      lockConfig.setDefaultValue(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP);
+      lockConfig.setDefaultValue(LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP);
+      lockConfig.setDefaultValue(LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP);
+      lockConfig.setDefaultValue(ZK_CONNECTION_TIMEOUT_MS_PROP);
+      lockConfig.setDefaultValue(ZK_SESSION_TIMEOUT_MS_PROP);
+      lockConfig.setDefaultValue(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP);
+      return lockConfig;
     }
   }
 

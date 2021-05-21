@@ -44,12 +44,6 @@ public class HoodieConfig implements Serializable {
     this.props = props;
   }
 
-  public static void setDefaultOnCondition(Properties props, boolean condition, HoodieConfig config) {
-    if (condition) {
-      props.putAll(config.getProps());
-    }
-  }
-
   public static <T> void set(Properties props, ConfigOption<T> cfg, String val) {
     props.setProperty(cfg.key(), val);
   }
@@ -134,4 +128,55 @@ public class HoodieConfig implements Serializable {
   public Properties getProps() {
     return props;
   }
+
+  public void setDefaultOnCondition(boolean condition, HoodieConfig config) {
+    if (condition) {
+      props.putAll(config.getProps());
+    }
+  }
+
+  public <T> void set(ConfigOption<T> cfg, String val) {
+    props.setProperty(cfg.key(), val);
+  }
+
+  public <T> void setDefaultValue(ConfigOption<T> configOption) {
+    setDefaultValue(props, configOption);
+  }
+
+  public <T> void setDefaultValue(ConfigOption<T> configOption, T defaultVal) {
+    setDefaultValue(props, configOption, defaultVal);
+  }
+
+  public <T> String getString(ConfigOption<T> configOption) {
+    return getString(props, configOption);
+  }
+
+  public <T> Integer getInt(ConfigOption<T> configOption) {
+    return getInt(props, configOption);
+  }
+
+  public <T> Boolean getBoolean(ConfigOption<T> configOption) {
+    return getBoolean(props, configOption);
+  }
+
+  public <T> Double getDouble(ConfigOption<T> configOption) {
+    return getDouble(props, configOption);
+  }
+
+  public <T> Float getFloat(ConfigOption<T> configOption) {
+    return getFloat(props, configOption);
+  }
+
+  public <T> Long getLong(ConfigOption<T> configOption) {
+    return getLong(props, configOption);
+  }
+
+  public <T> String getStringOrDefault(ConfigOption<T> configOption) {
+    return getStringOrDefault(props, configOption);
+  }
+
+  public <T> String getStringOrDefault(ConfigOption<T> configOption, String defaultVal) {
+    return getStringOrDefault(props, configOption, defaultVal);
+  }
+
 }

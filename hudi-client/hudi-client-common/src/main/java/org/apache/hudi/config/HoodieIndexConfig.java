@@ -194,12 +194,13 @@ public class HoodieIndexConfig extends HoodieConfig {
   /**
    * Use Spark engine by default.
    */
-  private HoodieIndexConfig(Properties props) {
-    this(EngineType.SPARK, props);
+
+  private HoodieIndexConfig() {
+    this(EngineType.SPARK);
   }
 
-  private HoodieIndexConfig(EngineType engineType, Properties props) {
-    super(props);
+  private HoodieIndexConfig(EngineType engineType) {
+    super();
     this.engineType = engineType;
   }
 
@@ -210,107 +211,107 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static class Builder {
 
     private EngineType engineType = EngineType.SPARK;
-    private final Properties props = new Properties();
+    private final HoodieIndexConfig hoodieIndexConfig = new HoodieIndexConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.hoodieIndexConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.hoodieIndexConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder withIndexType(HoodieIndex.IndexType indexType) {
-      set(props, INDEX_TYPE_PROP, indexType.name());
+      hoodieIndexConfig.set(INDEX_TYPE_PROP, indexType.name());
       return this;
     }
 
     public Builder withIndexClass(String indexClass) {
-      set(props, INDEX_CLASS_PROP, indexClass);
+      hoodieIndexConfig.set(INDEX_CLASS_PROP, indexClass);
       return this;
     }
 
     public Builder withHBaseIndexConfig(HoodieHBaseIndexConfig hBaseIndexConfig) {
-      props.putAll(hBaseIndexConfig.getProps());
+      hoodieIndexConfig.getProps().putAll(hBaseIndexConfig.getProps());
       return this;
     }
 
     public Builder bloomFilterNumEntries(int numEntries) {
-      set(props, BLOOM_FILTER_NUM_ENTRIES, String.valueOf(numEntries));
+      hoodieIndexConfig.set(BLOOM_FILTER_NUM_ENTRIES, String.valueOf(numEntries));
       return this;
     }
 
     public Builder bloomFilterFPP(double fpp) {
-      set(props, BLOOM_FILTER_FPP, String.valueOf(fpp));
+      hoodieIndexConfig.set(BLOOM_FILTER_FPP, String.valueOf(fpp));
       return this;
     }
 
     public Builder bloomIndexParallelism(int parallelism) {
-      set(props, BLOOM_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
+      hoodieIndexConfig.set(BLOOM_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder bloomIndexPruneByRanges(boolean pruneRanges) {
-      set(props, BLOOM_INDEX_PRUNE_BY_RANGES_PROP, String.valueOf(pruneRanges));
+      hoodieIndexConfig.set(BLOOM_INDEX_PRUNE_BY_RANGES_PROP, String.valueOf(pruneRanges));
       return this;
     }
 
     public Builder bloomIndexUseCaching(boolean useCaching) {
-      set(props, BLOOM_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
+      hoodieIndexConfig.set(BLOOM_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
       return this;
     }
 
     public Builder bloomIndexTreebasedFilter(boolean useTreeFilter) {
-      set(props, BLOOM_INDEX_TREE_BASED_FILTER_PROP, String.valueOf(useTreeFilter));
+      hoodieIndexConfig.set(BLOOM_INDEX_TREE_BASED_FILTER_PROP, String.valueOf(useTreeFilter));
       return this;
     }
 
     public Builder bloomIndexBucketizedChecking(boolean bucketizedChecking) {
-      set(props, BLOOM_INDEX_BUCKETIZED_CHECKING_PROP, String.valueOf(bucketizedChecking));
+      hoodieIndexConfig.set(BLOOM_INDEX_BUCKETIZED_CHECKING_PROP, String.valueOf(bucketizedChecking));
       return this;
     }
 
     public Builder bloomIndexKeysPerBucket(int keysPerBucket) {
-      set(props, BLOOM_INDEX_KEYS_PER_BUCKET_PROP, String.valueOf(keysPerBucket));
+      hoodieIndexConfig.set(BLOOM_INDEX_KEYS_PER_BUCKET_PROP, String.valueOf(keysPerBucket));
       return this;
     }
 
     public Builder withBloomIndexInputStorageLevel(String level) {
-      set(props, BLOOM_INDEX_INPUT_STORAGE_LEVEL, level);
+      hoodieIndexConfig.set(BLOOM_INDEX_INPUT_STORAGE_LEVEL, level);
       return this;
     }
 
     public Builder withBloomIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      set(props, BLOOM_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
+      hoodieIndexConfig.set(BLOOM_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 
     public Builder withSimpleIndexParallelism(int parallelism) {
-      set(props, SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
+      hoodieIndexConfig.set(SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder simpleIndexUseCaching(boolean useCaching) {
-      set(props, SIMPLE_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
+      hoodieIndexConfig.set(SIMPLE_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
       return this;
     }
 
     public Builder withSimpleIndexInputStorageLevel(String level) {
-      set(props, SIMPLE_INDEX_INPUT_STORAGE_LEVEL, level);
+      hoodieIndexConfig.set(SIMPLE_INDEX_INPUT_STORAGE_LEVEL, level);
       return this;
     }
 
     public Builder withGlobalSimpleIndexParallelism(int parallelism) {
-      set(props, GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
+      hoodieIndexConfig.set(GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withGlobalSimpleIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      set(props, SIMPLE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
+      hoodieIndexConfig.set(SIMPLE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 
@@ -320,30 +321,29 @@ public class HoodieIndexConfig extends HoodieConfig {
     }
 
     public HoodieIndexConfig build() {
-      HoodieIndexConfig config = new HoodieIndexConfig(engineType, props);
-      setDefaultValue(props, INDEX_TYPE_PROP, getDefaultIndexType(engineType));
-      setDefaultValue(props, INDEX_CLASS_PROP);
-      setDefaultValue(props, BLOOM_FILTER_NUM_ENTRIES);
-      setDefaultValue(props, BLOOM_FILTER_FPP);
-      setDefaultValue(props, BLOOM_INDEX_PARALLELISM_PROP);
-      setDefaultValue(props, BLOOM_INDEX_PRUNE_BY_RANGES_PROP);
-      setDefaultValue(props, BLOOM_INDEX_USE_CACHING_PROP);
-      setDefaultValue(props, BLOOM_INDEX_INPUT_STORAGE_LEVEL);
-      setDefaultValue(props, BLOOM_INDEX_UPDATE_PARTITION_PATH);
-      setDefaultValue(props, BLOOM_INDEX_TREE_BASED_FILTER_PROP);
-      setDefaultValue(props, BLOOM_INDEX_BUCKETIZED_CHECKING_PROP);
-      setDefaultValue(props, BLOOM_INDEX_KEYS_PER_BUCKET_PROP);
-      setDefaultValue(props, BLOOM_INDEX_FILTER_TYPE);
-      setDefaultValue(props, HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES);
-      setDefaultValue(props, SIMPLE_INDEX_PARALLELISM_PROP);
-      setDefaultValue(props, SIMPLE_INDEX_USE_CACHING_PROP);
-      setDefaultValue(props, SIMPLE_INDEX_INPUT_STORAGE_LEVEL);
-      setDefaultValue(props, GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP);
-      setDefaultValue(props, SIMPLE_INDEX_UPDATE_PARTITION_PATH);
+      hoodieIndexConfig.setDefaultValue(INDEX_TYPE_PROP, getDefaultIndexType(engineType));
+      hoodieIndexConfig.setDefaultValue(INDEX_CLASS_PROP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_FILTER_NUM_ENTRIES);
+      hoodieIndexConfig.setDefaultValue(BLOOM_FILTER_FPP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_PARALLELISM_PROP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_PRUNE_BY_RANGES_PROP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_USE_CACHING_PROP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_INPUT_STORAGE_LEVEL);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_UPDATE_PARTITION_PATH);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_TREE_BASED_FILTER_PROP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_BUCKETIZED_CHECKING_PROP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_KEYS_PER_BUCKET_PROP);
+      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_FILTER_TYPE);
+      hoodieIndexConfig.setDefaultValue(HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES);
+      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_PARALLELISM_PROP);
+      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_USE_CACHING_PROP);
+      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_INPUT_STORAGE_LEVEL);
+      hoodieIndexConfig.setDefaultValue(GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP);
+      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_UPDATE_PARTITION_PATH);
 
       // Throws IllegalArgumentException if the value set is not a known Hoodie Index Type
-      HoodieIndex.IndexType.valueOf(getString(props, INDEX_TYPE_PROP));
-      return config;
+      HoodieIndex.IndexType.valueOf(hoodieIndexConfig.getString(INDEX_TYPE_PROP));
+      return hoodieIndexConfig;
     }
 
     private String getDefaultIndexType(EngineType engineType) {
