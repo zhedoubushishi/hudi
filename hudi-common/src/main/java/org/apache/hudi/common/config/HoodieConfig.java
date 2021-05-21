@@ -44,12 +44,6 @@ public class HoodieConfig implements Serializable {
     this.props = props;
   }
 
-  public static void setDefaultOnCondition(Properties props, boolean condition, HoodieConfig config) {
-    if (condition) {
-      props.putAll(config.getProps());
-    }
-  }
-
   public static <T> void set(Properties props, ConfigOption<T> cfg, String val) {
     props.setProperty(cfg.key(), val);
   }
@@ -133,5 +127,27 @@ public class HoodieConfig implements Serializable {
 
   public Properties getProps() {
     return props;
+  }
+
+  public void setDefaultOnCondition(boolean condition, HoodieConfig config) {
+    if (condition) {
+      props.putAll(config.getProps());
+    }
+  }
+
+  public <T> void set(ConfigOption<T> cfg, String val) {
+    set(props, cfg, val);
+  }
+
+  public <T> void setDefaultValue(ConfigOption<T> configOption) {
+    setDefaultValue(props, configOption);
+  }
+
+  public <T> void setDefaultValue(ConfigOption<T> configOption, T defaultVal) {
+    setDefaultValue(props, configOption, defaultVal);
+  }
+
+  public <T> String getString(ConfigOption<T> configOption) {
+    return getString(props, configOption);
   }
 }

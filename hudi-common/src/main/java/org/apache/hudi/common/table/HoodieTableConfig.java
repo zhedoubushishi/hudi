@@ -153,16 +153,18 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
         "hoodie.properties file seems invalid. Please check for left over `.updated` files if any, manually copy it to hoodie.properties and retry");
   }
 
+  /*
   public HoodieTableConfig(Properties props) {
     super(props);
   }
+   */
 
   /**
    * For serializing and de-serializing.
    *
-   * @deprecated
    */
   public HoodieTableConfig() {
+    super();
   }
 
   /**
@@ -299,9 +301,5 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
   public Map<String, String> getMapProps() {
     return props.entrySet().stream()
         .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())));
-  }
-
-  public Properties getProperties() {
-    return props;
   }
 }

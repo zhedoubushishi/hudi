@@ -82,7 +82,7 @@ public class TestUpgradeDowngradeCommand extends AbstractShellIntegrationTest {
     // update hoodie.table.version to 1
     metaClient.getTableConfig().setTableVersion(HoodieTableVersion.ONE);
     try (FSDataOutputStream os = metaClient.getFs().create(new Path(metaClient.getMetaPath() + "/" + HoodieTableConfig.HOODIE_PROPERTIES_FILE), true)) {
-      metaClient.getTableConfig().getProperties().store(os, "");
+      metaClient.getTableConfig().getProps().store(os, "");
     }
     metaClient = HoodieTableMetaClient.reload(HoodieCLI.getTableMetaClient());
 

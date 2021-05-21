@@ -398,7 +398,7 @@ public class TestUpgradeDowngrade extends HoodieClientTestBase {
     metaClient.getTableConfig().setTableVersion(HoodieTableVersion.ONE);
     Path propertyFile = new Path(metaClient.getMetaPath() + "/" + HoodieTableConfig.HOODIE_PROPERTIES_FILE);
     try (FSDataOutputStream os = metaClient.getFs().create(propertyFile)) {
-      metaClient.getTableConfig().getProperties().store(os, "");
+      metaClient.getTableConfig().getProps().store(os, "");
     }
   }
 

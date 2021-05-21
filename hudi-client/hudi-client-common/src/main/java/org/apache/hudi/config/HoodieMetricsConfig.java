@@ -99,8 +99,8 @@ public class HoodieMetricsConfig extends HoodieConfig {
       .withVersion("0.7.0")
       .withDescription("");
 
-  private HoodieMetricsConfig(Properties props) {
-    super(props);
+  private HoodieMetricsConfig() {
+    super();
   }
 
   public static HoodieMetricsConfig.Builder newBuilder() {
@@ -109,83 +109,83 @@ public class HoodieMetricsConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieMetricsConfig hoodieMetricsConfig = new HoodieMetricsConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.hoodieMetricsConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.hoodieMetricsConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder on(boolean metricsOn) {
-      set(props, METRICS_ON, String.valueOf(metricsOn));
+      hoodieMetricsConfig.set(METRICS_ON, String.valueOf(metricsOn));
       return this;
     }
 
     public Builder withReporterType(String reporterType) {
-      set(props, METRICS_REPORTER_TYPE, reporterType);
+      hoodieMetricsConfig.set(METRICS_REPORTER_TYPE, reporterType);
       return this;
     }
 
     public Builder toGraphiteHost(String host) {
-      set(props, GRAPHITE_SERVER_HOST, host);
+      hoodieMetricsConfig.set(GRAPHITE_SERVER_HOST, host);
       return this;
     }
 
     public Builder onGraphitePort(int port) {
-      set(props, GRAPHITE_SERVER_PORT, String.valueOf(port));
+      hoodieMetricsConfig.set(GRAPHITE_SERVER_PORT, String.valueOf(port));
       return this;
     }
 
     public Builder toJmxHost(String host) {
-      set(props, JMX_HOST, host);
+      hoodieMetricsConfig.set(JMX_HOST, host);
       return this;
     }
 
     public Builder onJmxPort(String port) {
-      set(props, JMX_PORT, port);
+      hoodieMetricsConfig.set(JMX_PORT, port);
       return this;
     }
 
     public Builder usePrefix(String prefix) {
-      set(props, GRAPHITE_METRIC_PREFIX, prefix);
+      hoodieMetricsConfig.set(GRAPHITE_METRIC_PREFIX, prefix);
       return this;
     }
 
     public Builder withReporterClass(String className) {
-      set(props, METRICS_REPORTER_CLASS, className);
+      hoodieMetricsConfig.set(METRICS_REPORTER_CLASS, className);
       return this;
     }
 
     public Builder withExecutorMetrics(boolean enable) {
-      set(props, ENABLE_EXECUTOR_METRICS, String.valueOf(enable));
+      hoodieMetricsConfig.set(ENABLE_EXECUTOR_METRICS, String.valueOf(enable));
       return this;
     }
 
     public HoodieMetricsConfig build() {
-      HoodieMetricsConfig config = new HoodieMetricsConfig(props);
-      setDefaultValue(props, METRICS_ON);
-      setDefaultValue(props, METRICS_REPORTER_TYPE);
-      setDefaultValue(props, GRAPHITE_SERVER_HOST);
-      setDefaultValue(props, GRAPHITE_SERVER_PORT);
-      setDefaultValue(props, JMX_HOST);
-      setDefaultValue(props, JMX_PORT);
-      MetricsReporterType reporterType = MetricsReporterType.valueOf(getString(props, METRICS_REPORTER_TYPE));
-      setDefaultOnCondition(props, reporterType == MetricsReporterType.DATADOG,
-          HoodieMetricsDatadogConfig.newBuilder().fromProperties(props).build());
-      setDefaultValue(props, METRICS_REPORTER_CLASS);
-      setDefaultOnCondition(props, reporterType == MetricsReporterType.PROMETHEUS_PUSHGATEWAY,
-              HoodieMetricsPrometheusConfig.newBuilder().fromProperties(props).build());
-      setDefaultOnCondition(props, reporterType == MetricsReporterType.PROMETHEUS,
-              HoodieMetricsPrometheusConfig.newBuilder().fromProperties(props).build());
+      hoodieMetricsConfig.setDefaultValue(METRICS_ON);
+      hoodieMetricsConfig.setDefaultValue(METRICS_REPORTER_TYPE);
+      hoodieMetricsConfig.setDefaultValue(GRAPHITE_SERVER_HOST);
+      hoodieMetricsConfig.setDefaultValue(GRAPHITE_SERVER_PORT);
+      hoodieMetricsConfig.setDefaultValue(JMX_HOST);
+      hoodieMetricsConfig.setDefaultValue(JMX_PORT);
+      MetricsReporterType reporterType = MetricsReporterType.valueOf(hoodieMetricsConfig.getString(METRICS_REPORTER_TYPE));
 
-      return config;
+      hoodieMetricsConfig.setDefaultOnCondition(reporterType == MetricsReporterType.DATADOG,
+          HoodieMetricsDatadogConfig.newBuilder().fromProperties(hoodieMetricsConfig.getProps()).build());
+      hoodieMetricsConfig.setDefaultValue(METRICS_REPORTER_CLASS);
+      hoodieMetricsConfig.setDefaultOnCondition(reporterType == MetricsReporterType.PROMETHEUS_PUSHGATEWAY,
+              HoodieMetricsPrometheusConfig.newBuilder().fromProperties(hoodieMetricsConfig.getProps()).build());
+      hoodieMetricsConfig.setDefaultOnCondition(reporterType == MetricsReporterType.PROMETHEUS,
+              HoodieMetricsPrometheusConfig.newBuilder().fromProperties(hoodieMetricsConfig.getProps()).build());
+
+      return hoodieMetricsConfig;
     }
   }
 

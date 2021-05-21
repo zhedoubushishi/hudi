@@ -74,8 +74,8 @@ public class ConsistencyGuardConfig extends HoodieConfig {
       .withVersion("0.6.0")
       .withDescription("");
 
-  public ConsistencyGuardConfig(Properties props) {
-    super(props);
+  private ConsistencyGuardConfig() {
+    super();
   }
 
   public static ConsistencyGuardConfig.Builder newBuilder() {
@@ -111,58 +111,58 @@ public class ConsistencyGuardConfig extends HoodieConfig {
    */
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final ConsistencyGuardConfig consistencyGuardConfig = new ConsistencyGuardConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        props.load(reader);
+        consistencyGuardConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.consistencyGuardConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder withConsistencyCheckEnabled(boolean enabled) {
-      set(props, CONSISTENCY_CHECK_ENABLED_PROP, String.valueOf(enabled));
+      consistencyGuardConfig.set(CONSISTENCY_CHECK_ENABLED_PROP, String.valueOf(enabled));
       return this;
     }
 
     public Builder withInitialConsistencyCheckIntervalMs(int initialIntevalMs) {
-      set(props, INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP, String.valueOf(initialIntevalMs));
+      consistencyGuardConfig.set(INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP, String.valueOf(initialIntevalMs));
       return this;
     }
 
     public Builder withMaxConsistencyCheckIntervalMs(int maxIntervalMs) {
-      set(props, MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP, String.valueOf(maxIntervalMs));
+      consistencyGuardConfig.set(MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP, String.valueOf(maxIntervalMs));
       return this;
     }
 
     public Builder withMaxConsistencyChecks(int maxConsistencyChecks) {
-      set(props, MAX_CONSISTENCY_CHECKS_PROP, String.valueOf(maxConsistencyChecks));
+      consistencyGuardConfig.set(MAX_CONSISTENCY_CHECKS_PROP, String.valueOf(maxConsistencyChecks));
       return this;
     }
 
     public Builder withOptimisticConsistencyGuardSleepTimeMs(long sleepTimeMs) {
-      set(props, OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP, String.valueOf(sleepTimeMs));
+      consistencyGuardConfig.set(OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP, String.valueOf(sleepTimeMs));
       return this;
     }
 
     public Builder withEnableOptimisticConsistencyGuard(boolean enableOptimisticConsistencyGuard) {
-      set(props, ENABLE_OPTIMISTIC_CONSISTENCY_GUARD, String.valueOf(enableOptimisticConsistencyGuard));
+      consistencyGuardConfig.set(ENABLE_OPTIMISTIC_CONSISTENCY_GUARD, String.valueOf(enableOptimisticConsistencyGuard));
       return this;
     }
 
     public ConsistencyGuardConfig build() {
-      setDefaultValue(props, CONSISTENCY_CHECK_ENABLED_PROP);
-      setDefaultValue(props, INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
-      setDefaultValue(props, MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
-      setDefaultValue(props, MAX_CONSISTENCY_CHECKS_PROP);
-      setDefaultValue(props, OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP);
-      setDefaultValue(props, ENABLE_OPTIMISTIC_CONSISTENCY_GUARD);
-      return new ConsistencyGuardConfig(props);
+      consistencyGuardConfig.setDefaultValue(CONSISTENCY_CHECK_ENABLED_PROP);
+      consistencyGuardConfig.setDefaultValue(INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
+      consistencyGuardConfig.setDefaultValue(MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
+      consistencyGuardConfig.setDefaultValue(MAX_CONSISTENCY_CHECKS_PROP);
+      consistencyGuardConfig.setDefaultValue(OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP);
+      consistencyGuardConfig.setDefaultValue(ENABLE_OPTIMISTIC_CONSISTENCY_GUARD);
+      return consistencyGuardConfig;
     }
   }
 }
