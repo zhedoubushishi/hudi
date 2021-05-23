@@ -136,7 +136,7 @@ public class HoodieConfig implements Serializable {
   }
 
   public <T> void set(ConfigOption<T> cfg, String val) {
-    set(props, cfg, val);
+    props.setProperty(cfg.key(), val);
   }
 
   public <T> void setDefaultValue(ConfigOption<T> configOption) {
@@ -150,4 +150,33 @@ public class HoodieConfig implements Serializable {
   public <T> String getString(ConfigOption<T> configOption) {
     return getString(props, configOption);
   }
+
+  public <T> Integer getInt(ConfigOption<T> configOption) {
+    return getInt(props, configOption);
+  }
+
+  public <T> Boolean getBoolean(ConfigOption<T> configOption) {
+    return getBoolean(props, configOption);
+  }
+
+  public <T> Double getDouble(ConfigOption<T> configOption) {
+    return getDouble(props, configOption);
+  }
+
+  public <T> Float getFloat(ConfigOption<T> configOption) {
+    return getFloat(props, configOption);
+  }
+
+  public <T> Long getLong(ConfigOption<T> configOption) {
+    return getLong(props, configOption);
+  }
+
+  public <T> String getStringOrDefault(ConfigOption<T> configOption) {
+    return getStringOrDefault(props, configOption);
+  }
+
+  public <T> String getStringOrDefault(ConfigOption<T> configOption, String defaultVal) {
+    return getStringOrDefault(props, configOption, defaultVal);
+  }
+
 }

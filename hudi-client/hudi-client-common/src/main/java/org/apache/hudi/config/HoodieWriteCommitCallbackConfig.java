@@ -64,8 +64,8 @@ public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
       .withVersion("0.6.0")
       .withDescription("Callback timeout in seconds. 3 by default");
 
-  private HoodieWriteCommitCallbackConfig(Properties props) {
-    super(props);
+  private HoodieWriteCommitCallbackConfig() {
+    super();
   }
 
   public static HoodieWriteCommitCallbackConfig.Builder newBuilder() {
@@ -74,53 +74,52 @@ public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieWriteCommitCallbackConfig writeCommitCallbackConfig = new HoodieWriteCommitCallbackConfig();
 
     public HoodieWriteCommitCallbackConfig.Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.writeCommitCallbackConfig.getProps().load(reader);
         return this;
       }
     }
 
     public HoodieWriteCommitCallbackConfig.Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.writeCommitCallbackConfig.getProps().putAll(props);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder writeCommitCallbackOn(String callbackOn) {
-      set(props, CALLBACK_ON, callbackOn);
+      writeCommitCallbackConfig.set(CALLBACK_ON, callbackOn);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackClass(String callbackClass) {
-      set(props, CALLBACK_CLASS_PROP, callbackClass);
+      writeCommitCallbackConfig.set(CALLBACK_CLASS_PROP, callbackClass);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackHttpUrl(String url) {
-      set(props, CALLBACK_HTTP_URL_PROP, url);
+      writeCommitCallbackConfig.set(CALLBACK_HTTP_URL_PROP, url);
       return this;
     }
 
     public Builder withCallbackHttpTimeoutSeconds(String timeoutSeconds) {
-      set(props, CALLBACK_HTTP_TIMEOUT_SECONDS, timeoutSeconds);
+      writeCommitCallbackConfig.set(CALLBACK_HTTP_TIMEOUT_SECONDS, timeoutSeconds);
       return this;
     }
 
     public Builder withCallbackHttpApiKey(String apiKey) {
-      set(props, CALLBACK_HTTP_API_KEY, apiKey);
+      writeCommitCallbackConfig.set(CALLBACK_HTTP_API_KEY, apiKey);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig build() {
-      HoodieWriteCommitCallbackConfig config = new HoodieWriteCommitCallbackConfig(props);
-      setDefaultValue(props, CALLBACK_ON);
-      setDefaultValue(props, CALLBACK_CLASS_PROP);
-      setDefaultValue(props, CALLBACK_HTTP_API_KEY);
-      setDefaultValue(props, CALLBACK_HTTP_TIMEOUT_SECONDS);
+      writeCommitCallbackConfig.setDefaultValue(CALLBACK_ON);
+      writeCommitCallbackConfig.setDefaultValue(CALLBACK_CLASS_PROP);
+      writeCommitCallbackConfig.setDefaultValue(CALLBACK_HTTP_API_KEY);
+      writeCommitCallbackConfig.setDefaultValue(CALLBACK_HTTP_TIMEOUT_SECONDS);
 
-      return config;
+      return writeCommitCallbackConfig;
     }
   }
 

@@ -83,27 +83,27 @@ public class ConsistencyGuardConfig extends HoodieConfig {
   }
 
   public boolean isConsistencyCheckEnabled() {
-    return getBoolean(props, CONSISTENCY_CHECK_ENABLED_PROP);
+    return getBoolean(CONSISTENCY_CHECK_ENABLED_PROP);
   }
 
   public int getMaxConsistencyChecks() {
-    return getInt(props, MAX_CONSISTENCY_CHECKS_PROP);
+    return getInt(MAX_CONSISTENCY_CHECKS_PROP);
   }
 
   public int getInitialConsistencyCheckIntervalMs() {
-    return getInt(props, INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
+    return getInt(INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
   }
 
   public int getMaxConsistencyCheckIntervalMs() {
-    return getInt(props, MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
+    return getInt(MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
   }
 
   public long getOptimisticConsistencyGuardSleepTimeMs() {
-    return getLong(props, OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP);
+    return getLong(OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP);
   }
 
   public boolean shouldEnableOptimisticConsistencyGuard() {
-    return getBoolean(props, ENABLE_OPTIMISTIC_CONSISTENCY_GUARD);
+    return getBoolean(ENABLE_OPTIMISTIC_CONSISTENCY_GUARD);
   }
 
   /**

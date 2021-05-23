@@ -102,71 +102,71 @@ public class HoodieBootstrapConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final HoodieBootstrapConfig hoodieBootstrapConfig = new HoodieBootstrapConfig();
+    private final HoodieBootstrapConfig bootstrapConfig = new HoodieBootstrapConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.hoodieBootstrapConfig.getProps().load(reader);
+        this.bootstrapConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder withBootstrapBasePath(String basePath) {
-      hoodieBootstrapConfig.set(BOOTSTRAP_BASE_PATH_PROP, basePath);
+      bootstrapConfig.set(BOOTSTRAP_BASE_PATH_PROP, basePath);
       return this;
     }
 
     public Builder withBootstrapModeSelector(String partitionSelectorClass) {
-      hoodieBootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
+      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
       return this;
     }
 
     public Builder withFullBootstrapInputProvider(String partitionSelectorClass) {
-      hoodieBootstrapConfig.set(FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
+      bootstrapConfig.set(FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
       return this;
     }
 
     public Builder withBootstrapKeyGenClass(String keyGenClass) {
-      hoodieBootstrapConfig.set(BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
+      bootstrapConfig.set(BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
       return this;
     }
 
     public Builder withBootstrapPartitionPathTranslatorClass(String partitionPathTranslatorClass) {
-      hoodieBootstrapConfig
+      bootstrapConfig
           .set(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, partitionPathTranslatorClass);
       return this;
     }
 
     public Builder withBootstrapParallelism(int parallelism) {
-      hoodieBootstrapConfig.set(BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
+      bootstrapConfig.set(BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withBootstrapModeSelectorRegex(String regex) {
-      hoodieBootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX, regex);
+      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX, regex);
       return this;
     }
 
     public Builder withBootstrapModeForRegexMatch(BootstrapMode modeForRegexMatch) {
-      hoodieBootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE, modeForRegexMatch.name());
+      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE, modeForRegexMatch.name());
       return this;
     }
 
     public Builder fromProperties(Properties props) {
-      this.hoodieBootstrapConfig.getProps().putAll(props);
+      this.bootstrapConfig.getProps().putAll(props);
       return this;
     }
 
     public HoodieBootstrapConfig build() {
-      hoodieBootstrapConfig.setDefaultValue(BOOTSTRAP_PARALLELISM);
-      hoodieBootstrapConfig.setDefaultValue(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
-      hoodieBootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR);
-      hoodieBootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX);
-      hoodieBootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE);
-      hoodieBootstrapConfig.setDefaultValue(BOOTSTRAP_INDEX_CLASS_PROP, HoodieTableConfig.getDefaultBootstrapIndexClass(
-          hoodieBootstrapConfig.getProps()));
-      hoodieBootstrapConfig.setDefaultValue(FULL_BOOTSTRAP_INPUT_PROVIDER);
-      return hoodieBootstrapConfig;
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_PARALLELISM);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE);
+      bootstrapConfig.setDefaultValue(BOOTSTRAP_INDEX_CLASS_PROP, HoodieTableConfig.getDefaultBootstrapIndexClass(
+          bootstrapConfig.getProps()));
+      bootstrapConfig.setDefaultValue(FULL_BOOTSTRAP_INPUT_PROVIDER);
+      return bootstrapConfig;
     }
   }
 }

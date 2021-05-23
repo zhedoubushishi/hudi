@@ -363,39 +363,39 @@ public class HoodieWriteConfig extends HoodieConfig {
    * base properties.
    */
   public String getBasePath() {
-    return getString(props, BASE_PATH_PROP);
+    return getString(BASE_PATH_PROP);
   }
 
   public String getSchema() {
-    return getString(props, AVRO_SCHEMA);
+    return getString(AVRO_SCHEMA);
   }
 
   public void setSchema(String schemaStr) {
-    set(props, AVRO_SCHEMA, schemaStr);
+    set(AVRO_SCHEMA, schemaStr);
   }
 
   public boolean getAvroSchemaValidate() {
-    return getBoolean(props, AVRO_SCHEMA_VALIDATE);
+    return getBoolean(AVRO_SCHEMA_VALIDATE);
   }
 
   public String getTableName() {
-    return getString(props, TABLE_NAME);
+    return getString(TABLE_NAME);
   }
 
   public String getPreCombineField() {
-    return getString(props, PRECOMBINE_FIELD_PROP);
+    return getString(PRECOMBINE_FIELD_PROP);
   }
 
   public String getWritePayloadClass() {
-    return getString(props, WRITE_PAYLOAD_CLASS);
+    return getString(WRITE_PAYLOAD_CLASS);
   }
 
   public String getKeyGeneratorClass() {
-    return getString(props, KEYGENERATOR_CLASS_PROP);
+    return getString(KEYGENERATOR_CLASS_PROP);
   }
 
   public Boolean shouldAutoCommit() {
-    return getBoolean(props, HOODIE_AUTO_COMMIT_PROP);
+    return getBoolean(HOODIE_AUTO_COMMIT_PROP);
   }
 
   public Boolean shouldAssumeDatePartitioning() {
@@ -403,35 +403,35 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public boolean shouldUseExternalSchemaTransformation() {
-    return getBoolean(props, EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION);
+    return getBoolean(EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION);
   }
 
   public Integer getTimelineLayoutVersion() {
-    return getInt(props, TIMELINE_LAYOUT_VERSION);
+    return getInt(TIMELINE_LAYOUT_VERSION);
   }
 
   public int getBulkInsertShuffleParallelism() {
-    return getInt(props, BULKINSERT_PARALLELISM);
+    return getInt(BULKINSERT_PARALLELISM);
   }
 
   public String getUserDefinedBulkInsertPartitionerClass() {
-    return getString(props, BULKINSERT_USER_DEFINED_PARTITIONER_CLASS);
+    return getString(BULKINSERT_USER_DEFINED_PARTITIONER_CLASS);
   }
 
   public int getInsertShuffleParallelism() {
-    return getInt(props, INSERT_PARALLELISM);
+    return getInt(INSERT_PARALLELISM);
   }
 
   public int getUpsertShuffleParallelism() {
-    return getInt(props, UPSERT_PARALLELISM);
+    return getInt(UPSERT_PARALLELISM);
   }
 
   public int getDeleteShuffleParallelism() {
-    return Math.max(getInt(props, DELETE_PARALLELISM), 1);
+    return Math.max(getInt(DELETE_PARALLELISM), 1);
   }
 
   public int getRollbackParallelism() {
-    return getInt(props, ROLLBACK_PARALLELISM);
+    return getInt(ROLLBACK_PARALLELISM);
   }
 
   public int getFileListingParallelism() {
@@ -439,88 +439,88 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public boolean shouldRollbackUsingMarkers() {
-    return getBoolean(props, ROLLBACK_USING_MARKERS);
+    return getBoolean(ROLLBACK_USING_MARKERS);
   }
 
   public int getWriteBufferLimitBytes() {
-    return Integer.parseInt(getStringOrDefault(props, WRITE_BUFFER_LIMIT_BYTES));
+    return Integer.parseInt(getStringOrDefault(WRITE_BUFFER_LIMIT_BYTES));
   }
 
   public boolean shouldCombineBeforeInsert() {
-    return getBoolean(props, COMBINE_BEFORE_INSERT_PROP);
+    return getBoolean(COMBINE_BEFORE_INSERT_PROP);
   }
 
   public boolean shouldCombineBeforeUpsert() {
-    return getBoolean(props, COMBINE_BEFORE_UPSERT_PROP);
+    return getBoolean(COMBINE_BEFORE_UPSERT_PROP);
   }
 
   public boolean shouldCombineBeforeDelete() {
-    return getBoolean(props, COMBINE_BEFORE_DELETE_PROP);
+    return getBoolean(COMBINE_BEFORE_DELETE_PROP);
   }
 
   public boolean shouldAllowMultiWriteOnSameInstant() {
-    return getBoolean(props, ALLOW_MULTI_WRITE_ON_SAME_INSTANT);
+    return getBoolean(ALLOW_MULTI_WRITE_ON_SAME_INSTANT);
   }
 
   public String getWriteStatusClassName() {
-    return getString(props, HOODIE_WRITE_STATUS_CLASS_PROP);
+    return getString(HOODIE_WRITE_STATUS_CLASS_PROP);
   }
 
   public int getFinalizeWriteParallelism() {
-    return getInt(props, FINALIZE_WRITE_PARALLELISM);
+    return getInt(FINALIZE_WRITE_PARALLELISM);
   }
 
   public int getMarkersDeleteParallelism() {
-    return getInt(props, MARKERS_DELETE_PARALLELISM);
+    return getInt(MARKERS_DELETE_PARALLELISM);
   }
 
   public boolean isEmbeddedTimelineServerEnabled() {
-    return getBoolean(props, EMBEDDED_TIMELINE_SERVER_ENABLED);
+    return getBoolean(EMBEDDED_TIMELINE_SERVER_ENABLED);
   }
 
   public int getEmbeddedTimelineServerPort() {
-    return Integer.parseInt(getStringOrDefault(props, EMBEDDED_TIMELINE_SERVER_PORT));
+    return Integer.parseInt(getStringOrDefault(EMBEDDED_TIMELINE_SERVER_PORT));
   }
 
   public int getEmbeddedTimelineServerThreads() {
-    return Integer.parseInt(getStringOrDefault(props, EMBEDDED_TIMELINE_SERVER_THREADS));
+    return Integer.parseInt(getStringOrDefault(EMBEDDED_TIMELINE_SERVER_THREADS));
   }
 
   public boolean getEmbeddedTimelineServerCompressOutput() {
-    return Boolean.parseBoolean(getStringOrDefault(props, EMBEDDED_TIMELINE_SERVER_COMPRESS_OUTPUT));
+    return Boolean.parseBoolean(getStringOrDefault(EMBEDDED_TIMELINE_SERVER_COMPRESS_OUTPUT));
   }
 
   public boolean getEmbeddedTimelineServerUseAsync() {
-    return Boolean.parseBoolean(getStringOrDefault(props, EMBEDDED_TIMELINE_SERVER_USE_ASYNC));
+    return Boolean.parseBoolean(getStringOrDefault(EMBEDDED_TIMELINE_SERVER_USE_ASYNC));
   }
 
   public boolean isFailOnTimelineArchivingEnabled() {
-    return getBoolean(props, FAIL_ON_TIMELINE_ARCHIVING_ENABLED_PROP);
+    return getBoolean(FAIL_ON_TIMELINE_ARCHIVING_ENABLED_PROP);
   }
 
   public int getMaxConsistencyChecks() {
-    return getInt(props, MAX_CONSISTENCY_CHECKS_PROP);
+    return getInt(MAX_CONSISTENCY_CHECKS_PROP);
   }
 
   public int getInitialConsistencyCheckIntervalMs() {
-    return getInt(props, INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
+    return getInt(INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
   }
 
   public int getMaxConsistencyCheckIntervalMs() {
-    return getInt(props, MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
+    return getInt(MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
   }
 
   public BulkInsertSortMode getBulkInsertSortMode() {
-    String sortMode = getString(props, BULKINSERT_SORT_MODE);
+    String sortMode = getString(BULKINSERT_SORT_MODE);
     return BulkInsertSortMode.valueOf(sortMode.toUpperCase());
   }
 
   public boolean isMergeDataValidationCheckEnabled() {
-    return getBoolean(props, MERGE_DATA_VALIDATION_CHECK_ENABLED);
+    return getBoolean(MERGE_DATA_VALIDATION_CHECK_ENABLED);
   }
 
   public boolean allowDuplicateInserts() {
-    return getBoolean(props, MERGE_ALLOW_DUPLICATE_ON_INSERTS);
+    return getBoolean(MERGE_ALLOW_DUPLICATE_ON_INSERTS);
   }
 
   public EngineType getEngineType() {
@@ -531,99 +531,99 @@ public class HoodieWriteConfig extends HoodieConfig {
    * compaction properties.
    */
   public HoodieCleaningPolicy getCleanerPolicy() {
-    return HoodieCleaningPolicy.valueOf(getString(props, HoodieCompactionConfig.CLEANER_POLICY_PROP));
+    return HoodieCleaningPolicy.valueOf(getString(HoodieCompactionConfig.CLEANER_POLICY_PROP));
   }
 
   public int getCleanerFileVersionsRetained() {
-    return getInt(props, HoodieCompactionConfig.CLEANER_FILE_VERSIONS_RETAINED_PROP);
+    return getInt(HoodieCompactionConfig.CLEANER_FILE_VERSIONS_RETAINED_PROP);
   }
 
   public int getCleanerCommitsRetained() {
-    return getInt(props, HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP);
+    return getInt(HoodieCompactionConfig.CLEANER_COMMITS_RETAINED_PROP);
   }
 
   public int getMaxCommitsToKeep() {
-    return getInt(props, HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP);
+    return getInt(HoodieCompactionConfig.MAX_COMMITS_TO_KEEP_PROP);
   }
 
   public int getMinCommitsToKeep() {
-    return getInt(props, HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP);
+    return getInt(HoodieCompactionConfig.MIN_COMMITS_TO_KEEP_PROP);
   }
 
   public int getParquetSmallFileLimit() {
-    return getInt(props, HoodieCompactionConfig.PARQUET_SMALL_FILE_LIMIT_BYTES);
+    return getInt(HoodieCompactionConfig.PARQUET_SMALL_FILE_LIMIT_BYTES);
   }
 
   public double getRecordSizeEstimationThreshold() {
-    return getDouble(props, HoodieCompactionConfig.RECORD_SIZE_ESTIMATION_THRESHOLD_PROP);
+    return getDouble(HoodieCompactionConfig.RECORD_SIZE_ESTIMATION_THRESHOLD_PROP);
   }
 
   public int getCopyOnWriteInsertSplitSize() {
-    return getInt(props, HoodieCompactionConfig.COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE);
+    return getInt(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE);
   }
 
   public int getCopyOnWriteRecordSizeEstimate() {
-    return getInt(props, HoodieCompactionConfig.COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE);
+    return getInt(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE);
   }
 
   public boolean shouldAutoTuneInsertSplits() {
-    return getBoolean(props, HoodieCompactionConfig.COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS);
+    return getBoolean(HoodieCompactionConfig.COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS);
   }
 
   public int getCleanerParallelism() {
-    return getInt(props, HoodieCompactionConfig.CLEANER_PARALLELISM);
+    return getInt(HoodieCompactionConfig.CLEANER_PARALLELISM);
   }
 
   public boolean isAutoClean() {
-    return getBoolean(props, HoodieCompactionConfig.AUTO_CLEAN_PROP);
+    return getBoolean(HoodieCompactionConfig.AUTO_CLEAN_PROP);
   }
 
   public boolean isAsyncClean() {
-    return getBoolean(props, HoodieCompactionConfig.ASYNC_CLEAN_PROP);
+    return getBoolean(HoodieCompactionConfig.ASYNC_CLEAN_PROP);
   }
 
   public boolean incrementalCleanerModeEnabled() {
-    return getBoolean(props, HoodieCompactionConfig.CLEANER_INCREMENTAL_MODE);
+    return getBoolean(HoodieCompactionConfig.CLEANER_INCREMENTAL_MODE);
   }
 
   public boolean inlineCompactionEnabled() {
-    return getBoolean(props, HoodieCompactionConfig.INLINE_COMPACT_PROP);
+    return getBoolean(HoodieCompactionConfig.INLINE_COMPACT_PROP);
   }
 
   public CompactionTriggerStrategy getInlineCompactTriggerStrategy() {
-    return CompactionTriggerStrategy.valueOf(getString(props, HoodieCompactionConfig.INLINE_COMPACT_TRIGGER_STRATEGY_PROP));
+    return CompactionTriggerStrategy.valueOf(getString(HoodieCompactionConfig.INLINE_COMPACT_TRIGGER_STRATEGY_PROP));
   }
 
   public int getInlineCompactDeltaCommitMax() {
-    return getInt(props, HoodieCompactionConfig.INLINE_COMPACT_NUM_DELTA_COMMITS_PROP);
+    return getInt(HoodieCompactionConfig.INLINE_COMPACT_NUM_DELTA_COMMITS_PROP);
   }
 
   public int getInlineCompactDeltaSecondsMax() {
-    return getInt(props, HoodieCompactionConfig.INLINE_COMPACT_TIME_DELTA_SECONDS_PROP);
+    return getInt(HoodieCompactionConfig.INLINE_COMPACT_TIME_DELTA_SECONDS_PROP);
   }
 
   public CompactionStrategy getCompactionStrategy() {
-    return ReflectionUtils.loadClass(getString(props, HoodieCompactionConfig.COMPACTION_STRATEGY_PROP));
+    return ReflectionUtils.loadClass(getString(HoodieCompactionConfig.COMPACTION_STRATEGY_PROP));
   }
 
   public Long getTargetIOPerCompactionInMB() {
-    return getLong(props, HoodieCompactionConfig.TARGET_IO_PER_COMPACTION_IN_MB_PROP);
+    return getLong(HoodieCompactionConfig.TARGET_IO_PER_COMPACTION_IN_MB_PROP);
   }
 
   public Boolean getCompactionLazyBlockReadEnabled() {
-    return getBoolean(props, HoodieCompactionConfig.COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP);
+    return getBoolean(HoodieCompactionConfig.COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP);
   }
 
   public Boolean getCompactionReverseLogReadEnabled() {
-    return getBoolean(props, HoodieCompactionConfig.COMPACTION_REVERSE_LOG_READ_ENABLED_PROP);
+    return getBoolean(HoodieCompactionConfig.COMPACTION_REVERSE_LOG_READ_ENABLED_PROP);
   }
 
   public boolean inlineClusteringEnabled() {
-    return getBoolean(props, HoodieClusteringConfig.INLINE_CLUSTERING_PROP);
+    return getBoolean(HoodieClusteringConfig.INLINE_CLUSTERING_PROP);
   }
 
   public boolean isAsyncClusteringEnabled() {
-    return getBoolean(props, HoodieClusteringConfig.ASYNC_CLUSTERING_ENABLE_OPT_KEY);
+    return getBoolean(HoodieClusteringConfig.ASYNC_CLUSTERING_ENABLE_OPT_KEY);
   }
 
   public boolean isClusteringEnabled() {
@@ -632,150 +632,150 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public int getInlineClusterMaxCommits() {
-    return getInt(props, HoodieClusteringConfig.INLINE_CLUSTERING_MAX_COMMIT_PROP);
+    return getInt(HoodieClusteringConfig.INLINE_CLUSTERING_MAX_COMMIT_PROP);
   }
 
   public String getPayloadClass() {
-    return getString(props, HoodieCompactionConfig.PAYLOAD_CLASS_PROP);
+    return getString(HoodieCompactionConfig.PAYLOAD_CLASS_PROP);
   }
 
   public int getTargetPartitionsPerDayBasedCompaction() {
-    return getInt(props, HoodieCompactionConfig.TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP);
+    return getInt(HoodieCompactionConfig.TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP);
   }
 
   public int getCommitArchivalBatchSize() {
-    return getInt(props, HoodieCompactionConfig.COMMITS_ARCHIVAL_BATCH_SIZE_PROP);
+    return getInt(HoodieCompactionConfig.COMMITS_ARCHIVAL_BATCH_SIZE_PROP);
   }
 
   public Boolean shouldCleanBootstrapBaseFile() {
-    return getBoolean(props, HoodieCompactionConfig.CLEANER_BOOTSTRAP_BASE_FILE_ENABLED);
+    return getBoolean(HoodieCompactionConfig.CLEANER_BOOTSTRAP_BASE_FILE_ENABLED);
   }
 
   public String getClusteringUpdatesStrategyClass() {
-    return getString(props, HoodieClusteringConfig.CLUSTERING_UPDATES_STRATEGY_PROP);
+    return getString(HoodieClusteringConfig.CLUSTERING_UPDATES_STRATEGY_PROP);
   }
 
   public HoodieFailedWritesCleaningPolicy getFailedWritesCleanPolicy() {
     return HoodieFailedWritesCleaningPolicy
-        .valueOf(getString(props, HoodieCompactionConfig.FAILED_WRITES_CLEANER_POLICY_PROP));
+        .valueOf(getString(HoodieCompactionConfig.FAILED_WRITES_CLEANER_POLICY_PROP));
   }
 
   /**
    * Clustering properties.
    */
   public String getClusteringPlanStrategyClass() {
-    return getString(props, HoodieClusteringConfig.CLUSTERING_PLAN_STRATEGY_CLASS);
+    return getString(HoodieClusteringConfig.CLUSTERING_PLAN_STRATEGY_CLASS);
   }
 
   public String getClusteringExecutionStrategyClass() {
-    return getString(props, HoodieClusteringConfig.CLUSTERING_EXECUTION_STRATEGY_CLASS);
+    return getString(HoodieClusteringConfig.CLUSTERING_EXECUTION_STRATEGY_CLASS);
   }
 
   public long getClusteringMaxBytesInGroup() {
-    return getLong(props, HoodieClusteringConfig.CLUSTERING_MAX_BYTES_PER_GROUP);
+    return getLong(HoodieClusteringConfig.CLUSTERING_MAX_BYTES_PER_GROUP);
   }
 
   public long getClusteringSmallFileLimit() {
-    return getLong(props, HoodieClusteringConfig.CLUSTERING_PLAN_SMALL_FILE_LIMIT);
+    return getLong(HoodieClusteringConfig.CLUSTERING_PLAN_SMALL_FILE_LIMIT);
   }
 
   public int getClusteringMaxNumGroups() {
-    return getInt(props, HoodieClusteringConfig.CLUSTERING_MAX_NUM_GROUPS);
+    return getInt(HoodieClusteringConfig.CLUSTERING_MAX_NUM_GROUPS);
   }
 
   public long getClusteringTargetFileMaxBytes() {
-    return getLong(props, HoodieClusteringConfig.CLUSTERING_TARGET_FILE_MAX_BYTES);
+    return getLong(HoodieClusteringConfig.CLUSTERING_TARGET_FILE_MAX_BYTES);
   }
 
   public int getTargetPartitionsForClustering() {
-    return getInt(props, HoodieClusteringConfig.CLUSTERING_TARGET_PARTITIONS);
+    return getInt(HoodieClusteringConfig.CLUSTERING_TARGET_PARTITIONS);
   }
 
   public String getClusteringSortColumns() {
-    return getString(props, HoodieClusteringConfig.CLUSTERING_SORT_COLUMNS_PROPERTY);
+    return getString(HoodieClusteringConfig.CLUSTERING_SORT_COLUMNS_PROPERTY);
   }
 
   /**
    * index properties.
    */
   public HoodieIndex.IndexType getIndexType() {
-    return HoodieIndex.IndexType.valueOf(getString(props, HoodieIndexConfig.INDEX_TYPE_PROP));
+    return HoodieIndex.IndexType.valueOf(getString(HoodieIndexConfig.INDEX_TYPE_PROP));
   }
 
   public String getIndexClass() {
-    return getString(props, HoodieIndexConfig.INDEX_CLASS_PROP);
+    return getString(HoodieIndexConfig.INDEX_CLASS_PROP);
   }
 
   public int getBloomFilterNumEntries() {
-    return getInt(props, HoodieIndexConfig.BLOOM_FILTER_NUM_ENTRIES);
+    return getInt(HoodieIndexConfig.BLOOM_FILTER_NUM_ENTRIES);
   }
 
   public double getBloomFilterFPP() {
-    return getDouble(props, HoodieIndexConfig.BLOOM_FILTER_FPP);
+    return getDouble(HoodieIndexConfig.BLOOM_FILTER_FPP);
   }
 
   public String getHbaseZkQuorum() {
-    return getString(props, HoodieHBaseIndexConfig.HBASE_ZKQUORUM_PROP);
+    return getString(HoodieHBaseIndexConfig.HBASE_ZKQUORUM_PROP);
   }
 
   public int getHbaseZkPort() {
-    return getInt(props, HoodieHBaseIndexConfig.HBASE_ZKPORT_PROP);
+    return getInt(HoodieHBaseIndexConfig.HBASE_ZKPORT_PROP);
   }
 
   public String getHBaseZkZnodeParent() {
-    return getString(props, HoodieHBaseIndexConfig.HBASE_ZK_ZNODEPARENT);
+    return getString(HoodieHBaseIndexConfig.HBASE_ZK_ZNODEPARENT);
   }
 
   public String getHbaseTableName() {
-    return getString(props, HoodieHBaseIndexConfig.HBASE_TABLENAME_PROP);
+    return getString(HoodieHBaseIndexConfig.HBASE_TABLENAME_PROP);
   }
 
   public int getHbaseIndexGetBatchSize() {
-    return getInt(props, HoodieHBaseIndexConfig.HBASE_GET_BATCH_SIZE_PROP);
+    return getInt(HoodieHBaseIndexConfig.HBASE_GET_BATCH_SIZE_PROP);
   }
 
   public Boolean getHBaseIndexRollbackSync() {
-    return getBoolean(props, HoodieHBaseIndexConfig.HBASE_INDEX_ROLLBACK_SYNC);
+    return getBoolean(HoodieHBaseIndexConfig.HBASE_INDEX_ROLLBACK_SYNC);
   }
 
   public int getHbaseIndexPutBatchSize() {
-    return getInt(props, HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_PROP);
+    return getInt(HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_PROP);
   }
 
   public Boolean getHbaseIndexPutBatchSizeAutoCompute() {
-    return getBoolean(props, HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP);
+    return getBoolean(HoodieHBaseIndexConfig.HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP);
   }
 
   public String getHBaseQPSResourceAllocatorClass() {
-    return getString(props, HoodieHBaseIndexConfig.HBASE_INDEX_QPS_ALLOCATOR_CLASS);
+    return getString(HoodieHBaseIndexConfig.HBASE_INDEX_QPS_ALLOCATOR_CLASS);
   }
 
   public String getHBaseQPSZKnodePath() {
-    return getString(props, HoodieHBaseIndexConfig.HBASE_ZK_PATH_QPS_ROOT);
+    return getString(HoodieHBaseIndexConfig.HBASE_ZK_PATH_QPS_ROOT);
   }
 
   public String getHBaseZkZnodeSessionTimeout() {
-    return getString(props, HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS);
+    return getString(HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS);
   }
 
   public String getHBaseZkZnodeConnectionTimeout() {
-    return getString(props, HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS);
+    return getString(HoodieHBaseIndexConfig.HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS);
   }
 
   public boolean getHBaseIndexShouldComputeQPSDynamically() {
-    return getBoolean(props, HoodieHBaseIndexConfig.HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY);
+    return getBoolean(HoodieHBaseIndexConfig.HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY);
   }
 
   public int getHBaseIndexDesiredPutsTime() {
-    return getInt(props, HoodieHBaseIndexConfig.HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS);
+    return getInt(HoodieHBaseIndexConfig.HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS);
   }
 
   public String getBloomFilterType() {
-    return getString(props, HoodieIndexConfig.BLOOM_INDEX_FILTER_TYPE);
+    return getString(HoodieIndexConfig.BLOOM_INDEX_FILTER_TYPE);
   }
 
   public int getDynamicBloomFilterMaxNumEntries() {
-    return getInt(props, HoodieIndexConfig.HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES);
+    return getInt(HoodieIndexConfig.HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES);
   }
 
   /**
@@ -784,15 +784,15 @@ public class HoodieWriteConfig extends HoodieConfig {
    * the jobs would be (0.17) 1/6, 0.33 (2/6) and 0.5 (3/6) respectively.
    */
   public float getHbaseIndexQPSFraction() {
-    return getFloat(props, HoodieHBaseIndexConfig.HBASE_QPS_FRACTION_PROP);
+    return getFloat(HoodieHBaseIndexConfig.HBASE_QPS_FRACTION_PROP);
   }
 
   public float getHBaseIndexMinQPSFraction() {
-    return getFloat(props, HoodieHBaseIndexConfig.HBASE_MIN_QPS_FRACTION_PROP);
+    return getFloat(HoodieHBaseIndexConfig.HBASE_MIN_QPS_FRACTION_PROP);
   }
 
   public float getHBaseIndexMaxQPSFraction() {
-    return getFloat(props, HoodieHBaseIndexConfig.HBASE_MAX_QPS_FRACTION_PROP);
+    return getFloat(HoodieHBaseIndexConfig.HBASE_MAX_QPS_FRACTION_PROP);
   }
 
   /**
@@ -800,224 +800,224 @@ public class HoodieWriteConfig extends HoodieConfig {
    * Hoodie jobs to an Hbase Region Server
    */
   public int getHbaseIndexMaxQPSPerRegionServer() {
-    return getInt(props, HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP);
+    return getInt(HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP);
   }
 
   public boolean getHbaseIndexUpdatePartitionPath() {
-    return getBoolean(props, HoodieHBaseIndexConfig.HBASE_INDEX_UPDATE_PARTITION_PATH);
+    return getBoolean(HoodieHBaseIndexConfig.HBASE_INDEX_UPDATE_PARTITION_PATH);
   }
 
   public int getBloomIndexParallelism() {
-    return getInt(props, HoodieIndexConfig.BLOOM_INDEX_PARALLELISM_PROP);
+    return getInt(HoodieIndexConfig.BLOOM_INDEX_PARALLELISM_PROP);
   }
 
   public boolean getBloomIndexPruneByRanges() {
-    return getBoolean(props, HoodieIndexConfig.BLOOM_INDEX_PRUNE_BY_RANGES_PROP);
+    return getBoolean(HoodieIndexConfig.BLOOM_INDEX_PRUNE_BY_RANGES_PROP);
   }
 
   public boolean getBloomIndexUseCaching() {
-    return getBoolean(props, HoodieIndexConfig.BLOOM_INDEX_USE_CACHING_PROP);
+    return getBoolean(HoodieIndexConfig.BLOOM_INDEX_USE_CACHING_PROP);
   }
 
   public boolean useBloomIndexTreebasedFilter() {
-    return getBoolean(props, HoodieIndexConfig.BLOOM_INDEX_TREE_BASED_FILTER_PROP);
+    return getBoolean(HoodieIndexConfig.BLOOM_INDEX_TREE_BASED_FILTER_PROP);
   }
 
   public boolean useBloomIndexBucketizedChecking() {
-    return getBoolean(props, HoodieIndexConfig.BLOOM_INDEX_BUCKETIZED_CHECKING_PROP);
+    return getBoolean(HoodieIndexConfig.BLOOM_INDEX_BUCKETIZED_CHECKING_PROP);
   }
 
   public int getBloomIndexKeysPerBucket() {
-    return getInt(props, HoodieIndexConfig.BLOOM_INDEX_KEYS_PER_BUCKET_PROP);
+    return getInt(HoodieIndexConfig.BLOOM_INDEX_KEYS_PER_BUCKET_PROP);
   }
 
   public boolean getBloomIndexUpdatePartitionPath() {
-    return getBoolean(props, HoodieIndexConfig.BLOOM_INDEX_UPDATE_PARTITION_PATH);
+    return getBoolean(HoodieIndexConfig.BLOOM_INDEX_UPDATE_PARTITION_PATH);
   }
 
   public int getSimpleIndexParallelism() {
-    return getInt(props, HoodieIndexConfig.SIMPLE_INDEX_PARALLELISM_PROP);
+    return getInt(HoodieIndexConfig.SIMPLE_INDEX_PARALLELISM_PROP);
   }
 
   public boolean getSimpleIndexUseCaching() {
-    return getBoolean(props, HoodieIndexConfig.SIMPLE_INDEX_USE_CACHING_PROP);
+    return getBoolean(HoodieIndexConfig.SIMPLE_INDEX_USE_CACHING_PROP);
   }
 
   public int getGlobalSimpleIndexParallelism() {
-    return getInt(props, HoodieIndexConfig.GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP);
+    return getInt(HoodieIndexConfig.GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP);
   }
 
   public boolean getGlobalSimpleIndexUpdatePartitionPath() {
-    return getBoolean(props, HoodieIndexConfig.SIMPLE_INDEX_UPDATE_PARTITION_PATH);
+    return getBoolean(HoodieIndexConfig.SIMPLE_INDEX_UPDATE_PARTITION_PATH);
   }
 
   /**
    * storage properties.
    */
   public long getParquetMaxFileSize() {
-    return getLong(props, HoodieStorageConfig.PARQUET_FILE_MAX_BYTES);
+    return getLong(HoodieStorageConfig.PARQUET_FILE_MAX_BYTES);
   }
 
   public int getParquetBlockSize() {
-    return getInt(props, HoodieStorageConfig.PARQUET_BLOCK_SIZE_BYTES);
+    return getInt(HoodieStorageConfig.PARQUET_BLOCK_SIZE_BYTES);
   }
 
   public int getParquetPageSize() {
-    return getInt(props, HoodieStorageConfig.PARQUET_PAGE_SIZE_BYTES);
+    return getInt(HoodieStorageConfig.PARQUET_PAGE_SIZE_BYTES);
   }
 
   public int getLogFileDataBlockMaxSize() {
-    return getInt(props, HoodieStorageConfig.LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES);
+    return getInt(HoodieStorageConfig.LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES);
   }
 
   public int getLogFileMaxSize() {
-    return getInt(props, HoodieStorageConfig.LOGFILE_SIZE_MAX_BYTES);
+    return getInt(HoodieStorageConfig.LOGFILE_SIZE_MAX_BYTES);
   }
 
   public double getParquetCompressionRatio() {
-    return getDouble(props, HoodieStorageConfig.PARQUET_COMPRESSION_RATIO);
+    return getDouble(HoodieStorageConfig.PARQUET_COMPRESSION_RATIO);
   }
 
   public CompressionCodecName getParquetCompressionCodec() {
-    return CompressionCodecName.fromConf(getString(props, HoodieStorageConfig.PARQUET_COMPRESSION_CODEC));
+    return CompressionCodecName.fromConf(getString(HoodieStorageConfig.PARQUET_COMPRESSION_CODEC));
   }
 
   public double getLogFileToParquetCompressionRatio() {
-    return getDouble(props, HoodieStorageConfig.LOGFILE_TO_PARQUET_COMPRESSION_RATIO);
+    return getDouble(HoodieStorageConfig.LOGFILE_TO_PARQUET_COMPRESSION_RATIO);
   }
 
   public long getHFileMaxFileSize() {
-    return getLong(props, HoodieStorageConfig.HFILE_FILE_MAX_BYTES);
+    return getLong(HoodieStorageConfig.HFILE_FILE_MAX_BYTES);
   }
 
   public int getHFileBlockSize() {
-    return getInt(props, HoodieStorageConfig.HFILE_BLOCK_SIZE_BYTES);
+    return getInt(HoodieStorageConfig.HFILE_BLOCK_SIZE_BYTES);
   }
 
   public Compression.Algorithm getHFileCompressionAlgorithm() {
-    return Compression.Algorithm.valueOf(getString(props, HoodieStorageConfig.HFILE_COMPRESSION_ALGORITHM));
+    return Compression.Algorithm.valueOf(getString(HoodieStorageConfig.HFILE_COMPRESSION_ALGORITHM));
   }
 
   /**
    * metrics properties.
    */
   public boolean isMetricsOn() {
-    return getBoolean(props, HoodieMetricsConfig.METRICS_ON);
+    return getBoolean(HoodieMetricsConfig.METRICS_ON);
   }
 
   public boolean isExecutorMetricsEnabled() {
     return Boolean.parseBoolean(
-        getStringOrDefault(props, HoodieMetricsConfig.ENABLE_EXECUTOR_METRICS, "false"));
+        getStringOrDefault(HoodieMetricsConfig.ENABLE_EXECUTOR_METRICS, "false"));
   }
 
   public MetricsReporterType getMetricsReporterType() {
-    return MetricsReporterType.valueOf(getString(props, HoodieMetricsConfig.METRICS_REPORTER_TYPE));
+    return MetricsReporterType.valueOf(getString(HoodieMetricsConfig.METRICS_REPORTER_TYPE));
   }
 
   public String getGraphiteServerHost() {
-    return getString(props, HoodieMetricsConfig.GRAPHITE_SERVER_HOST);
+    return getString(HoodieMetricsConfig.GRAPHITE_SERVER_HOST);
   }
 
   public int getGraphiteServerPort() {
-    return getInt(props, HoodieMetricsConfig.GRAPHITE_SERVER_PORT);
+    return getInt(HoodieMetricsConfig.GRAPHITE_SERVER_PORT);
   }
 
   public String getGraphiteMetricPrefix() {
-    return getString(props, HoodieMetricsConfig.GRAPHITE_METRIC_PREFIX);
+    return getString(HoodieMetricsConfig.GRAPHITE_METRIC_PREFIX);
   }
 
   public String getJmxHost() {
-    return getString(props, HoodieMetricsConfig.JMX_HOST);
+    return getString(HoodieMetricsConfig.JMX_HOST);
   }
 
   public String getJmxPort() {
-    return getString(props, HoodieMetricsConfig.JMX_PORT);
+    return getString(HoodieMetricsConfig.JMX_PORT);
   }
 
   public int getDatadogReportPeriodSeconds() {
-    return getInt(props, HoodieMetricsDatadogConfig.DATADOG_REPORT_PERIOD_SECONDS);
+    return getInt(HoodieMetricsDatadogConfig.DATADOG_REPORT_PERIOD_SECONDS);
   }
 
   public ApiSite getDatadogApiSite() {
-    return ApiSite.valueOf(getString(props, HoodieMetricsDatadogConfig.DATADOG_API_SITE));
+    return ApiSite.valueOf(getString(HoodieMetricsDatadogConfig.DATADOG_API_SITE));
   }
 
   public String getDatadogApiKey() {
     if (props.containsKey(HoodieMetricsDatadogConfig.DATADOG_API_KEY.key())) {
-      return getString(props, HoodieMetricsDatadogConfig.DATADOG_API_KEY);
+      return getString(HoodieMetricsDatadogConfig.DATADOG_API_KEY);
     } else {
       Supplier<String> apiKeySupplier = ReflectionUtils.loadClass(
-          getString(props, HoodieMetricsDatadogConfig.DATADOG_API_KEY_SUPPLIER));
+          getString(HoodieMetricsDatadogConfig.DATADOG_API_KEY_SUPPLIER));
       return apiKeySupplier.get();
     }
   }
 
   public boolean getDatadogApiKeySkipValidation() {
-    return getBoolean(props, HoodieMetricsDatadogConfig.DATADOG_API_KEY_SKIP_VALIDATION);
+    return getBoolean(HoodieMetricsDatadogConfig.DATADOG_API_KEY_SKIP_VALIDATION);
   }
 
   public int getDatadogApiTimeoutSeconds() {
-    return getInt(props, HoodieMetricsDatadogConfig.DATADOG_API_TIMEOUT_SECONDS);
+    return getInt(HoodieMetricsDatadogConfig.DATADOG_API_TIMEOUT_SECONDS);
   }
 
   public String getDatadogMetricPrefix() {
-    return getString(props, HoodieMetricsDatadogConfig.DATADOG_METRIC_PREFIX);
+    return getString(HoodieMetricsDatadogConfig.DATADOG_METRIC_PREFIX);
   }
 
   public String getDatadogMetricHost() {
-    return getString(props, HoodieMetricsDatadogConfig.DATADOG_METRIC_HOST);
+    return getString(HoodieMetricsDatadogConfig.DATADOG_METRIC_HOST);
   }
 
   public List<String> getDatadogMetricTags() {
-    return Arrays.stream(getStringOrDefault(props,
+    return Arrays.stream(getStringOrDefault(
         HoodieMetricsDatadogConfig.DATADOG_METRIC_TAGS, ",").split("\\s*,\\s*")).collect(Collectors.toList());
   }
 
   public String getMetricReporterClassName() {
-    return getString(props, HoodieMetricsConfig.METRICS_REPORTER_CLASS);
+    return getString(HoodieMetricsConfig.METRICS_REPORTER_CLASS);
   }
 
   public int getPrometheusPort() {
-    return getInt(props, HoodieMetricsPrometheusConfig.PROMETHEUS_PORT);
+    return getInt(HoodieMetricsPrometheusConfig.PROMETHEUS_PORT);
   }
 
   public String getPushGatewayHost() {
-    return getString(props, HoodieMetricsPrometheusConfig.PUSHGATEWAY_HOST);
+    return getString(HoodieMetricsPrometheusConfig.PUSHGATEWAY_HOST);
   }
 
   public int getPushGatewayPort() {
-    return getInt(props, HoodieMetricsPrometheusConfig.PUSHGATEWAY_PORT);
+    return getInt(HoodieMetricsPrometheusConfig.PUSHGATEWAY_PORT);
   }
 
   public int getPushGatewayReportPeriodSeconds() {
-    return getInt(props, HoodieMetricsPrometheusConfig.PUSHGATEWAY_REPORT_PERIOD_SECONDS);
+    return getInt(HoodieMetricsPrometheusConfig.PUSHGATEWAY_REPORT_PERIOD_SECONDS);
   }
 
   public boolean getPushGatewayDeleteOnShutdown() {
-    return getBoolean(props, HoodieMetricsPrometheusConfig.PUSHGATEWAY_DELETE_ON_SHUTDOWN);
+    return getBoolean(HoodieMetricsPrometheusConfig.PUSHGATEWAY_DELETE_ON_SHUTDOWN);
   }
 
   public String getPushGatewayJobName() {
-    return getString(props, HoodieMetricsPrometheusConfig.PUSHGATEWAY_JOB_NAME);
+    return getString(HoodieMetricsPrometheusConfig.PUSHGATEWAY_JOB_NAME);
   }
 
   public boolean getPushGatewayRandomJobNameSuffix() {
-    return getBoolean(props, HoodieMetricsPrometheusConfig.PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX);
+    return getBoolean(HoodieMetricsPrometheusConfig.PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX);
   }
 
   /**
    * memory configs.
    */
   public int getMaxDFSStreamBufferSize() {
-    return getInt(props, HoodieMemoryConfig.MAX_DFS_STREAM_BUFFER_SIZE_PROP);
+    return getInt(HoodieMemoryConfig.MAX_DFS_STREAM_BUFFER_SIZE_PROP);
   }
 
   public String getSpillableMapBasePath() {
-    return getString(props, HoodieMemoryConfig.SPILLABLE_MAP_BASE_PATH_PROP);
+    return getString(HoodieMemoryConfig.SPILLABLE_MAP_BASE_PATH_PROP);
   }
 
   public double getWriteStatusFailureFraction() {
-    return getDouble(props, HoodieMemoryConfig.WRITESTATUS_FAILURE_FRACTION_PROP);
+    return getDouble(HoodieMemoryConfig.WRITESTATUS_FAILURE_FRACTION_PROP);
   }
 
   public ConsistencyGuardConfig getConsistencyGuardConfig() {
@@ -1056,55 +1056,55 @@ public class HoodieWriteConfig extends HoodieConfig {
    * Commit call back configs.
    */
   public boolean writeCommitCallbackOn() {
-    return getBoolean(props, HoodieWriteCommitCallbackConfig.CALLBACK_ON);
+    return getBoolean(HoodieWriteCommitCallbackConfig.CALLBACK_ON);
   }
 
   public String getCallbackClass() {
-    return getString(props, HoodieWriteCommitCallbackConfig.CALLBACK_CLASS_PROP);
+    return getString(HoodieWriteCommitCallbackConfig.CALLBACK_CLASS_PROP);
   }
 
   public String getBootstrapSourceBasePath() {
-    return getString(props, HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP);
+    return getString(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP);
   }
 
   public String getBootstrapModeSelectorClass() {
-    return getString(props, HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR);
+    return getString(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR);
   }
 
   public String getFullBootstrapInputProvider() {
-    return getString(props, HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER);
+    return getString(HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER);
   }
 
   public String getBootstrapKeyGeneratorClass() {
-    return getString(props, HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS);
+    return getString(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS);
   }
 
   public String getBootstrapModeSelectorRegex() {
-    return getString(props, HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX);
+    return getString(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX);
   }
 
   public BootstrapMode getBootstrapModeForRegexMatch() {
-    return BootstrapMode.valueOf(getString(props, HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX_MODE));
+    return BootstrapMode.valueOf(getString(HoodieBootstrapConfig.BOOTSTRAP_MODE_SELECTOR_REGEX_MODE));
   }
 
   public String getBootstrapPartitionPathTranslatorClass() {
-    return getString(props, HoodieBootstrapConfig.BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
+    return getString(HoodieBootstrapConfig.BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
   }
 
   public int getBootstrapParallelism() {
-    return getInt(props, HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM);
+    return getInt(HoodieBootstrapConfig.BOOTSTRAP_PARALLELISM);
   }
 
   public Long getMaxMemoryPerPartitionMerge() {
-    return getLong(props, HoodieMemoryConfig.MAX_MEMORY_FOR_MERGE_PROP);
+    return getLong(HoodieMemoryConfig.MAX_MEMORY_FOR_MERGE_PROP);
   }
 
   public Long getHoodieClientHeartbeatIntervalInMs() {
-    return getLong(props, CLIENT_HEARTBEAT_INTERVAL_IN_MS_PROP);
+    return getLong(CLIENT_HEARTBEAT_INTERVAL_IN_MS_PROP);
   }
 
   public Integer getHoodieClientHeartbeatTolerableMisses() {
-    return getInt(props, CLIENT_HEARTBEAT_NUM_TOLERABLE_MISSES_PROP);
+    return getInt(CLIENT_HEARTBEAT_NUM_TOLERABLE_MISSES_PROP);
   }
 
   /**
@@ -1119,27 +1119,27 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public int getMetadataInsertParallelism() {
-    return getInt(props, HoodieMetadataConfig.METADATA_INSERT_PARALLELISM_PROP);
+    return getInt(HoodieMetadataConfig.METADATA_INSERT_PARALLELISM_PROP);
   }
 
   public int getMetadataCompactDeltaCommitMax() {
-    return getInt(props, HoodieMetadataConfig.METADATA_COMPACT_NUM_DELTA_COMMITS_PROP);
+    return getInt(HoodieMetadataConfig.METADATA_COMPACT_NUM_DELTA_COMMITS_PROP);
   }
 
   public boolean isMetadataAsyncClean() {
-    return getBoolean(props, HoodieMetadataConfig.METADATA_ASYNC_CLEAN_PROP);
+    return getBoolean(HoodieMetadataConfig.METADATA_ASYNC_CLEAN_PROP);
   }
 
   public int getMetadataMaxCommitsToKeep() {
-    return getInt(props, HoodieMetadataConfig.MAX_COMMITS_TO_KEEP_PROP);
+    return getInt(HoodieMetadataConfig.MAX_COMMITS_TO_KEEP_PROP);
   }
 
   public int getMetadataMinCommitsToKeep() {
-    return getInt(props, HoodieMetadataConfig.MIN_COMMITS_TO_KEEP_PROP);
+    return getInt(HoodieMetadataConfig.MIN_COMMITS_TO_KEEP_PROP);
   }
 
   public int getMetadataCleanerCommitsRetained() {
-    return getInt(props, HoodieMetadataConfig.CLEANER_COMMITS_RETAINED_PROP);
+    return getInt(HoodieMetadataConfig.CLEANER_COMMITS_RETAINED_PROP);
   }
 
   /**
@@ -1148,27 +1148,27 @@ public class HoodieWriteConfig extends HoodieConfig {
    */
 
   public String getLockProviderClass() {
-    return getString(props, HoodieLockConfig.LOCK_PROVIDER_CLASS_PROP);
+    return getString(HoodieLockConfig.LOCK_PROVIDER_CLASS_PROP);
   }
 
   public String getLockHiveDatabaseName() {
-    return getString(props, HIVE_DATABASE_NAME_PROP);
+    return getString(HIVE_DATABASE_NAME_PROP);
   }
 
   public String getLockHiveTableName() {
-    return getString(props, HIVE_TABLE_NAME_PROP);
+    return getString(HIVE_TABLE_NAME_PROP);
   }
 
   public ConflictResolutionStrategy getWriteConflictResolutionStrategy() {
-    return ReflectionUtils.loadClass(getString(props, HoodieLockConfig.WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP));
+    return ReflectionUtils.loadClass(getString(HoodieLockConfig.WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP));
   }
 
   public Long getLockAcquireWaitTimeoutInMs() {
-    return getLong(props, LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP);
+    return getLong(LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP);
   }
 
   public WriteConcurrencyMode getWriteConcurrencyMode() {
-    return WriteConcurrencyMode.fromValue(getString(props, WRITE_CONCURRENCY_MODE_PROP));
+    return WriteConcurrencyMode.fromValue(getString(WRITE_CONCURRENCY_MODE_PROP));
   }
 
   public Boolean inlineTableServices() {
@@ -1176,7 +1176,7 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public String getWriteMetaKeyPrefixes() {
-    return getString(props, WRITE_META_KEY_PREFIXES_PROP);
+    return getString(WRITE_META_KEY_PREFIXES_PROP);
   }
 
   public static class Builder {

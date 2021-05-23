@@ -102,8 +102,8 @@ public class HoodieStorageConfig extends HoodieConfig {
       .withDescription("Expected additional compression as records move from log files to parquet. Used for merge_on_read "
           + "table to send inserts into log files & control the size of compacted parquet file.");
 
-  private HoodieStorageConfig(Properties props) {
-    super(props);
+  private HoodieStorageConfig() {
+    super();
   }
 
   public static HoodieStorageConfig.Builder newBuilder() {
@@ -112,90 +112,89 @@ public class HoodieStorageConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieStorageConfig storageConfig = new HoodieStorageConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.storageConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.storageConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder parquetMaxFileSize(long maxFileSize) {
-      set(props, PARQUET_FILE_MAX_BYTES, String.valueOf(maxFileSize));
+      storageConfig.set(PARQUET_FILE_MAX_BYTES, String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder parquetBlockSize(int blockSize) {
-      set(props, PARQUET_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
+      storageConfig.set(PARQUET_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
       return this;
     }
 
     public Builder parquetPageSize(int pageSize) {
-      set(props, PARQUET_PAGE_SIZE_BYTES, String.valueOf(pageSize));
+      storageConfig.set(PARQUET_PAGE_SIZE_BYTES, String.valueOf(pageSize));
       return this;
     }
 
     public Builder hfileMaxFileSize(long maxFileSize) {
-      set(props, HFILE_FILE_MAX_BYTES, String.valueOf(maxFileSize));
+      storageConfig.set(HFILE_FILE_MAX_BYTES, String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder hfileBlockSize(int blockSize) {
-      set(props, HFILE_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
+      storageConfig.set(HFILE_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
       return this;
     }
 
     public Builder logFileDataBlockMaxSize(int dataBlockSize) {
-      set(props, LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES, String.valueOf(dataBlockSize));
+      storageConfig.set(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES, String.valueOf(dataBlockSize));
       return this;
     }
 
     public Builder logFileMaxSize(int logFileSize) {
-      set(props, LOGFILE_SIZE_MAX_BYTES, String.valueOf(logFileSize));
+      storageConfig.set(LOGFILE_SIZE_MAX_BYTES, String.valueOf(logFileSize));
       return this;
     }
 
     public Builder parquetCompressionRatio(double parquetCompressionRatio) {
-      set(props, PARQUET_COMPRESSION_RATIO, String.valueOf(parquetCompressionRatio));
+      storageConfig.set(PARQUET_COMPRESSION_RATIO, String.valueOf(parquetCompressionRatio));
       return this;
     }
 
     public Builder parquetCompressionCodec(String parquetCompressionCodec) {
-      set(props, PARQUET_COMPRESSION_CODEC, parquetCompressionCodec);
+      storageConfig.set(PARQUET_COMPRESSION_CODEC, parquetCompressionCodec);
       return this;
     }
 
     public Builder hfileCompressionAlgorithm(String hfileCompressionAlgorithm) {
-      set(props, HFILE_COMPRESSION_ALGORITHM, hfileCompressionAlgorithm);
+      storageConfig.set(HFILE_COMPRESSION_ALGORITHM, hfileCompressionAlgorithm);
       return this;
     }
 
     public Builder logFileToParquetCompressionRatio(double logFileToParquetCompressionRatio) {
-      set(props, LOGFILE_TO_PARQUET_COMPRESSION_RATIO, String.valueOf(logFileToParquetCompressionRatio));
+      storageConfig.set(LOGFILE_TO_PARQUET_COMPRESSION_RATIO, String.valueOf(logFileToParquetCompressionRatio));
       return this;
     }
 
     public HoodieStorageConfig build() {
-      HoodieStorageConfig config = new HoodieStorageConfig(props);
-      setDefaultValue(props, PARQUET_FILE_MAX_BYTES);
-      setDefaultValue(props, PARQUET_BLOCK_SIZE_BYTES);
-      setDefaultValue(props, PARQUET_PAGE_SIZE_BYTES);
-      setDefaultValue(props, LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES);
-      setDefaultValue(props, LOGFILE_SIZE_MAX_BYTES);
-      setDefaultValue(props, PARQUET_COMPRESSION_RATIO);
-      setDefaultValue(props, PARQUET_COMPRESSION_CODEC);
-      setDefaultValue(props, LOGFILE_TO_PARQUET_COMPRESSION_RATIO);
-      setDefaultValue(props, HFILE_BLOCK_SIZE_BYTES);
-      setDefaultValue(props, HFILE_COMPRESSION_ALGORITHM);
-      setDefaultValue(props, HFILE_FILE_MAX_BYTES);
+      storageConfig.setDefaultValue(PARQUET_FILE_MAX_BYTES);
+      storageConfig.setDefaultValue(PARQUET_BLOCK_SIZE_BYTES);
+      storageConfig.setDefaultValue(PARQUET_PAGE_SIZE_BYTES);
+      storageConfig.setDefaultValue(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES);
+      storageConfig.setDefaultValue(LOGFILE_SIZE_MAX_BYTES);
+      storageConfig.setDefaultValue(PARQUET_COMPRESSION_RATIO);
+      storageConfig.setDefaultValue(PARQUET_COMPRESSION_CODEC);
+      storageConfig.setDefaultValue(LOGFILE_TO_PARQUET_COMPRESSION_RATIO);
+      storageConfig.setDefaultValue(HFILE_BLOCK_SIZE_BYTES);
+      storageConfig.setDefaultValue(HFILE_COMPRESSION_ALGORITHM);
+      storageConfig.setDefaultValue(HFILE_FILE_MAX_BYTES);
 
-      return config;
+      return storageConfig;
     }
   }
 

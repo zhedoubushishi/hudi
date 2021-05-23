@@ -83,8 +83,8 @@ public class HoodieMemoryConfig extends HoodieConfig {
           + "Default is 10%. If set to 100%, with lot of failures, this can cause memory pressure, cause OOMs and "
           + "mask actual data errors.");
 
-  private HoodieMemoryConfig(Properties props) {
-    super(props);
+  private HoodieMemoryConfig() {
+    super();
   }
 
   public static HoodieMemoryConfig.Builder newBuilder() {
@@ -93,53 +93,52 @@ public class HoodieMemoryConfig extends HoodieConfig {
 
   public static class Builder {
 
-    private final Properties props = new Properties();
+    private final HoodieMemoryConfig memoryConfig = new HoodieMemoryConfig();
 
     public Builder fromFile(File propertiesFile) throws IOException {
       try (FileReader reader = new FileReader(propertiesFile)) {
-        this.props.load(reader);
+        this.memoryConfig.getProps().load(reader);
         return this;
       }
     }
 
     public Builder fromProperties(Properties props) {
-      this.props.putAll(props);
+      this.memoryConfig.getProps().putAll(props);
       return this;
     }
 
     public Builder withMaxMemoryFractionPerPartitionMerge(double maxMemoryFractionPerPartitionMerge) {
-      set(props, MAX_MEMORY_FRACTION_FOR_MERGE_PROP, String.valueOf(maxMemoryFractionPerPartitionMerge));
+      memoryConfig.set(MAX_MEMORY_FRACTION_FOR_MERGE_PROP, String.valueOf(maxMemoryFractionPerPartitionMerge));
       return this;
     }
 
     public Builder withMaxMemoryMaxSize(long mergeMaxSize, long compactionMaxSize) {
-      set(props, MAX_MEMORY_FOR_MERGE_PROP, String.valueOf(mergeMaxSize));
-      set(props, MAX_MEMORY_FOR_COMPACTION_PROP, String.valueOf(compactionMaxSize));
+      memoryConfig.set(MAX_MEMORY_FOR_MERGE_PROP, String.valueOf(mergeMaxSize));
+      memoryConfig.set(MAX_MEMORY_FOR_COMPACTION_PROP, String.valueOf(compactionMaxSize));
       return this;
     }
 
     public Builder withMaxMemoryFractionPerCompaction(double maxMemoryFractionPerCompaction) {
-      set(props, MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP, String.valueOf(maxMemoryFractionPerCompaction));
+      memoryConfig.set(MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP, String.valueOf(maxMemoryFractionPerCompaction));
       return this;
     }
 
     public Builder withMaxDFSStreamBufferSize(int maxStreamBufferSize) {
-      set(props, MAX_DFS_STREAM_BUFFER_SIZE_PROP, String.valueOf(maxStreamBufferSize));
+      memoryConfig.set(MAX_DFS_STREAM_BUFFER_SIZE_PROP, String.valueOf(maxStreamBufferSize));
       return this;
     }
 
     public Builder withWriteStatusFailureFraction(double failureFraction) {
-      set(props, WRITESTATUS_FAILURE_FRACTION_PROP, String.valueOf(failureFraction));
+      memoryConfig.set(WRITESTATUS_FAILURE_FRACTION_PROP, String.valueOf(failureFraction));
       return this;
     }
 
     public HoodieMemoryConfig build() {
-      HoodieMemoryConfig config = new HoodieMemoryConfig(props);
-      setDefaultValue(props, MAX_DFS_STREAM_BUFFER_SIZE_PROP);
-      setDefaultValue(props, SPILLABLE_MAP_BASE_PATH_PROP);
-      setDefaultValue(props, MAX_MEMORY_FOR_MERGE_PROP);
-      setDefaultValue(props, WRITESTATUS_FAILURE_FRACTION_PROP);
-      return config;
+      memoryConfig.setDefaultValue(MAX_DFS_STREAM_BUFFER_SIZE_PROP);
+      memoryConfig.setDefaultValue(SPILLABLE_MAP_BASE_PATH_PROP);
+      memoryConfig.setDefaultValue(MAX_MEMORY_FOR_MERGE_PROP);
+      memoryConfig.setDefaultValue(WRITESTATUS_FAILURE_FRACTION_PROP);
+      return memoryConfig;
     }
   }
 }
