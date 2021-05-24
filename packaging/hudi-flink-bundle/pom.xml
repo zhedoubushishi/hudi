@@ -425,6 +425,10 @@
           <artifactId>guava</artifactId>
           <groupId>com.google.guava</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>pentaho-aggdesigner-algorithm</artifactId>
+          <groupId>org.pentaho</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

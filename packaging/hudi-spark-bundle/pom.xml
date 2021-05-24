@@ -277,6 +277,12 @@
       <artifactId>hive-service</artifactId>
       <version>${hive.version}</version>
       <scope>${spark.bundle.hive.scope}</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>pentaho-aggdesigner-algorithm</artifactId>
+          <groupId>org.pentaho</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
