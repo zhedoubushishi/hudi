@@ -46,7 +46,7 @@ public class HoodieConfig implements Serializable {
     this.props = props;
   }
 
-  public <T> void set(ConfigOption<T> cfg, String val) {
+  public <T> void setValue(ConfigOption<T> cfg, String val) {
     props.setProperty(cfg.key(), val);
   }
 
@@ -54,7 +54,7 @@ public class HoodieConfig implements Serializable {
     if (!contains(configOption)) {
       Option<T> inferValue = Option.empty();
       if (configOption.getInferFunc().isPresent()) {
-        inferValue = configOption.getInferFunc().get().apply(props);
+        inferValue = configOption.getInferFunc().get().apply(this);
       }
       props.setProperty(configOption.key(), inferValue.isPresent() ? inferValue.get().toString() : configOption.defaultValue().toString());
     }

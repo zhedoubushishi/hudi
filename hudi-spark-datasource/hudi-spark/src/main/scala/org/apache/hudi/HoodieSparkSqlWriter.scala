@@ -115,7 +115,7 @@ private[hudi] object HoodieSparkSqlWriter {
       handleSaveModes(mode, basePath, tableConfig, tblName, operation, fs)
       // Create the table if not present
       if (!tableExists) {
-        val archiveLogFolder = hoodieConfig.getStringOrDefault(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME)
+        val archiveLogFolder = hoodieConfig.getStringOrDefault(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP)
         val partitionColumns = HoodieWriterUtils.getPartitionColumns(keyGenerator)
 
         val tableMetaClient = HoodieTableMetaClient.withPropertyBuilder()
@@ -287,7 +287,7 @@ private[hudi] object HoodieSparkSqlWriter {
     }
 
     if (!tableExists) {
-      val archiveLogFolder = hoodieConfig.getStringOrDefault(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME)
+      val archiveLogFolder = hoodieConfig.getStringOrDefault(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP)
       val partitionColumns = HoodieWriterUtils.getPartitionColumns(parameters)
       HoodieTableMetaClient.withPropertyBuilder()
           .setTableType(HoodieTableType.valueOf(tableType))
@@ -474,7 +474,7 @@ private[hudi] object HoodieSparkSqlWriter {
     } else {
       sqlPropertyText
     }
-    hoodieConfig.set(HIVE_TABLE_PROPERTIES, sqlPropertyText)
+    hoodieConfig.setValue(HIVE_TABLE_PROPERTIES, sqlPropertyText)
     hoodieConfig
   }
 

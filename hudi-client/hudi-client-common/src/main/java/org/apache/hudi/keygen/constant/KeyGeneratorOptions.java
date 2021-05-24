@@ -25,26 +25,26 @@ public class KeyGeneratorOptions {
   public static final ConfigOption<String> URL_ENCODE_PARTITIONING_OPT_KEY = ConfigOption
       .key("hoodie.datasource.write.partitionpath.urlencode")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HIVE_STYLE_PARTITIONING_OPT_KEY = ConfigOption
       .key("hoodie.datasource.write.hive_style_partitioning")
       .defaultValue("false")
-      .withDescription("Flag to indicate whether to use Hive style partitioning.\n"
+      .withDocumentation("Flag to indicate whether to use Hive style partitioning.\n"
           + "If set true, the names of partition folders follow <partition_column_name>=<partition_value> format.\n"
           + "By default false (the names of partition folders are only partition values)");
 
   public static final ConfigOption<String> RECORDKEY_FIELD_OPT_KEY = ConfigOption
       .key("hoodie.datasource.write.recordkey.field")
       .defaultValue("uuid")
-      .withDescription("Record key field. Value to be used as the `recordKey` component of `HoodieKey`.\n"
+      .withDocumentation("Record key field. Value to be used as the `recordKey` component of `HoodieKey`.\n"
           + "Actual value will be obtained by invoking .toString() on the field value. Nested fields can be specified using\n"
           + "the dot notation eg: `a.b.c`");
 
   public static final ConfigOption<String> PARTITIONPATH_FIELD_OPT_KEY = ConfigOption
       .key("hoodie.datasource.write.partitionpath.field")
       .defaultValue("partitionpath")
-      .withDescription("Partition path field. Value to be used at the partitionPath component of HoodieKey. "
+      .withDocumentation("Partition path field. Value to be used at the partitionPath component of HoodieKey. "
           + "Actual value ontained by invoking .toString()");
 }
 

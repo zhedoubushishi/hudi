@@ -82,7 +82,7 @@ public class TestSimpleKeyGenerator extends KeyGeneratorTestUtilities {
 
   private TypedProperties getPropsWithNestedPartitionPathField() {
     TypedProperties properties = getCommonProps();
-    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY, "nested_col.prop1");
+    properties.put(KeyGeneratorOptions.PARTITIONPATH_FIELD_OPT_KEY.key(), "nested_col.prop1");
     return properties;
   }
 

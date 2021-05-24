@@ -34,26 +34,26 @@ public class HoodieClusteringConfig extends HoodieConfig {
   public static final ConfigOption<String> CLUSTERING_PLAN_STRATEGY_CLASS = ConfigOption
       .key("hoodie.clustering.plan.strategy.class")
       .defaultValue("org.apache.hudi.client.clustering.plan.strategy.SparkRecentDaysClusteringPlanStrategy")
-      .withVersion("0.7.0")
-      .withDescription("Config to provide a strategy class to create ClusteringPlan. Class has to be subclass of ClusteringPlanStrategy");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Config to provide a strategy class to create ClusteringPlan. Class has to be subclass of ClusteringPlanStrategy");
 
   public static final ConfigOption<String> CLUSTERING_EXECUTION_STRATEGY_CLASS = ConfigOption
       .key("hoodie.clustering.execution.strategy.class")
       .defaultValue("org.apache.hudi.client.clustering.run.strategy.SparkSortAndSizeExecutionStrategy")
-      .withVersion("0.7.0")
-      .withDescription("Config to provide a strategy class to execute a ClusteringPlan. Class has to be subclass of RunClusteringStrategy");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Config to provide a strategy class to execute a ClusteringPlan. Class has to be subclass of RunClusteringStrategy");
 
   public static final ConfigOption<String> INLINE_CLUSTERING_PROP = ConfigOption
       .key("hoodie.clustering.inline")
       .defaultValue("false")
-      .withVersion("0.7.0")
-      .withDescription("Turn on inline clustering - clustering will be run after write operation is complete");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Turn on inline clustering - clustering will be run after write operation is complete");
 
   public static final ConfigOption<String> INLINE_CLUSTERING_MAX_COMMIT_PROP = ConfigOption
       .key("hoodie.clustering.inline.max.commits")
       .defaultValue("4")
-      .withVersion("0.7.0")
-      .withDescription("Config to control frequency of clustering");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Config to control frequency of clustering");
 
   // Any strategy specific params can be saved with this prefix
   public static final String CLUSTERING_STRATEGY_PARAM_PREFIX = "hoodie.clustering.plan.strategy.";
@@ -61,52 +61,52 @@ public class HoodieClusteringConfig extends HoodieConfig {
   public static final ConfigOption<String> CLUSTERING_TARGET_PARTITIONS = ConfigOption
       .key(CLUSTERING_STRATEGY_PARAM_PREFIX + "daybased.lookback.partitions")
       .defaultValue("2")
-      .withVersion("0.7.0")
-      .withDescription("Number of partitions to list to create ClusteringPlan");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Number of partitions to list to create ClusteringPlan");
 
   public static final ConfigOption<String> CLUSTERING_PLAN_SMALL_FILE_LIMIT = ConfigOption
       .key(CLUSTERING_STRATEGY_PARAM_PREFIX + "small.file.limit")
       .defaultValue(String.valueOf(600 * 1024 * 1024L))
-      .withVersion("0.7.0")
-      .withDescription("Files smaller than the size specified here are candidates for clustering");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Files smaller than the size specified here are candidates for clustering");
 
   public static final ConfigOption<String> CLUSTERING_MAX_BYTES_PER_GROUP = ConfigOption
       .key(CLUSTERING_STRATEGY_PARAM_PREFIX + "max.bytes.per.group")
       .defaultValue(String.valueOf(2 * 1024 * 1024 * 1024L))
-      .withVersion("0.7.0")
-      .withDescription("Each clustering operation can create multiple groups. Total amount of data processed by clustering operation"
+      .sinceVersion("0.7.0")
+      .withDocumentation("Each clustering operation can create multiple groups. Total amount of data processed by clustering operation"
           + " is defined by below two properties (CLUSTERING_MAX_BYTES_PER_GROUP * CLUSTERING_MAX_NUM_GROUPS)."
           + " Max amount of data to be included in one group");
 
   public static final ConfigOption<String> CLUSTERING_MAX_NUM_GROUPS = ConfigOption
       .key(CLUSTERING_STRATEGY_PARAM_PREFIX + "max.num.groups")
       .defaultValue("30")
-      .withVersion("0.7.0")
-      .withDescription("Maximum number of groups to create as part of ClusteringPlan. Increasing groups will increase parallelism");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Maximum number of groups to create as part of ClusteringPlan. Increasing groups will increase parallelism");
 
   public static final ConfigOption<String> CLUSTERING_TARGET_FILE_MAX_BYTES = ConfigOption
       .key(CLUSTERING_STRATEGY_PARAM_PREFIX + "target.file.max.bytes")
       .defaultValue(String.valueOf(1 * 1024 * 1024 * 1024L))
-      .withVersion("0.7.0")
-      .withDescription("Each group can produce 'N' (CLUSTERING_MAX_GROUP_SIZE/CLUSTERING_TARGET_FILE_SIZE) output file groups");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Each group can produce 'N' (CLUSTERING_MAX_GROUP_SIZE/CLUSTERING_TARGET_FILE_SIZE) output file groups");
 
   public static final ConfigOption<String> CLUSTERING_SORT_COLUMNS_PROPERTY = ConfigOption
       .key(CLUSTERING_STRATEGY_PARAM_PREFIX + "sort.columns")
       .noDefaultValue()
-      .withVersion("0.7.0")
-      .withDescription("Columns to sort the data by when clustering");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Columns to sort the data by when clustering");
 
   public static final ConfigOption<String> CLUSTERING_UPDATES_STRATEGY_PROP = ConfigOption
       .key("hoodie.clustering.updates.strategy")
       .defaultValue("org.apache.hudi.client.clustering.update.strategy.SparkRejectUpdateStrategy")
-      .withVersion("0.7.0")
-      .withDescription("When file groups is in clustering, need to handle the update to these file groups. Default strategy just reject the update");
+      .sinceVersion("0.7.0")
+      .withDocumentation("When file groups is in clustering, need to handle the update to these file groups. Default strategy just reject the update");
 
   public static final ConfigOption<String> ASYNC_CLUSTERING_ENABLE_OPT_KEY = ConfigOption
       .key("hoodie.clustering.async.enabled")
       .defaultValue("false")
-      .withVersion("0.7.0")
-      .withDescription("Async clustering");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Async clustering");
 
   private HoodieClusteringConfig() {
     super();
@@ -128,52 +128,52 @@ public class HoodieClusteringConfig extends HoodieConfig {
     }
 
     public Builder withClusteringPlanStrategyClass(String clusteringStrategyClass) {
-      clusteringConfig.set(CLUSTERING_PLAN_STRATEGY_CLASS, clusteringStrategyClass);
+      clusteringConfig.setValue(CLUSTERING_PLAN_STRATEGY_CLASS, clusteringStrategyClass);
       return this;
     }
 
     public Builder withClusteringExecutionStrategyClass(String runClusteringStrategyClass) {
-      clusteringConfig.set(CLUSTERING_EXECUTION_STRATEGY_CLASS, runClusteringStrategyClass);
+      clusteringConfig.setValue(CLUSTERING_EXECUTION_STRATEGY_CLASS, runClusteringStrategyClass);
       return this;
     }
 
     public Builder withClusteringTargetPartitions(int clusteringTargetPartitions) {
-      clusteringConfig.set(CLUSTERING_TARGET_PARTITIONS, String.valueOf(clusteringTargetPartitions));
+      clusteringConfig.setValue(CLUSTERING_TARGET_PARTITIONS, String.valueOf(clusteringTargetPartitions));
       return this;
     }
 
     public Builder withClusteringPlanSmallFileLimit(long clusteringSmallFileLimit) {
-      clusteringConfig.set(CLUSTERING_PLAN_SMALL_FILE_LIMIT, String.valueOf(clusteringSmallFileLimit));
+      clusteringConfig.setValue(CLUSTERING_PLAN_SMALL_FILE_LIMIT, String.valueOf(clusteringSmallFileLimit));
       return this;
     }
     
     public Builder withClusteringSortColumns(String sortColumns) {
-      clusteringConfig.set(CLUSTERING_SORT_COLUMNS_PROPERTY, sortColumns);
+      clusteringConfig.setValue(CLUSTERING_SORT_COLUMNS_PROPERTY, sortColumns);
       return this;
     }
 
     public Builder withClusteringMaxBytesInGroup(long clusteringMaxGroupSize) {
-      clusteringConfig.set(CLUSTERING_MAX_BYTES_PER_GROUP, String.valueOf(clusteringMaxGroupSize));
+      clusteringConfig.setValue(CLUSTERING_MAX_BYTES_PER_GROUP, String.valueOf(clusteringMaxGroupSize));
       return this;
     }
 
     public Builder withClusteringMaxNumGroups(int maxNumGroups) {
-      clusteringConfig.set(CLUSTERING_MAX_NUM_GROUPS, String.valueOf(maxNumGroups));
+      clusteringConfig.setValue(CLUSTERING_MAX_NUM_GROUPS, String.valueOf(maxNumGroups));
       return this;
     }
 
     public Builder withClusteringTargetFileMaxBytes(long targetFileSize) {
-      clusteringConfig.set(CLUSTERING_TARGET_FILE_MAX_BYTES, String.valueOf(targetFileSize));
+      clusteringConfig.setValue(CLUSTERING_TARGET_FILE_MAX_BYTES, String.valueOf(targetFileSize));
       return this;
     }
 
     public Builder withInlineClustering(Boolean inlineClustering) {
-      clusteringConfig.set(INLINE_CLUSTERING_PROP, String.valueOf(inlineClustering));
+      clusteringConfig.setValue(INLINE_CLUSTERING_PROP, String.valueOf(inlineClustering));
       return this;
     }
 
     public Builder withInlineClusteringNumCommits(int numCommits) {
-      clusteringConfig.set(INLINE_CLUSTERING_MAX_COMMIT_PROP, String.valueOf(numCommits));
+      clusteringConfig.setValue(INLINE_CLUSTERING_MAX_COMMIT_PROP, String.valueOf(numCommits));
       return this;
     }
 
@@ -183,12 +183,12 @@ public class HoodieClusteringConfig extends HoodieConfig {
     }
 
     public Builder withClusteringUpdatesStrategy(String updatesStrategyClass) {
-      clusteringConfig.set(CLUSTERING_UPDATES_STRATEGY_PROP, updatesStrategyClass);
+      clusteringConfig.setValue(CLUSTERING_UPDATES_STRATEGY_PROP, updatesStrategyClass);
       return this;
     }
 
     public Builder withAsyncClustering(Boolean asyncClustering) {
-      clusteringConfig.set(ASYNC_CLUSTERING_ENABLE_OPT_KEY, String.valueOf(asyncClustering));
+      clusteringConfig.setValue(ASYNC_CLUSTERING_ENABLE_OPT_KEY, String.valueOf(asyncClustering));
       return this;
     }
 

@@ -33,38 +33,38 @@ public class HoodieMetricsPrometheusConfig extends HoodieConfig {
   public static final ConfigOption<String> PUSHGATEWAY_HOST = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".host")
       .defaultValue("localhost")
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> PUSHGATEWAY_PORT = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".port")
       .defaultValue(9091)
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> PUSHGATEWAY_REPORT_PERIOD_SECONDS = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".report.period.seconds")
       .defaultValue(30)
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   public static final ConfigOption<Boolean> PUSHGATEWAY_DELETE_ON_SHUTDOWN = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".delete.on.shutdown")
       .defaultValue(true)
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   public static final ConfigOption<String> PUSHGATEWAY_JOB_NAME = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".job.name")
       .defaultValue("")
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   public static final ConfigOption<Boolean> PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".random.job.name.suffix")
       .defaultValue(true)
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   // Prometheus HttpServer
   public static final String PROMETHEUS_PREFIX = METRIC_PREFIX + ".prometheus";
@@ -72,8 +72,8 @@ public class HoodieMetricsPrometheusConfig extends HoodieConfig {
   public static final ConfigOption<Integer> PROMETHEUS_PORT = ConfigOption
       .key(PROMETHEUS_PREFIX + ".port")
       .defaultValue(9090)
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   private HoodieMetricsPrometheusConfig() {
     super();

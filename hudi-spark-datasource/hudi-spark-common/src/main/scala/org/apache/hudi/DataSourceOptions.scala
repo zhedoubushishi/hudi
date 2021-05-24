@@ -58,7 +58,7 @@ object DataSourceReadOptions {
     .key("hoodie.datasource.query.type")
     .defaultValue(QUERY_TYPE_SNAPSHOT_OPT_VAL)
     .withAlternatives("hoodie.datasource.view.type")
-    .withDescription("Whether data needs to be read, in incremental mode (new data since an instantTime) " +
+    .withDocumentation("Whether data needs to be read, in incremental mode (new data since an instantTime) " +
       "(or) Read Optimized mode (obtain latest view, based on columnar data) (or) Snapshot mode " +
       "(obtain latest view, based on row & columnar data)")
 
@@ -70,19 +70,19 @@ object DataSourceReadOptions {
   val REALTIME_MERGE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.merge.type")
     .defaultValue(REALTIME_PAYLOAD_COMBINE_OPT_VAL)
-    .withDescription("")
+    .withDocumentation("")
 
   val READ_PATHS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.paths")
     .noDefaultValue()
-    .withDescription("")
+    .withDocumentation("")
 
   val READ_PRE_COMBINE_FIELD = HoodieWriteConfig.PRECOMBINE_FIELD_PROP
 
   val ENABLE_HOODIE_FILE_INDEX: ConfigOption[Boolean] = ConfigOption
     .key("hoodie.file.index.enable")
     .defaultValue(true)
-    .withDescription("")
+    .withDocumentation("")
 
   @Deprecated
   val VIEW_TYPE_OPT_KEY = "hoodie.datasource.view.type"
@@ -106,7 +106,7 @@ object DataSourceReadOptions {
   val BEGIN_INSTANTTIME_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.begin.instanttime")
     .noDefaultValue()
-    .withDescription("Instant time to start incrementally pulling data from. The instanttime here need not necessarily " +
+    .withDocumentation("Instant time to start incrementally pulling data from. The instanttime here need not necessarily " +
       "correspond to an instant on the timeline. New data written with an instant_time > BEGIN_INSTANTTIME are fetched out. " +
       "For e.g: ‘20170901080000’ will get all new data written after Sep 1, 2017 08:00AM.")
 
@@ -120,7 +120,7 @@ object DataSourceReadOptions {
   val END_INSTANTTIME_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.end.instanttime")
     .noDefaultValue()
-    .withDescription("Instant time to limit incrementally fetched data to. " +
+    .withDocumentation("Instant time to limit incrementally fetched data to. " +
       "New data written with an instant_time <= END_INSTANTTIME are fetched out.")
 
   /**
@@ -132,7 +132,7 @@ object DataSourceReadOptions {
   val INCREMENTAL_READ_SCHEMA_USE_END_INSTANTTIME_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.schema.use.end.instanttime")
     .defaultValue("false")
-    .withDescription("Uses end instant schema when incrementally fetched data to. Default: users latest instant schema.")
+    .withDocumentation("Uses end instant schema when incrementally fetched data to. Default: users latest instant schema.")
 
   /**
     * For use-cases like DeltaStreamer which reads from Hoodie Incremental table and applies opaque map functions,
@@ -142,7 +142,7 @@ object DataSourceReadOptions {
   val PUSH_DOWN_INCR_FILTERS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.incr.filters")
     .defaultValue("")
-    .withDescription("")
+    .withDocumentation("")
 
   /**
    * For the use-cases like users only want to incremental pull from certain partitions instead of the full table.
@@ -151,7 +151,7 @@ object DataSourceReadOptions {
   val INCR_PATH_GLOB_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.read.incr.path.glob")
     .defaultValue("")
-    .withDescription("")
+    .withDocumentation("")
 }
 
 /**
@@ -176,7 +176,7 @@ object DataSourceWriteOptions {
   val OPERATION_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.operation")
     .defaultValue(UPSERT_OPERATION_OPT_VAL)
-    .withDescription("Whether to do upsert, insert or bulkinsert for the write operation. " +
+    .withDocumentation("Whether to do upsert, insert or bulkinsert for the write operation. " +
       "Use bulkinsert to load new data into a table, and there on use upsert/insert. " +
       "bulk insert uses a disk based write path to scale to load large inputs without need to cache it.")
 
@@ -192,7 +192,7 @@ object DataSourceWriteOptions {
     .key("hoodie.datasource.write.table.type")
     .defaultValue(COW_TABLE_TYPE_OPT_VAL)
     .withAlternatives("hoodie.datasource.write.storage.type")
-    .withDescription("The table type for the underlying data, for this write. This can’t change between writes.")
+    .withDocumentation("The table type for the underlying data, for this write. This can’t change between writes.")
 
   @Deprecated
   val STORAGE_TYPE_OPT_KEY = "hoodie.datasource.write.storage.type"
@@ -248,7 +248,7 @@ object DataSourceWriteOptions {
   val TABLE_NAME_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.table.name")
     .noDefaultValue()
-    .withDescription("Hive table name, to register the table into.")
+    .withDocumentation("Hive table name, to register the table into.")
 
   /**
     * Field used in preCombining before actual write. When two records have the same
@@ -299,7 +299,7 @@ object DataSourceWriteOptions {
   val ENABLE_ROW_WRITER_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.row.writer.enable")
     .defaultValue("false")
-    .withDescription("")
+    .withDocumentation("")
 
   /**
     * Option keys beginning with this prefix, are automatically added to the commit/deltacommit metadata.
@@ -308,7 +308,7 @@ object DataSourceWriteOptions {
   val COMMIT_METADATA_KEYPREFIX_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.commitmeta.key.prefix")
     .defaultValue("_")
-    .withDescription("Option keys beginning with this prefix, are automatically added to the commit/deltacommit metadata. " +
+    .withDocumentation("Option keys beginning with this prefix, are automatically added to the commit/deltacommit metadata. " +
       "This is useful to store checkpointing information, in a consistent way with the hudi timeline")
 
   /**
@@ -318,7 +318,7 @@ object DataSourceWriteOptions {
   val INSERT_DROP_DUPS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.insert.drop.duplicates")
     .defaultValue("false")
-    .withDescription("If set to true, filters out all duplicate records from incoming dataframe, during insert operations.")
+    .withDocumentation("If set to true, filters out all duplicate records from incoming dataframe, during insert operations.")
 
   /**
     * Flag to indicate how many times streaming job should retry for a failed microbatch
@@ -327,7 +327,7 @@ object DataSourceWriteOptions {
   val STREAMING_RETRY_CNT_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.streaming.retry.count")
     .defaultValue("3")
-    .withDescription("")
+    .withDocumentation("")
 
   /**
     * Flag to indicate how long (by millisecond) before a retry should issued for failed microbatch
@@ -336,7 +336,7 @@ object DataSourceWriteOptions {
   val STREAMING_RETRY_INTERVAL_MS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.streaming.retry.interval.ms")
     .defaultValue("2000")
-    .withDescription("")
+    .withDocumentation("")
 
   /**
     * Flag to indicate whether to ignore any non exception error (e.g. writestatus error)
@@ -346,12 +346,12 @@ object DataSourceWriteOptions {
   val STREAMING_IGNORE_FAILED_BATCH_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.write.streaming.ignore.failed.batch")
     .defaultValue("true")
-    .withDescription("")
+    .withDocumentation("")
 
   val META_SYNC_CLIENT_TOOL_CLASS: ConfigOption[String] = ConfigOption
     .key("hoodie.meta.sync.client.tool.class")
     .defaultValue(classOf[HiveSyncTool].getName)
-    .withDescription("")
+    .withDocumentation("")
 
   // HIVE SYNC SPECIFIC CONFIGS
   // NOTE: DO NOT USE uppercase for the keys as they are internally lower-cased. Using upper-cases causes
@@ -360,121 +360,121 @@ object DataSourceWriteOptions {
   val HIVE_SYNC_ENABLED_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.enable")
     .defaultValue("false")
-    .withDescription("When set to true, register/sync the table to Apache Hive metastore")
+    .withDocumentation("When set to true, register/sync the table to Apache Hive metastore")
 
   val META_SYNC_ENABLED_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.meta.sync.enable")
     .defaultValue("false")
-    .withDescription("")
+    .withDocumentation("")
 
   val HIVE_DATABASE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.database")
     .defaultValue("default")
-    .withDescription("database to sync to")
+    .withDocumentation("database to sync to")
 
   val HIVE_TABLE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.table")
     .defaultValue("unknown")
-    .withDescription("table to sync to")
+    .withDocumentation("table to sync to")
 
   val HIVE_BASE_FILE_FORMAT_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.base_file_format")
     .defaultValue("PARQUET")
-    .withDescription("")
+    .withDocumentation("")
 
   val HIVE_USER_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.username")
     .defaultValue("hive")
-    .withDescription("hive user name to use")
+    .withDocumentation("hive user name to use")
 
   val HIVE_PASS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.password")
     .defaultValue("hive")
-    .withDescription("hive password to use")
+    .withDocumentation("hive password to use")
 
   val HIVE_URL_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.jdbcurl")
     .defaultValue("jdbc:hive2://localhost:10000")
-    .withDescription("Hive metastore url")
+    .withDocumentation("Hive metastore url")
 
   val HIVE_PARTITION_FIELDS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.partition_fields")
     .defaultValue("")
-    .withDescription("field in the table to use for determining hive partition columns.")
+    .withDocumentation("field in the table to use for determining hive partition columns.")
 
   val HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.partition_extractor_class")
     .defaultValue(classOf[SlashEncodedDayPartitionValueExtractor].getCanonicalName)
-    .withDescription("")
+    .withDocumentation("")
 
   val HIVE_ASSUME_DATE_PARTITION_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.assume_date_partitioning")
     .defaultValue("false")
-    .withDescription("Assume partitioning is yyyy/mm/dd")
+    .withDocumentation("Assume partitioning is yyyy/mm/dd")
 
   val HIVE_USE_PRE_APACHE_INPUT_FORMAT_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.use_pre_apache_input_format")
     .defaultValue("false")
-    .withDescription("")
+    .withDocumentation("")
 
   val HIVE_USE_JDBC_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.use_jdbc")
     .defaultValue("true")
-    .withDescription("Use JDBC when hive synchronization is enabled")
+    .withDocumentation("Use JDBC when hive synchronization is enabled")
 
   val HIVE_AUTO_CREATE_DATABASE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.auto_create_database")
     .defaultValue("true")
-    .withDescription("Auto create hive database if does not exists")
+    .withDocumentation("Auto create hive database if does not exists")
 
   val HIVE_IGNORE_EXCEPTIONS_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.ignore_exceptions")
     .defaultValue("false")
-    .withDescription("")
+    .withDocumentation("")
 
   val HIVE_SKIP_RO_SUFFIX: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.skip_ro_suffix")
     .defaultValue("false")
-    .withDescription("Skip the _ro suffix for Read optimized table, when registering")
+    .withDocumentation("Skip the _ro suffix for Read optimized table, when registering")
 
   val HIVE_SUPPORT_TIMESTAMP: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.support_timestamp")
     .defaultValue("false")
-    .withDescription("‘INT64’ with original type TIMESTAMP_MICROS is converted to hive ‘timestamp’ type. " +
+    .withDocumentation("‘INT64’ with original type TIMESTAMP_MICROS is converted to hive ‘timestamp’ type. " +
       "Disabled by default for backward compatibility.")
 
   val HIVE_TABLE_PROPERTIES: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.table_properties")
     .noDefaultValue()
-    .withDescription("")
+    .withDocumentation("")
 
   val HIVE_TABLE_SERDE_PROPERTIES: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.serde_properties")
     .noDefaultValue()
-    .withDescription("")
+    .withDocumentation("")
 
   val HIVE_SYNC_AS_DATA_SOURCE_TABLE: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.hive_sync.sync_as_datasource")
     .defaultValue("true")
-    .withDescription("")
+    .withDocumentation("")
 
   // Async Compaction - Enabled by default for MOR
   val ASYNC_COMPACT_ENABLE_OPT_KEY: ConfigOption[String] = ConfigOption
     .key("hoodie.datasource.compaction.async.enable")
     .defaultValue("true")
-    .withDescription("")
+    .withDocumentation("")
 
   // Avro Kafka Source configs
   val KAFKA_AVRO_VALUE_DESERIALIZER: ConfigOption[String] = ConfigOption
     .key("hoodie.deltastreamer.source.kafka.value.deserializer.class")
     .noDefaultValue()
-    .withDescription("")
+    .withDocumentation("")
 
   // Schema provider class to be set to be used in custom kakfa deserializer
   val SCHEMA_PROVIDER_CLASS_PROP: ConfigOption[String] = ConfigOption
     .key("hoodie.deltastreamer.schemaprovider.class")
     .noDefaultValue()
-    .withDescription("")
+    .withDocumentation("")
 
 }
 
@@ -486,8 +486,8 @@ object DataSourceOptionsHelper {
   val allConfigsWithAlternatives = List(
     DataSourceReadOptions.QUERY_TYPE_OPT_KEY,
     DataSourceWriteOptions.TABLE_TYPE_OPT_KEY,
-    HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME,
-    HoodieTableConfig.HOODIE_LOG_FILE_FORMAT_PROP_NAME
+    HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP,
+    HoodieTableConfig.HOODIE_LOG_FILE_FORMAT_PROP
   )
 
   // put all the deprecated configs here

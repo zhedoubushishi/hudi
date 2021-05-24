@@ -36,15 +36,15 @@ public final class HoodieMetadataConfig extends HoodieConfig {
   public static final ConfigOption<Boolean> METADATA_ENABLE_PROP = ConfigOption
       .key(METADATA_PREFIX + ".enable")
       .defaultValue(false)
-      .withVersion("0.7.0")
-      .withDescription("Enable the internal Metadata Table which stores table level file listings");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Enable the internal Metadata Table which stores table level file listings");
 
   // Validate contents of Metadata Table on each access against the actual filesystem
   public static final ConfigOption<Boolean> METADATA_VALIDATE_PROP = ConfigOption
       .key(METADATA_PREFIX + ".validate")
       .defaultValue(false)
-      .withVersion("0.7.0")
-      .withDescription("Validate contents of Metadata Table on each access against the actual listings from DFS");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Validate contents of Metadata Table on each access against the actual listings from DFS");
 
   public static final boolean DEFAULT_METADATA_ENABLE_FOR_READERS = false;
 
@@ -52,76 +52,76 @@ public final class HoodieMetadataConfig extends HoodieConfig {
   public static final ConfigOption<Boolean> METADATA_METRICS_ENABLE_PROP = ConfigOption
       .key(METADATA_PREFIX + ".metrics.enable")
       .defaultValue(false)
-      .withVersion("0.7.0")
-      .withDescription("");
+      .sinceVersion("0.7.0")
+      .withDocumentation("");
 
   // Parallelism for inserts
   public static final ConfigOption<Integer> METADATA_INSERT_PARALLELISM_PROP = ConfigOption
       .key(METADATA_PREFIX + ".insert.parallelism")
       .defaultValue(1)
-      .withVersion("0.7.0")
-      .withDescription("Parallelism to use when writing to the metadata table");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Parallelism to use when writing to the metadata table");
 
   // Async clean
   public static final ConfigOption<Boolean> METADATA_ASYNC_CLEAN_PROP = ConfigOption
       .key(METADATA_PREFIX + ".clean.async")
       .defaultValue(false)
-      .withVersion("0.7.0")
-      .withDescription("Enable asynchronous cleaning for metadata table");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Enable asynchronous cleaning for metadata table");
 
   // Maximum delta commits before compaction occurs
   public static final ConfigOption<Integer> METADATA_COMPACT_NUM_DELTA_COMMITS_PROP = ConfigOption
       .key(METADATA_PREFIX + ".compact.max.delta.commits")
       .defaultValue(24)
-      .withVersion("0.7.0")
-      .withDescription("Controls how often the metadata table is compacted.");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Controls how often the metadata table is compacted.");
 
   // Archival settings
   public static final ConfigOption<Integer> MIN_COMMITS_TO_KEEP_PROP = ConfigOption
       .key(METADATA_PREFIX + ".keep.min.commits")
       .defaultValue(20)
-      .withVersion("0.7.0")
-      .withDescription("Controls the archival of the metadata table’s timeline");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Controls the archival of the metadata table’s timeline");
 
   public static final ConfigOption<Integer> MAX_COMMITS_TO_KEEP_PROP = ConfigOption
       .key(METADATA_PREFIX + ".keep.max.commits")
       .defaultValue(30)
-      .withVersion("0.7.0")
-      .withDescription("Controls the archival of the metadata table’s timeline");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Controls the archival of the metadata table’s timeline");
 
   // Cleaner commits retained
   public static final ConfigOption<Integer> CLEANER_COMMITS_RETAINED_PROP = ConfigOption
       .key(METADATA_PREFIX + ".cleaner.commits.retained")
       .defaultValue(3)
-      .withVersion("0.7.0")
-      .withDescription("");
+      .sinceVersion("0.7.0")
+      .withDocumentation("");
 
   // Controls whether or not, upon failure to fetch from metadata table, should fallback to listing.
   public static final ConfigOption<String> ENABLE_FALLBACK_PROP = ConfigOption
       .key(METADATA_PREFIX + ".fallback.enable")
       .defaultValue("true")
-      .withVersion("0.7.0")
-      .withDescription("Fallback to listing from DFS, if there are any errors in fetching from metadata table");
+      .sinceVersion("0.7.0")
+      .withDocumentation("Fallback to listing from DFS, if there are any errors in fetching from metadata table");
 
   // Regex to filter out matching directories during bootstrap
   public static final ConfigOption<String> DIRECTORY_FILTER_REGEX = ConfigOption
       .key(METADATA_PREFIX + ".dir.filter.regex")
       .defaultValue("")
-      .withVersion("0.7.0")
-      .withDescription("");
+      .sinceVersion("0.7.0")
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_ASSUME_DATE_PARTITIONING_PROP = ConfigOption
       .key("hoodie.assume.date.partitioning")
       .defaultValue("false")
-      .withVersion("0.7.0")
-      .withDescription("Should HoodieWriteClient assume the data is partitioned by dates, i.e three levels from base path. "
+      .sinceVersion("0.7.0")
+      .withDocumentation("Should HoodieWriteClient assume the data is partitioned by dates, i.e three levels from base path. "
           + "This is a stop-gap to support tables created by versions < 0.3.1. Will be removed eventually");
 
   public static final ConfigOption<Integer> FILE_LISTING_PARALLELISM_PROP = ConfigOption
       .key("hoodie.file.listing.parallelism")
       .defaultValue(1500)
-      .withVersion("0.7.0")
-      .withDescription("");
+      .sinceVersion("0.7.0")
+      .withDocumentation("");
 
   private HoodieMetadataConfig() {
     super();
@@ -176,63 +176,63 @@ public final class HoodieMetadataConfig extends HoodieConfig {
     }
 
     public Builder enable(boolean enable) {
-      metadataConfig.set(METADATA_ENABLE_PROP, String.valueOf(enable));
+      metadataConfig.setValue(METADATA_ENABLE_PROP, String.valueOf(enable));
       return this;
     }
 
     public Builder enableMetrics(boolean enableMetrics) {
-      metadataConfig.set(METADATA_METRICS_ENABLE_PROP, String.valueOf(enableMetrics));
+      metadataConfig.setValue(METADATA_METRICS_ENABLE_PROP, String.valueOf(enableMetrics));
       return this;
     }
 
     public Builder enableFallback(boolean fallback) {
-      metadataConfig.set(ENABLE_FALLBACK_PROP, String.valueOf(fallback));
+      metadataConfig.setValue(ENABLE_FALLBACK_PROP, String.valueOf(fallback));
       return this;
     }
 
     public Builder validate(boolean validate) {
-      metadataConfig.set(METADATA_VALIDATE_PROP, String.valueOf(validate));
+      metadataConfig.setValue(METADATA_VALIDATE_PROP, String.valueOf(validate));
       return this;
     }
 
     public Builder withInsertParallelism(int parallelism) {
-      metadataConfig.set(METADATA_INSERT_PARALLELISM_PROP, String.valueOf(parallelism));
+      metadataConfig.setValue(METADATA_INSERT_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withAsyncClean(boolean asyncClean) {
-      metadataConfig.set(METADATA_ASYNC_CLEAN_PROP, String.valueOf(asyncClean));
+      metadataConfig.setValue(METADATA_ASYNC_CLEAN_PROP, String.valueOf(asyncClean));
       return this;
     }
 
     public Builder withMaxNumDeltaCommitsBeforeCompaction(int maxNumDeltaCommitsBeforeCompaction) {
-      metadataConfig.set(METADATA_COMPACT_NUM_DELTA_COMMITS_PROP, String.valueOf(maxNumDeltaCommitsBeforeCompaction));
+      metadataConfig.setValue(METADATA_COMPACT_NUM_DELTA_COMMITS_PROP, String.valueOf(maxNumDeltaCommitsBeforeCompaction));
       return this;
     }
 
     public Builder archiveCommitsWith(int minToKeep, int maxToKeep) {
-      metadataConfig.set(MIN_COMMITS_TO_KEEP_PROP, String.valueOf(minToKeep));
-      metadataConfig.set(MAX_COMMITS_TO_KEEP_PROP, String.valueOf(maxToKeep));
+      metadataConfig.setValue(MIN_COMMITS_TO_KEEP_PROP, String.valueOf(minToKeep));
+      metadataConfig.setValue(MAX_COMMITS_TO_KEEP_PROP, String.valueOf(maxToKeep));
       return this;
     }
 
     public Builder retainCommits(int commitsRetained) {
-      metadataConfig.set(CLEANER_COMMITS_RETAINED_PROP, String.valueOf(commitsRetained));
+      metadataConfig.setValue(CLEANER_COMMITS_RETAINED_PROP, String.valueOf(commitsRetained));
       return this;
     }
 
     public Builder withFileListingParallelism(int parallelism) {
-      metadataConfig.set(FILE_LISTING_PARALLELISM_PROP, String.valueOf(parallelism));
+      metadataConfig.setValue(FILE_LISTING_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withAssumeDatePartitioning(boolean assumeDatePartitioning) {
-      metadataConfig.set(HOODIE_ASSUME_DATE_PARTITIONING_PROP, String.valueOf(assumeDatePartitioning));
+      metadataConfig.setValue(HOODIE_ASSUME_DATE_PARTITIONING_PROP, String.valueOf(assumeDatePartitioning));
       return this;
     }
 
     public Builder withDirectoryFilterRegex(String regex) {
-      metadataConfig.set(DIRECTORY_FILTER_REGEX, regex);
+      metadataConfig.setValue(DIRECTORY_FILTER_REGEX, regex);
       return this;
     }
 

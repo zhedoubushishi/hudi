@@ -40,59 +40,59 @@ public class HoodieMetricsDatadogConfig extends HoodieConfig {
   public static final ConfigOption<Integer> DATADOG_REPORT_PERIOD_SECONDS = ConfigOption
       .key(DATADOG_PREFIX + ".report.period.seconds")
       .defaultValue(30)
-      .withVersion("0.6.0")
-      .withDescription("Datadog report period in seconds. Default to 30.");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog report period in seconds. Default to 30.");
 
   public static final ConfigOption<String> DATADOG_API_SITE = ConfigOption
       .key(DATADOG_PREFIX + ".api.site")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Datadog API site: EU or US");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog API site: EU or US");
 
   public static final ConfigOption<String> DATADOG_API_KEY = ConfigOption
       .key(DATADOG_PREFIX + ".api.key")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Datadog API key");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog API key");
 
   public static final ConfigOption<Boolean> DATADOG_API_KEY_SKIP_VALIDATION = ConfigOption
       .key(DATADOG_PREFIX + ".api.key.skip.validation")
       .defaultValue(false)
-      .withVersion("0.6.0")
-      .withDescription("Before sending metrics via Datadog API, whether to skip validating Datadog API key or not. "
+      .sinceVersion("0.6.0")
+      .withDocumentation("Before sending metrics via Datadog API, whether to skip validating Datadog API key or not. "
           + "Default to false.");
 
   public static final ConfigOption<String> DATADOG_API_KEY_SUPPLIER = ConfigOption
       .key(DATADOG_PREFIX + ".api.key.supplier")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Datadog API key supplier to supply the API key at runtime. "
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog API key supplier to supply the API key at runtime. "
           + "This will take effect if hoodie.metrics.datadog.api.key is not set.");
 
   public static final ConfigOption<Integer> DATADOG_API_TIMEOUT_SECONDS = ConfigOption
       .key(DATADOG_PREFIX + ".api.timeout.seconds")
       .defaultValue(3)
-      .withVersion("0.6.0")
-      .withDescription("Datadog API timeout in seconds. Default to 3.");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog API timeout in seconds. Default to 3.");
 
   public static final ConfigOption<String> DATADOG_METRIC_PREFIX = ConfigOption
       .key(DATADOG_PREFIX + ".metric.prefix")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Datadog metric prefix to be prepended to each metric name with a dot as delimiter. "
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog metric prefix to be prepended to each metric name with a dot as delimiter. "
           + "For example, if it is set to foo, foo. will be prepended.");
 
   public static final ConfigOption<String> DATADOG_METRIC_HOST = ConfigOption
       .key(DATADOG_PREFIX + ".metric.host")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Datadog metric host to be sent along with metrics data.");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog metric host to be sent along with metrics data.");
 
   public static final ConfigOption<String> DATADOG_METRIC_TAGS = ConfigOption
       .key(DATADOG_PREFIX + ".metric.tags")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Datadog metric tags (comma-delimited) to be sent along with metrics data.");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Datadog metric tags (comma-delimited) to be sent along with metrics data.");
 
   private HoodieMetricsDatadogConfig() {
     super();
@@ -112,47 +112,47 @@ public class HoodieMetricsDatadogConfig extends HoodieConfig {
     }
 
     public Builder withDatadogReportPeriodSeconds(int period) {
-      metricsDatadogConfig.set(DATADOG_REPORT_PERIOD_SECONDS, String.valueOf(period));
+      metricsDatadogConfig.setValue(DATADOG_REPORT_PERIOD_SECONDS, String.valueOf(period));
       return this;
     }
 
     public Builder withDatadogApiSite(String apiSite) {
-      metricsDatadogConfig.set(DATADOG_API_SITE, apiSite);
+      metricsDatadogConfig.setValue(DATADOG_API_SITE, apiSite);
       return this;
     }
 
     public Builder withDatadogApiKey(String apiKey) {
-      metricsDatadogConfig.set(DATADOG_API_KEY, apiKey);
+      metricsDatadogConfig.setValue(DATADOG_API_KEY, apiKey);
       return this;
     }
 
     public Builder withDatadogApiKeySkipValidation(boolean skip) {
-      metricsDatadogConfig.set(DATADOG_API_KEY_SKIP_VALIDATION, String.valueOf(skip));
+      metricsDatadogConfig.setValue(DATADOG_API_KEY_SKIP_VALIDATION, String.valueOf(skip));
       return this;
     }
 
     public Builder withDatadogApiKeySupplier(String apiKeySupplier) {
-      metricsDatadogConfig.set(DATADOG_API_KEY_SUPPLIER, apiKeySupplier);
+      metricsDatadogConfig.setValue(DATADOG_API_KEY_SUPPLIER, apiKeySupplier);
       return this;
     }
 
     public Builder withDatadogApiTimeoutSeconds(int timeout) {
-      metricsDatadogConfig.set(DATADOG_API_TIMEOUT_SECONDS, String.valueOf(timeout));
+      metricsDatadogConfig.setValue(DATADOG_API_TIMEOUT_SECONDS, String.valueOf(timeout));
       return this;
     }
 
     public Builder withDatadogPrefix(String prefix) {
-      metricsDatadogConfig.set(DATADOG_METRIC_PREFIX, prefix);
+      metricsDatadogConfig.setValue(DATADOG_METRIC_PREFIX, prefix);
       return this;
     }
 
     public Builder withDatadogHost(String host) {
-      metricsDatadogConfig.set(DATADOG_METRIC_HOST, host);
+      metricsDatadogConfig.setValue(DATADOG_METRIC_HOST, host);
       return this;
     }
 
     public Builder withDatadogTags(String tags) {
-      metricsDatadogConfig.set(DATADOG_METRIC_TAGS, tags);
+      metricsDatadogConfig.setValue(DATADOG_METRIC_TAGS, tags);
       return this;
     }
 

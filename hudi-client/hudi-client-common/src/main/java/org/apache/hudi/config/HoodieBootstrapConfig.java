@@ -39,58 +39,58 @@ public class HoodieBootstrapConfig extends HoodieConfig {
   public static final ConfigOption<String> BOOTSTRAP_BASE_PATH_PROP = ConfigOption
       .key("hoodie.bootstrap.base.path")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Base path of the dataset that needs to be bootstrapped as a Hudi table");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Base path of the dataset that needs to be bootstrapped as a Hudi table");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR = ConfigOption
       .key("hoodie.bootstrap.mode.selector")
       .defaultValue(MetadataOnlyBootstrapModeSelector.class.getCanonicalName())
-      .withVersion("0.6.0")
-      .withDescription("Selects the mode in which each file/partition in the bootstrapped dataset gets bootstrapped");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Selects the mode in which each file/partition in the bootstrapped dataset gets bootstrapped");
 
   public static final ConfigOption<String> FULL_BOOTSTRAP_INPUT_PROVIDER = ConfigOption
       .key("hoodie.bootstrap.full.input.provider")
       .defaultValue("org.apache.hudi.bootstrap.SparkParquetBootstrapDataProvider")
-      .withVersion("0.6.0")
-      .withDescription("Class to use for reading the bootstrap dataset partitions/files, for Bootstrap mode FULL_RECORD");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Class to use for reading the bootstrap dataset partitions/files, for Bootstrap mode FULL_RECORD");
 
   public static final ConfigOption<String> BOOTSTRAP_KEYGEN_CLASS = ConfigOption
       .key("hoodie.bootstrap.keygen.class")
       .noDefaultValue()
-      .withVersion("0.6.0")
-      .withDescription("Key generator implementation to be used for generating keys from the bootstrapped dataset");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Key generator implementation to be used for generating keys from the bootstrapped dataset");
 
   public static final ConfigOption<String> BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS = ConfigOption
       .key("hoodie.bootstrap.partitionpath.translator.class")
       .defaultValue(IdentityBootstrapPartitionPathTranslator.class.getName())
-      .withVersion("0.6.0")
-      .withDescription("Translates the partition paths from the bootstrapped data into how is laid out as a Hudi table.");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Translates the partition paths from the bootstrapped data into how is laid out as a Hudi table.");
 
   public static final ConfigOption<String> BOOTSTRAP_PARALLELISM = ConfigOption
       .key("hoodie.bootstrap.parallelism")
       .defaultValue("1500")
-      .withVersion("0.6.0")
-      .withDescription("Parallelism value to be used to bootstrap data into hudi");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Parallelism value to be used to bootstrap data into hudi");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR_REGEX = ConfigOption
       .key("hoodie.bootstrap.mode.selector.regex")
       .defaultValue(".*")
-      .withVersion("0.6.0")
-      .withDescription("Matches each bootstrap dataset partition against this regex and applies the mode below to it.");
+      .sinceVersion("0.6.0")
+      .withDocumentation("Matches each bootstrap dataset partition against this regex and applies the mode below to it.");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR_REGEX_MODE = ConfigOption
       .key("hoodie.bootstrap.mode.selector.regex.mode")
       .defaultValue(BootstrapMode.METADATA_ONLY.name())
-      .withVersion("0.6.0")
-      .withDescription("Bootstrap mode to apply for partition paths, that match regex above. "
+      .sinceVersion("0.6.0")
+      .withDocumentation("Bootstrap mode to apply for partition paths, that match regex above. "
           + "METADATA_ONLY will generate just skeleton base files with keys/footers, avoiding full cost of rewriting the dataset. "
           + "FULL_RECORD will perform a full copy/rewrite of the data as a Hudi table.");
 
   public static final ConfigOption<String> BOOTSTRAP_INDEX_CLASS_PROP = ConfigOption
       .key("hoodie.bootstrap.index.class")
       .defaultValue(HFileBootstrapIndex.class.getName())
-      .withVersion("0.6.0")
-      .withDescription("");
+      .sinceVersion("0.6.0")
+      .withDocumentation("");
 
   private HoodieBootstrapConfig() {
     super();
@@ -112,43 +112,43 @@ public class HoodieBootstrapConfig extends HoodieConfig {
     }
 
     public Builder withBootstrapBasePath(String basePath) {
-      bootstrapConfig.set(BOOTSTRAP_BASE_PATH_PROP, basePath);
+      bootstrapConfig.setValue(BOOTSTRAP_BASE_PATH_PROP, basePath);
       return this;
     }
 
     public Builder withBootstrapModeSelector(String partitionSelectorClass) {
-      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
+      bootstrapConfig.setValue(BOOTSTRAP_MODE_SELECTOR, partitionSelectorClass);
       return this;
     }
 
     public Builder withFullBootstrapInputProvider(String partitionSelectorClass) {
-      bootstrapConfig.set(FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
+      bootstrapConfig.setValue(FULL_BOOTSTRAP_INPUT_PROVIDER, partitionSelectorClass);
       return this;
     }
 
     public Builder withBootstrapKeyGenClass(String keyGenClass) {
-      bootstrapConfig.set(BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
+      bootstrapConfig.setValue(BOOTSTRAP_KEYGEN_CLASS, keyGenClass);
       return this;
     }
 
     public Builder withBootstrapPartitionPathTranslatorClass(String partitionPathTranslatorClass) {
       bootstrapConfig
-          .set(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, partitionPathTranslatorClass);
+          .setValue(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS, partitionPathTranslatorClass);
       return this;
     }
 
     public Builder withBootstrapParallelism(int parallelism) {
-      bootstrapConfig.set(BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
+      bootstrapConfig.setValue(BOOTSTRAP_PARALLELISM, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withBootstrapModeSelectorRegex(String regex) {
-      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX, regex);
+      bootstrapConfig.setValue(BOOTSTRAP_MODE_SELECTOR_REGEX, regex);
       return this;
     }
 
     public Builder withBootstrapModeForRegexMatch(BootstrapMode modeForRegexMatch) {
-      bootstrapConfig.set(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE, modeForRegexMatch.name());
+      bootstrapConfig.setValue(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE, modeForRegexMatch.name());
       return this;
     }
 

@@ -56,16 +56,16 @@ public class HoodieLockConfig extends HoodieConfig {
   public static final ConfigOption<String> LOCK_PROVIDER_CLASS_PROP = ConfigOption
       .key(LOCK_PREFIX + "provider")
       .defaultValue(ZookeeperBasedLockProvider.class.getName())
-      .withVersion("0.8.0")
-      .withDescription("Lock provider class name, user can provide their own implementation of LockProvider "
+      .sinceVersion("0.8.0")
+      .withDocumentation("Lock provider class name, user can provide their own implementation of LockProvider "
           + "which should be subclass of org.apache.hudi.common.lock.LockProvider");
 
   // Pluggable strategies to use when resolving conflicts
   public static final ConfigOption<String> WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP = ConfigOption
       .key(LOCK_PREFIX + "conflict.resolution.strategy")
       .defaultValue(SimpleConcurrentFileWritesConflictResolutionStrategy.class.getName())
-      .withVersion("0.8.0")
-      .withDescription("Lock provider class name, this should be subclass of "
+      .sinceVersion("0.8.0")
+      .withDocumentation("Lock provider class name, this should be subclass of "
           + "org.apache.hudi.client.transaction.ConflictResolutionStrategy");
 
   private HoodieLockConfig() {
@@ -93,87 +93,87 @@ public class HoodieLockConfig extends HoodieConfig {
     }
 
     public HoodieLockConfig.Builder withLockProvider(Class<? extends LockProvider> lockProvider) {
-      lockConfig.set(LOCK_PROVIDER_CLASS_PROP, lockProvider.getName());
+      lockConfig.setValue(LOCK_PROVIDER_CLASS_PROP, lockProvider.getName());
       return this;
     }
 
     public HoodieLockConfig.Builder withHiveDatabaseName(String databaseName) {
-      lockConfig.set(HIVE_DATABASE_NAME_PROP, databaseName);
+      lockConfig.setValue(HIVE_DATABASE_NAME_PROP, databaseName);
       return this;
     }
 
     public HoodieLockConfig.Builder withHiveTableName(String tableName) {
-      lockConfig.set(HIVE_TABLE_NAME_PROP, tableName);
+      lockConfig.setValue(HIVE_TABLE_NAME_PROP, tableName);
       return this;
     }
 
     public HoodieLockConfig.Builder withHiveMetastoreURIs(String hiveMetastoreURIs) {
-      lockConfig.set(HIVE_METASTORE_URI_PROP, hiveMetastoreURIs);
+      lockConfig.setValue(HIVE_METASTORE_URI_PROP, hiveMetastoreURIs);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkQuorum(String zkQuorum) {
-      lockConfig.set(ZK_CONNECT_URL_PROP, zkQuorum);
+      lockConfig.setValue(ZK_CONNECT_URL_PROP, zkQuorum);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkBasePath(String zkBasePath) {
-      lockConfig.set(ZK_BASE_PATH_PROP, zkBasePath);
+      lockConfig.setValue(ZK_BASE_PATH_PROP, zkBasePath);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkPort(String zkPort) {
-      lockConfig.set(ZK_PORT_PROP, zkPort);
+      lockConfig.setValue(ZK_PORT_PROP, zkPort);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkLockKey(String zkLockKey) {
-      lockConfig.set(ZK_LOCK_KEY_PROP, zkLockKey);
+      lockConfig.setValue(ZK_LOCK_KEY_PROP, zkLockKey);
       return this;
     }
 
     public HoodieLockConfig.Builder withZkConnectionTimeoutInMs(Long connectionTimeoutInMs) {
-      lockConfig.set(ZK_CONNECTION_TIMEOUT_MS_PROP, String.valueOf(connectionTimeoutInMs));
+      lockConfig.setValue(ZK_CONNECTION_TIMEOUT_MS_PROP, String.valueOf(connectionTimeoutInMs));
       return this;
     }
 
     public HoodieLockConfig.Builder withZkSessionTimeoutInMs(Long sessionTimeoutInMs) {
-      lockConfig.set(ZK_SESSION_TIMEOUT_MS_PROP, String.valueOf(sessionTimeoutInMs));
+      lockConfig.setValue(ZK_SESSION_TIMEOUT_MS_PROP, String.valueOf(sessionTimeoutInMs));
       return this;
     }
 
     public HoodieLockConfig.Builder withNumRetries(int numRetries) {
-      lockConfig.set(LOCK_ACQUIRE_NUM_RETRIES_PROP, String.valueOf(numRetries));
+      lockConfig.setValue(LOCK_ACQUIRE_NUM_RETRIES_PROP, String.valueOf(numRetries));
       return this;
     }
 
     public HoodieLockConfig.Builder withRetryWaitTimeInMillis(Long retryWaitTimeInMillis) {
-      lockConfig.set(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryWaitTimeInMillis));
+      lockConfig.setValue(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryWaitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withRetryMaxWaitTimeInMillis(Long retryMaxWaitTimeInMillis) {
-      lockConfig.set(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryMaxWaitTimeInMillis));
+      lockConfig.setValue(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(retryMaxWaitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withClientNumRetries(int clientNumRetries) {
-      lockConfig.set(LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP, String.valueOf(clientNumRetries));
+      lockConfig.setValue(LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP, String.valueOf(clientNumRetries));
       return this;
     }
 
     public HoodieLockConfig.Builder withClientRetryWaitTimeInMillis(Long clientRetryWaitTimeInMillis) {
-      lockConfig.set(LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(clientRetryWaitTimeInMillis));
+      lockConfig.setValue(LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP, String.valueOf(clientRetryWaitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withLockWaitTimeInMillis(Long waitTimeInMillis) {
-      lockConfig.set(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP, String.valueOf(waitTimeInMillis));
+      lockConfig.setValue(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP, String.valueOf(waitTimeInMillis));
       return this;
     }
 
     public HoodieLockConfig.Builder withConflictResolutionStrategy(ConflictResolutionStrategy conflictResolutionStrategy) {
-      lockConfig.set(WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP, conflictResolutionStrategy.getClass().getName());
+      lockConfig.setValue(WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP, conflictResolutionStrategy.getClass().getName());
       return this;
     }
 
