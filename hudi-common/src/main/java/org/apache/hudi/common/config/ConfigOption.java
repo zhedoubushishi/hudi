@@ -40,7 +40,7 @@ public class ConfigOption<T> implements Serializable {
 
   private final T defaultValue;
 
-  private final String description;
+  private final String doc;
 
   private final Option<String> version;
 
@@ -49,11 +49,11 @@ public class ConfigOption<T> implements Serializable {
   // provide the ability to infer config value based on other configs
   private final Option<Function<Map, Option<T>>> inferFunction;
 
-  ConfigOption(String key, T defaultValue, String description, Option<String> version,
+  ConfigOption(String key, T defaultValue, String doc, Option<String> version,
       Option<Function<Map, Option<T>>> inferFunc, String... alternatives) {
     this.key = Objects.requireNonNull(key);
     this.defaultValue = defaultValue;
-    this.description = description;
+    this.doc = doc;
     this.version = version;
     this.inferFunction = inferFunc;
     this.alternatives = alternatives;
@@ -78,24 +78,24 @@ public class ConfigOption<T> implements Serializable {
     return alternatives;
   }
 
-  public ConfigOption<T> withDescription(String description) {
-    Objects.requireNonNull(description);
-    return new ConfigOption<>(key, defaultValue, description, version, inferFunction, alternatives);
+  public ConfigOption<T> withDocumentation(String doc) {
+    Objects.requireNonNull(doc);
+    return new ConfigOption<>(key, defaultValue, doc, version, inferFunction, alternatives);
   }
 
   public ConfigOption<T> withAlternatives(String... alternatives) {
     Objects.requireNonNull(alternatives);
-    return new ConfigOption<>(key, defaultValue, description, version, inferFunction, alternatives);
+    return new ConfigOption<>(key, defaultValue, doc, version, inferFunction, alternatives);
   }
 
   public ConfigOption<T> withVersion(String version) {
     Objects.requireNonNull(version);
-    return new ConfigOption<>(key, defaultValue, description, Option.of(version), inferFunction, alternatives);
+    return new ConfigOption<>(key, defaultValue, doc, Option.of(version), inferFunction, alternatives);
   }
 
   public ConfigOption<T> withInferFunction(Function<Map, Option<T>> inferFunction) {
     Objects.requireNonNull(inferFunction);
-    return new ConfigOption<>(key, defaultValue, description, version, Option.of(inferFunction), alternatives);
+    return new ConfigOption<>(key, defaultValue, doc, version, Option.of(inferFunction), alternatives);
   }
 
   /**
@@ -113,7 +113,7 @@ public class ConfigOption<T> implements Serializable {
   public String toString() {
     return String.format(
         "Key: '%s' , default: %s description: %s version: %s)",
-        key, defaultValue, description, version.isPresent() ? version.get() : "version is not defined");
+        key, defaultValue, doc, version.isPresent() ? version.get() : "version is not defined");
   }
 
   /**

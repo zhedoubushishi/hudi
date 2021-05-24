@@ -41,13 +41,13 @@ public class HoodieMetricsConfig extends HoodieConfig {
       .key(METRIC_PREFIX + ".on")
       .defaultValue(false)
       .withVersion("0.5.0")
-      .withDescription("Turn on/off metrics reporting. off by default.");
+      .withDocumentation("Turn on/off metrics reporting. off by default.");
 
   public static final ConfigOption<MetricsReporterType> METRICS_REPORTER_TYPE = ConfigOption
       .key(METRIC_PREFIX + ".reporter.type")
       .defaultValue(MetricsReporterType.GRAPHITE)
       .withVersion("0.5.0")
-      .withDescription("Type of metrics reporter.");
+      .withDocumentation("Type of metrics reporter.");
 
   // Graphite
   public static final String GRAPHITE_PREFIX = METRIC_PREFIX + ".graphite";
@@ -56,13 +56,13 @@ public class HoodieMetricsConfig extends HoodieConfig {
       .key(GRAPHITE_PREFIX + ".host")
       .defaultValue("localhost")
       .withVersion("0.5.0")
-      .withDescription("Graphite host to connect to");
+      .withDocumentation("Graphite host to connect to");
 
   public static final ConfigOption<Integer> GRAPHITE_SERVER_PORT = ConfigOption
       .key(GRAPHITE_PREFIX + ".port")
       .defaultValue(4756)
       .withVersion("0.5.0")
-      .withDescription("Graphite port to connect to");
+      .withDocumentation("Graphite port to connect to");
 
   // Jmx
   public static final String JMX_PREFIX = METRIC_PREFIX + ".jmx";
@@ -71,33 +71,33 @@ public class HoodieMetricsConfig extends HoodieConfig {
       .key(JMX_PREFIX + ".host")
       .defaultValue("localhost")
       .withVersion("0.5.1")
-      .withDescription("Jmx host to connect to");
+      .withDocumentation("Jmx host to connect to");
 
   public static final ConfigOption<Integer> JMX_PORT = ConfigOption
       .key(JMX_PREFIX + ".port")
       .defaultValue(9889)
       .withVersion("0.5.1")
-      .withDescription("Jmx port to connect to");
+      .withDocumentation("Jmx port to connect to");
 
   public static final ConfigOption<String> GRAPHITE_METRIC_PREFIX = ConfigOption
       .key(GRAPHITE_PREFIX + ".metric.prefix")
       .noDefaultValue()
       .withVersion("0.5.1")
-      .withDescription("Standard prefix applied to all metrics. This helps to add datacenter, environment information for e.g");
+      .withDocumentation("Standard prefix applied to all metrics. This helps to add datacenter, environment information for e.g");
 
   // User defined
   public static final ConfigOption<String> METRICS_REPORTER_CLASS = ConfigOption
       .key(METRIC_PREFIX + ".reporter.class")
       .defaultValue("")
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   // Enable metrics collection from executors
   public static final ConfigOption<String> ENABLE_EXECUTOR_METRICS = ConfigOption
       .key(METRIC_PREFIX + ".executor.enable")
       .noDefaultValue()
       .withVersion("0.7.0")
-      .withDescription("");
+      .withDocumentation("");
 
   private HoodieMetricsConfig(Properties props) {
     super(props);

@@ -40,49 +40,49 @@ public class HoodieBootstrapConfig extends HoodieConfig {
       .key("hoodie.bootstrap.base.path")
       .noDefaultValue()
       .withVersion("0.6.0")
-      .withDescription("Base path of the dataset that needs to be bootstrapped as a Hudi table");
+      .withDocumentation("Base path of the dataset that needs to be bootstrapped as a Hudi table");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR = ConfigOption
       .key("hoodie.bootstrap.mode.selector")
       .defaultValue(MetadataOnlyBootstrapModeSelector.class.getCanonicalName())
       .withVersion("0.6.0")
-      .withDescription("Selects the mode in which each file/partition in the bootstrapped dataset gets bootstrapped");
+      .withDocumentation("Selects the mode in which each file/partition in the bootstrapped dataset gets bootstrapped");
 
   public static final ConfigOption<String> FULL_BOOTSTRAP_INPUT_PROVIDER = ConfigOption
       .key("hoodie.bootstrap.full.input.provider")
       .defaultValue("org.apache.hudi.bootstrap.SparkParquetBootstrapDataProvider")
       .withVersion("0.6.0")
-      .withDescription("Class to use for reading the bootstrap dataset partitions/files, for Bootstrap mode FULL_RECORD");
+      .withDocumentation("Class to use for reading the bootstrap dataset partitions/files, for Bootstrap mode FULL_RECORD");
 
   public static final ConfigOption<String> BOOTSTRAP_KEYGEN_CLASS = ConfigOption
       .key("hoodie.bootstrap.keygen.class")
       .noDefaultValue()
       .withVersion("0.6.0")
-      .withDescription("Key generator implementation to be used for generating keys from the bootstrapped dataset");
+      .withDocumentation("Key generator implementation to be used for generating keys from the bootstrapped dataset");
 
   public static final ConfigOption<String> BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS = ConfigOption
       .key("hoodie.bootstrap.partitionpath.translator.class")
       .defaultValue(IdentityBootstrapPartitionPathTranslator.class.getName())
       .withVersion("0.6.0")
-      .withDescription("Translates the partition paths from the bootstrapped data into how is laid out as a Hudi table.");
+      .withDocumentation("Translates the partition paths from the bootstrapped data into how is laid out as a Hudi table.");
 
   public static final ConfigOption<String> BOOTSTRAP_PARALLELISM = ConfigOption
       .key("hoodie.bootstrap.parallelism")
       .defaultValue("1500")
       .withVersion("0.6.0")
-      .withDescription("Parallelism value to be used to bootstrap data into hudi");
+      .withDocumentation("Parallelism value to be used to bootstrap data into hudi");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR_REGEX = ConfigOption
       .key("hoodie.bootstrap.mode.selector.regex")
       .defaultValue(".*")
       .withVersion("0.6.0")
-      .withDescription("Matches each bootstrap dataset partition against this regex and applies the mode below to it.");
+      .withDocumentation("Matches each bootstrap dataset partition against this regex and applies the mode below to it.");
 
   public static final ConfigOption<String> BOOTSTRAP_MODE_SELECTOR_REGEX_MODE = ConfigOption
       .key("hoodie.bootstrap.mode.selector.regex.mode")
       .defaultValue(BootstrapMode.METADATA_ONLY.name())
       .withVersion("0.6.0")
-      .withDescription("Bootstrap mode to apply for partition paths, that match regex above. "
+      .withDocumentation("Bootstrap mode to apply for partition paths, that match regex above. "
           + "METADATA_ONLY will generate just skeleton base files with keys/footers, avoiding full cost of rewriting the dataset. "
           + "FULL_RECORD will perform a full copy/rewrite of the data as a Hudi table.");
 
@@ -90,7 +90,7 @@ public class HoodieBootstrapConfig extends HoodieConfig {
       .key("hoodie.bootstrap.index.class")
       .defaultValue(HFileBootstrapIndex.class.getName())
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public HoodieBootstrapConfig(Properties props) {
     super(props);

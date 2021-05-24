@@ -34,37 +34,37 @@ public class HoodieMetricsPrometheusConfig extends HoodieConfig {
       .key(PUSHGATEWAY_PREFIX + ".host")
       .defaultValue("localhost")
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> PUSHGATEWAY_PORT = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".port")
       .defaultValue(9091)
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> PUSHGATEWAY_REPORT_PERIOD_SECONDS = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".report.period.seconds")
       .defaultValue(30)
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Boolean> PUSHGATEWAY_DELETE_ON_SHUTDOWN = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".delete.on.shutdown")
       .defaultValue(true)
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> PUSHGATEWAY_JOB_NAME = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".job.name")
       .defaultValue("")
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Boolean> PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX = ConfigOption
       .key(PUSHGATEWAY_PREFIX + ".random.job.name.suffix")
       .defaultValue(true)
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   // Prometheus HttpServer
   public static final String PROMETHEUS_PREFIX = METRIC_PREFIX + ".prometheus";
@@ -73,7 +73,7 @@ public class HoodieMetricsPrometheusConfig extends HoodieConfig {
       .key(PROMETHEUS_PREFIX + ".port")
       .defaultValue(9090)
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public HoodieMetricsPrometheusConfig(Properties props) {
     super(props);

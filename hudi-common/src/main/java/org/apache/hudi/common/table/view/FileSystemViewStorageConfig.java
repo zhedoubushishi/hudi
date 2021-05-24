@@ -36,67 +36,67 @@ public class FileSystemViewStorageConfig extends HoodieConfig {
   public static final ConfigOption<FileSystemViewStorageType> FILESYSTEM_VIEW_STORAGE_TYPE = ConfigOption
       .key("hoodie.filesystem.view.type")
       .defaultValue(FileSystemViewStorageType.MEMORY)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> FILESYSTEM_VIEW_INCREMENTAL_SYNC_MODE = ConfigOption
       .key("hoodie.filesystem.view.incr.timeline.sync.enable")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<FileSystemViewStorageType> FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE = ConfigOption
       .key("hoodie.filesystem.view.secondary.type")
       .defaultValue(FileSystemViewStorageType.MEMORY)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> FILESYSTEM_VIEW_REMOTE_HOST = ConfigOption
       .key("hoodie.filesystem.view.remote.host")
       .defaultValue("localhost")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> FILESYSTEM_VIEW_REMOTE_PORT = ConfigOption
       .key("hoodie.filesystem.view.remote.port")
       .defaultValue(26754)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> FILESYSTEM_VIEW_SPILLABLE_DIR = ConfigOption
       .key("hoodie.filesystem.view.spillable.dir")
       .defaultValue("/tmp/view_map/")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Long> FILESYSTEM_VIEW_SPILLABLE_MEM = ConfigOption
       .key("hoodie.filesystem.view.spillable.mem")
       .defaultValue(100 * 1024 * 1024L) // 100 MB
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Double> FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION = ConfigOption
       .key("hoodie.filesystem.view.spillable.compaction.mem.fraction")
       .defaultValue(0.8)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Double> FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION = ConfigOption
       .key("hoodie.filesystem.view.spillable.bootstrap.base.file.mem.fraction")
       .defaultValue(0.05)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Double> FILESYSTEM_VIEW_REPLACED_MEM_FRACTION = ConfigOption
       .key("hoodie.filesystem.view.spillable.replaced.mem.fraction")
       .defaultValue(0.01)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Double> FILESYSTEM_VIEW_PENDING_CLUSTERING_MEM_FRACTION = ConfigOption
       .key("hoodie.filesystem.view.spillable.clustering.mem.fraction")
       .defaultValue(0.01)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> ROCKSDB_BASE_PATH_PROP = ConfigOption
       .key("hoodie.filesystem.view.rocksdb.base.path")
       .defaultValue("/tmp/hoodie_timeline_rocksdb")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> FILESTYSTEM_REMOTE_TIMELINE_CLIENT_TIMEOUT_SECS = ConfigOption
       .key("hoodie.filesystem.view.remote.timeout.secs")
       .defaultValue(5 * 60) // 5 min
-      .withDescription("");
+      .withDocumentation("");
 
   /**
    * Configs to control whether backup needs to be configured if clients were not able to reach
@@ -105,7 +105,7 @@ public class FileSystemViewStorageConfig extends HoodieConfig {
   public static final ConfigOption<String> REMOTE_BACKUP_VIEW_HANDLER_ENABLE = ConfigOption
       .key("hoodie.filesystem.remote.backup.view.enable")
       .defaultValue("true") // Need to be disabled only for tests.
-      .withDescription("");
+      .withDocumentation("");
 
   public static FileSystemViewStorageConfig.Builder newBuilder() {
     return new Builder();

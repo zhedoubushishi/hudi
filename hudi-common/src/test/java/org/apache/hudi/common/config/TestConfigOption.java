@@ -32,12 +32,12 @@ public class TestConfigOption {
   private static ConfigOption<String> FAKE_STRING_CONFIG = ConfigOption
       .key("test.fake.string.config")
       .defaultValue("1")
-      .withDescription("Fake config only for testing");
+      .withDocumentation("Fake config only for testing");
 
   private static ConfigOption<String> FAKE_BOOLEAN_CONFIG = ConfigOption
       .key("test.fake.boolean.config")
       .defaultValue("false")
-      .withDescription("Fake config only for testing");
+      .withDocumentation("Fake config only for testing");
 
   @Test
   public void testGetTypedValue() {

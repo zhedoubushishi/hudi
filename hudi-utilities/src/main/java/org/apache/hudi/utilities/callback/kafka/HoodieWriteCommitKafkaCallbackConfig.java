@@ -18,41 +18,41 @@
 package org.apache.hudi.utilities.callback.kafka;
 
 import org.apache.hudi.common.config.ConfigOption;
+import org.apache.hudi.common.config.HoodieConfig;
 
 import java.util.Properties;
 
-import static org.apache.hudi.common.config.HoodieConfig.setDefaultValue;
 import static org.apache.hudi.config.HoodieWriteCommitCallbackConfig.CALLBACK_PREFIX;
 
 /**
  * Kafka write callback related config.
  */
-public class HoodieWriteCommitKafkaCallbackConfig {
+public class HoodieWriteCommitKafkaCallbackConfig extends HoodieConfig {
 
   public static final ConfigOption<String> CALLBACK_KAFKA_BOOTSTRAP_SERVERS = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.bootstrap.servers")
       .noDefaultValue()
-      .withDescription("Bootstrap servers of kafka callback cluster");
+      .withDocumentation("Bootstrap servers of kafka callback cluster");
 
   public static final ConfigOption<String> CALLBACK_KAFKA_TOPIC = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.topic")
       .noDefaultValue()
-      .withDescription("Kafka topic to be sent along with callback messages");
+      .withDocumentation("Kafka topic to be sent along with callback messages");
 
   public static final ConfigOption<String> CALLBACK_KAFKA_PARTITION = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.partition")
       .noDefaultValue()
-      .withDescription("partition of CALLBACK_KAFKA_TOPIC, 0 by default");
+      .withDocumentation("partition of CALLBACK_KAFKA_TOPIC, 0 by default");
 
   public static final ConfigOption<String> CALLBACK_KAFKA_ACKS = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.acks")
       .defaultValue("all")
-      .withDescription("kafka acks level, all by default");
+      .withDocumentation("kafka acks level, all by default");
 
   public static final ConfigOption<Integer> CALLBACK_KAFKA_RETRIES = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.retries")
       .defaultValue(3)
-      .withDescription("Times to retry. 3 by default");
+      .withDocumentation("Times to retry. 3 by default");
 
   /**
    * Set default value for {@link HoodieWriteCommitKafkaCallbackConfig} if needed.

@@ -37,42 +37,42 @@ public class ConsistencyGuardConfig extends HoodieConfig {
       .key("hoodie.consistency.check.enabled")
       .defaultValue("false")
       .withVersion("0.5.0")
-      .withDescription("Enabled to handle S3 eventual consistency issue. This property is no longer required "
+      .withDocumentation("Enabled to handle S3 eventual consistency issue. This property is no longer required "
           + "since S3 is now strongly consistent. Will be removed in the future releases.");
 
   public static final ConfigOption<Long> INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP = ConfigOption
       .key("hoodie.consistency.check.initial_interval_ms")
       .defaultValue(400L)
       .withVersion("0.5.0")
-      .withDescription("");
+      .withDocumentation("");
 
   // max interval time
   public static final ConfigOption<Long> MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP = ConfigOption
       .key("hoodie.consistency.check.max_interval_ms")
       .defaultValue(20000L)
       .withVersion("0.5.0")
-      .withDescription("");
+      .withDocumentation("");
 
   // maximum number of checks, for consistency of written data. Will wait upto 140 Secs
   public static final ConfigOption<Integer> MAX_CONSISTENCY_CHECKS_PROP = ConfigOption
       .key("hoodie.consistency.check.max_checks")
       .defaultValue(6)
       .withVersion("0.5.0")
-      .withDescription("");
+      .withDocumentation("");
 
   // sleep time for OptimisticConsistencyGuard
   public static final ConfigOption<Long> OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP = ConfigOption
       .key("hoodie.optimistic.consistency.guard.sleep_time_ms")
       .defaultValue(500L)
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   // config to enable OptimisticConsistencyGuard in finalizeWrite instead of FailSafeConsistencyGuard
   public static final ConfigOption<Boolean> ENABLE_OPTIMISTIC_CONSISTENCY_GUARD = ConfigOption
       .key("_hoodie.optimistic.consistency.guard.enable")
       .defaultValue(true)
       .withVersion("0.6.0")
-      .withDescription("");
+      .withDocumentation("");
 
   public ConsistencyGuardConfig(Properties props) {
     super(props);
