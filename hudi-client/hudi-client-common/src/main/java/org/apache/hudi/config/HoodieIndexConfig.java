@@ -41,7 +41,7 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> INDEX_TYPE_PROP = ConfigOption
       .key("hoodie.index.type")
       .noDefaultValue()
-      .withDescription("Type of index to use. Default is Bloom filter. "
+      .withDocumentation("Type of index to use. Default is Bloom filter. "
           + "Possible options are [BLOOM | GLOBAL_BLOOM |SIMPLE | GLOBAL_SIMPLE | INMEMORY | HBASE]. "
           + "Bloom filters removes the dependency on a external system "
           + "and is stored in the footer of the Parquet Data Files");
@@ -49,14 +49,14 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> INDEX_CLASS_PROP = ConfigOption
       .key("hoodie.index.class")
       .defaultValue("")
-      .withDescription("Full path of user-defined index class and must be a subclass of HoodieIndex class. "
+      .withDocumentation("Full path of user-defined index class and must be a subclass of HoodieIndex class. "
           + "It will take precedence over the hoodie.index.type configuration if specified");
 
   // ***** Bloom Index configs *****
   public static final ConfigOption<String> BLOOM_FILTER_NUM_ENTRIES = ConfigOption
       .key("hoodie.index.bloom.num_entries")
       .defaultValue("60000")
-      .withDescription("Only applies if index type is BLOOM. "
+      .withDocumentation("Only applies if index type is BLOOM. "
           + "This is the number of entries to be stored in the bloom filter. "
           + "We assume the maxParquetFileSize is 128MB and averageRecordSize is 1024B and "
           + "hence we approx a total of 130K records in a file. The default (60000) is roughly half of this approximation. "
@@ -69,7 +69,7 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_FILTER_FPP = ConfigOption
       .key("hoodie.index.bloom.fpp")
       .defaultValue("0.000000001")
-      .withDescription("Only applies if index type is BLOOM. "
+      .withDocumentation("Only applies if index type is BLOOM. "
           + "Error rate allowed given the number of entries. This is used to calculate how many bits should be "
           + "assigned for the bloom filter and the number of hash functions. This is usually set very low (default: 0.000000001), "
           + "we like to tradeoff disk space for lower false positives. "
@@ -79,7 +79,7 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_INDEX_PARALLELISM_PROP = ConfigOption
       .key("hoodie.bloom.index.parallelism")
       .defaultValue("0")
-      .withDescription("Only applies if index type is BLOOM. "
+      .withDocumentation("Only applies if index type is BLOOM. "
           + "This is the amount of parallelism for index lookup, which involves a Spark Shuffle. "
           + "By default, this is auto computed based on input workload characteristics. "
           + "Disable explicit bloom index parallelism setting by default - hoodie auto computes");
@@ -87,7 +87,7 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_INDEX_PRUNE_BY_RANGES_PROP = ConfigOption
       .key("hoodie.bloom.index.prune.by.ranges")
       .defaultValue("true")
-      .withDescription("Only applies if index type is BLOOM. "
+      .withDocumentation("Only applies if index type is BLOOM. "
           + "When true, range information from files to leveraged speed up index lookups. Particularly helpful, "
           + "if the key has a monotonously increasing prefix, such as timestamp. "
           + "If the record key is completely random, it is better to turn this off.");
@@ -95,14 +95,14 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_INDEX_USE_CACHING_PROP = ConfigOption
       .key("hoodie.bloom.index.use.caching")
       .defaultValue("true")
-      .withDescription("Only applies if index type is BLOOM."
+      .withDocumentation("Only applies if index type is BLOOM."
           + "When true, the input RDD will cached to speed up index lookup by reducing IO "
           + "for computing parallelism or affected partitions");
 
   public static final ConfigOption<String> BLOOM_INDEX_TREE_BASED_FILTER_PROP = ConfigOption
       .key("hoodie.bloom.index.use.treebased.filter")
       .defaultValue("true")
-      .withDescription("Only applies if index type is BLOOM. "
+      .withDocumentation("Only applies if index type is BLOOM. "
           + "When true, interval tree based file pruning optimization is enabled. "
           + "This mode speeds-up file-pruning based on key ranges when compared with the brute-force mode");
 
@@ -110,40 +110,40 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_INDEX_BUCKETIZED_CHECKING_PROP = ConfigOption
       .key("hoodie.bloom.index.bucketized.checking")
       .defaultValue("true")
-      .withDescription("Only applies if index type is BLOOM. "
+      .withDocumentation("Only applies if index type is BLOOM. "
           + "When true, bucketized bloom filtering is enabled. "
           + "This reduces skew seen in sort based bloom index lookup");
 
   public static final ConfigOption<String> BLOOM_INDEX_FILTER_TYPE = ConfigOption
       .key("hoodie.bloom.index.filter.type")
       .defaultValue(BloomFilterTypeCode.SIMPLE.name())
-      .withDescription("Filter type used. Default is BloomFilterTypeCode.SIMPLE. "
+      .withDocumentation("Filter type used. Default is BloomFilterTypeCode.SIMPLE. "
           + "Available values are [BloomFilterTypeCode.SIMPLE , BloomFilterTypeCode.DYNAMIC_V0]. "
           + "Dynamic bloom filters auto size themselves based on number of keys.");
 
   public static final ConfigOption<String> HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES = ConfigOption
       .key("hoodie.bloom.index.filter.dynamic.max.entries")
       .defaultValue("100000")
-      .withDescription("The threshold for the maximum number of keys to record in a dynamic Bloom filter row. "
+      .withDocumentation("The threshold for the maximum number of keys to record in a dynamic Bloom filter row. "
           + "Only applies if filter type is BloomFilterTypeCode.DYNAMIC_V0.");
 
   public static final ConfigOption<String> SIMPLE_INDEX_USE_CACHING_PROP = ConfigOption
       .key("hoodie.simple.index.use.caching")
       .defaultValue("true")
-      .withDescription("Only applies if index type is SIMPLE. "
+      .withDocumentation("Only applies if index type is SIMPLE. "
           + "When true, the input RDD will cached to speed up index lookup by reducing IO "
           + "for computing parallelism or affected partitions");
 
   public static final ConfigOption<String> SIMPLE_INDEX_PARALLELISM_PROP = ConfigOption
       .key("hoodie.simple.index.parallelism")
       .defaultValue("50")
-      .withDescription("Only applies if index type is SIMPLE. "
+      .withDocumentation("Only applies if index type is SIMPLE. "
           + "This is the amount of parallelism for index lookup, which involves a Spark Shuffle");
 
   public static final ConfigOption<String> GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP = ConfigOption
       .key("hoodie.global.simple.index.parallelism")
       .defaultValue("100")
-      .withDescription("Only applies if index type is GLOBAL_SIMPLE. "
+      .withDocumentation("Only applies if index type is GLOBAL_SIMPLE. "
           + "This is the amount of parallelism for index lookup, which involves a Spark Shuffle");
 
   // 1B bloom filter checks happen in 250 seconds. 500ms to read a bloom filter.
@@ -151,7 +151,7 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_INDEX_KEYS_PER_BUCKET_PROP = ConfigOption
       .key("hoodie.bloom.index.keys.per.bucket")
       .defaultValue("10000000")
-      .withDescription("Only applies if bloomIndexBucketizedChecking is enabled and index type is bloom. "
+      .withDocumentation("Only applies if bloomIndexBucketizedChecking is enabled and index type is bloom. "
           + "This configuration controls the “bucket” size which tracks the number of record-key checks made against "
           + "a single file and is the unit of work allocated to each partition performing bloom filter lookup. "
           + "A higher value would amortize the fixed cost of reading a bloom filter to memory.");
@@ -159,13 +159,13 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_INDEX_INPUT_STORAGE_LEVEL = ConfigOption
       .key("hoodie.bloom.index.input.storage.level")
       .defaultValue("MEMORY_AND_DISK_SER")
-      .withDescription("Only applies when #bloomIndexUseCaching is set. Determine what level of persistence is used to cache input RDDs. "
+      .withDocumentation("Only applies when #bloomIndexUseCaching is set. Determine what level of persistence is used to cache input RDDs. "
           + "Refer to org.apache.spark.storage.StorageLevel for different values");
 
   public static final ConfigOption<String> SIMPLE_INDEX_INPUT_STORAGE_LEVEL = ConfigOption
       .key("hoodie.simple.index.input.storage.level")
       .defaultValue("MEMORY_AND_DISK_SER")
-      .withDescription("Only applies when #simpleIndexUseCaching is set. Determine what level of persistence is used to cache input RDDs. "
+      .withDocumentation("Only applies when #simpleIndexUseCaching is set. Determine what level of persistence is used to cache input RDDs. "
           + "Refer to org.apache.spark.storage.StorageLevel for different values");
 
   /**
@@ -179,7 +179,7 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> BLOOM_INDEX_UPDATE_PARTITION_PATH = ConfigOption
       .key("hoodie.bloom.index.update.partition.path")
       .defaultValue("false")
-      .withDescription("Only applies if index type is GLOBAL_BLOOM. "
+      .withDocumentation("Only applies if index type is GLOBAL_BLOOM. "
           + "When set to true, an update including the partition path of a record that already exists will result in "
           + "inserting the incoming record into the new partition and deleting the original record in the old partition. "
           + "When set to false, the original record will only be updated in the old partition");
@@ -187,7 +187,7 @@ public class HoodieIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> SIMPLE_INDEX_UPDATE_PARTITION_PATH = ConfigOption
       .key("hoodie.simple.index.update.partition.path")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   private EngineType engineType;
 

@@ -38,14 +38,14 @@ public class HoodieMemoryConfig extends HoodieConfig {
   public static final ConfigOption<String> MAX_MEMORY_FRACTION_FOR_MERGE_PROP = ConfigOption
       .key("hoodie.memory.merge.fraction")
       .defaultValue(String.valueOf(0.6))
-      .withDescription("This fraction is multiplied with the user memory fraction (1 - spark.memory.fraction) "
+      .withDocumentation("This fraction is multiplied with the user memory fraction (1 - spark.memory.fraction) "
           + "to get a final fraction of heap space to use during merge");
 
   // Default max memory fraction during compaction, excess spills to disk
   public static final ConfigOption<String> MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP = ConfigOption
       .key("hoodie.memory.compaction.fraction")
       .defaultValue(String.valueOf(0.6))
-      .withDescription("HoodieCompactedLogScanner reads logblocks, converts records to HoodieRecords and then "
+      .withDocumentation("HoodieCompactedLogScanner reads logblocks, converts records to HoodieRecords and then "
           + "merges these log blocks and records. At any point, the number of entries in a log block can be "
           + "less than or equal to the number of entries in the corresponding parquet file. This can lead to "
           + "OOM in the Scanner. Hence, a spillable map helps alleviate the memory pressure. Use this config to "
@@ -59,27 +59,27 @@ public class HoodieMemoryConfig extends HoodieConfig {
   public static final ConfigOption<Long> MAX_MEMORY_FOR_MERGE_PROP = ConfigOption
       .key("hoodie.memory.merge.max.size")
       .defaultValue(DEFAULT_MAX_MEMORY_FOR_SPILLABLE_MAP_IN_BYTES)
-      .withDescription("Property to set the max memory for merge");
+      .withDocumentation("Property to set the max memory for merge");
 
   public static final ConfigOption<String> MAX_MEMORY_FOR_COMPACTION_PROP = ConfigOption
       .key("hoodie.memory.compaction.max.size")
       .noDefaultValue()
-      .withDescription("Property to set the max memory for compaction");
+      .withDocumentation("Property to set the max memory for compaction");
 
   public static final ConfigOption<Integer> MAX_DFS_STREAM_BUFFER_SIZE_PROP = ConfigOption
       .key("hoodie.memory.dfs.buffer.max.size")
       .defaultValue(16 * 1024 * 1024)
-      .withDescription("Property to set the max memory for dfs inputstream buffer size");
+      .withDocumentation("Property to set the max memory for dfs inputstream buffer size");
 
   public static final ConfigOption<String> SPILLABLE_MAP_BASE_PATH_PROP = ConfigOption
       .key("hoodie.memory.spillable.map.path")
       .defaultValue("/tmp/")
-      .withDescription("Default file path prefix for spillable file");
+      .withDocumentation("Default file path prefix for spillable file");
 
   public static final ConfigOption<Double> WRITESTATUS_FAILURE_FRACTION_PROP = ConfigOption
       .key("hoodie.memory.writestatus.failure.fraction")
       .defaultValue(0.1)
-      .withDescription("Property to control how what fraction of the failed record, exceptions we report back to driver. "
+      .withDocumentation("Property to control how what fraction of the failed record, exceptions we report back to driver. "
           + "Default is 10%. If set to 100%, with lot of failures, this can cause memory pressure, cause OOMs and "
           + "mask actual data errors.");
 

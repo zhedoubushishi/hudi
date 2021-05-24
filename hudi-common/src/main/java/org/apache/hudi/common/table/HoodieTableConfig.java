@@ -61,71 +61,71 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
   public static final ConfigOption<String> HOODIE_TABLE_NAME_PROP_NAME = ConfigOption
       .key("hoodie.table.name")
       .noDefaultValue()
-      .withDescription("Table name that will be used for registering with Hive. Needs to be same across runs.");
+      .withDocumentation("Table name that will be used for registering with Hive. Needs to be same across runs.");
 
   public static final ConfigOption<HoodieTableType> HOODIE_TABLE_TYPE_PROP_NAME = ConfigOption
       .key("hoodie.table.type")
       .defaultValue(HoodieTableType.COPY_ON_WRITE)
-      .withDescription("The table type for the underlying data, for this write. This can’t change between writes.");
+      .withDocumentation("The table type for the underlying data, for this write. This can’t change between writes.");
 
   public static final ConfigOption<HoodieTableVersion> HOODIE_TABLE_VERSION_PROP_NAME = ConfigOption
       .key("hoodie.table.version")
       .defaultValue(HoodieTableVersion.ZERO)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_TABLE_PRECOMBINE_FIELD = ConfigOption
       .key("hoodie.table.precombine.field")
       .noDefaultValue()
-      .withDescription("Field used in preCombining before actual write. When two records have the same key value, "
+      .withDocumentation("Field used in preCombining before actual write. When two records have the same key value, "
           + "we will pick the one with the largest value for the precombine field, determined by Object.compareTo(..)");
 
   public static final ConfigOption<String> HOODIE_TABLE_PARTITION_COLUMNS = ConfigOption
       .key("hoodie.table.partition.columns")
       .noDefaultValue()
-      .withDescription("Partition path field. Value to be used at the partitionPath component of HoodieKey. "
+      .withDocumentation("Partition path field. Value to be used at the partitionPath component of HoodieKey. "
           + "Actual value ontained by invoking .toString()");
 
   public static final ConfigOption<HoodieFileFormat> HOODIE_BASE_FILE_FORMAT_PROP_NAME = ConfigOption
       .key("hoodie.table.base.file.format")
       .defaultValue(HoodieFileFormat.PARQUET)
       .withAlternatives("hoodie.table.ro.file.format")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<HoodieFileFormat> HOODIE_LOG_FILE_FORMAT_PROP_NAME = ConfigOption
       .key("hoodie.table.log.file.format")
       .defaultValue(HoodieFileFormat.HOODIE_LOG)
       .withAlternatives("hoodie.table.rt.file.format")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_TIMELINE_LAYOUT_VERSION = ConfigOption
       .key("hoodie.timeline.layout.version")
       .noDefaultValue()
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_PAYLOAD_CLASS_PROP_NAME = ConfigOption
       .key("hoodie.compaction.payload.class")
       .defaultValue(OverwriteWithLatestAvroPayload.class.getName())
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_ARCHIVELOG_FOLDER_PROP_NAME = ConfigOption
       .key("hoodie.archivelog.folder")
       .defaultValue("")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_BOOTSTRAP_INDEX_ENABLE = ConfigOption
       .key("hoodie.bootstrap.index.enable")
       .noDefaultValue()
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME = ConfigOption
       .key("hoodie.bootstrap.index.class")
       .defaultValue(HFileBootstrapIndex.class.getName())
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HOODIE_BOOTSTRAP_BASE_PATH = ConfigOption
       .key("hoodie.bootstrap.base.path")
       .noDefaultValue()
-      .withDescription("Base path of the dataset that needs to be bootstrapped as a Hudi table");
+      .withDocumentation("Base path of the dataset that needs to be bootstrapped as a Hudi table");
 
   public static final String NO_OP_BOOTSTRAP_INDEX_CLASS = NoOpBootstrapIndex.class.getName();
 

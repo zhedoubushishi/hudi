@@ -32,49 +32,49 @@ public class HoodieHBaseIndexConfig extends HoodieConfig {
   public static final ConfigOption<String> HBASE_ZKQUORUM_PROP = ConfigOption
       .key("hoodie.index.hbase.zkquorum")
       .noDefaultValue()
-      .withDescription("Only applies if index type is HBASE. HBase ZK Quorum url to connect to");
+      .withDocumentation("Only applies if index type is HBASE. HBase ZK Quorum url to connect to");
 
   public static final ConfigOption<String> HBASE_ZKPORT_PROP = ConfigOption
       .key("hoodie.index.hbase.zkport")
       .noDefaultValue()
-      .withDescription("Only applies if index type is HBASE. HBase ZK Quorum port to connect to");
+      .withDocumentation("Only applies if index type is HBASE. HBase ZK Quorum port to connect to");
 
   public static final ConfigOption<String> HBASE_TABLENAME_PROP = ConfigOption
       .key("hoodie.index.hbase.table")
       .noDefaultValue()
-      .withDescription("Only applies if index type is HBASE. HBase Table name to use as the index. "
+      .withDocumentation("Only applies if index type is HBASE. HBase Table name to use as the index. "
           + "Hudi stores the row_key and [partition_path, fileID, commitTime] mapping in the table");
 
   public static final ConfigOption<Integer> HBASE_GET_BATCH_SIZE_PROP = ConfigOption
       .key("hoodie.index.hbase.get.batch.size")
       .defaultValue(100)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HBASE_ZK_ZNODEPARENT = ConfigOption
       .key("hoodie.index.hbase.zknode.path")
       .noDefaultValue()
-      .withDescription("Only applies if index type is HBASE. This is the root znode that will contain "
+      .withDocumentation("Only applies if index type is HBASE. This is the root znode that will contain "
           + "all the znodes created/used by HBase");
 
   public static final ConfigOption<Integer> HBASE_PUT_BATCH_SIZE_PROP = ConfigOption
       .key("hoodie.index.hbase.put.batch.size")
       .defaultValue(100)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HBASE_INDEX_QPS_ALLOCATOR_CLASS = ConfigOption
       .key("hoodie.index.hbase.qps.allocator.class")
       .defaultValue(DefaultHBaseQPSResourceAllocator.class.getName())
-      .withDescription("Property to set which implementation of HBase QPS resource allocator to be used");
+      .withDocumentation("Property to set which implementation of HBase QPS resource allocator to be used");
 
   public static final ConfigOption<String> HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP = ConfigOption
       .key("hoodie.index.hbase.put.batch.size.autocompute")
       .defaultValue("false")
-      .withDescription("Property to set to enable auto computation of put batch size");
+      .withDocumentation("Property to set to enable auto computation of put batch size");
 
   public static final ConfigOption<Float> HBASE_QPS_FRACTION_PROP = ConfigOption
       .key("hoodie.index.hbase.qps.fraction")
       .defaultValue(0.5f)
-      .withDescription("Property to set the fraction of the global share of QPS that should be allocated to this job. Let's say there are 3"
+      .withDocumentation("Property to set the fraction of the global share of QPS that should be allocated to this job. Let's say there are 3"
           + " jobs which have input size in terms of number of rows required for HbaseIndexing as x, 2x, 3x respectively. Then"
           + " this fraction for the jobs would be (0.17) 1/6, 0.33 (2/6) and 0.5 (3/6) respectively."
           + " Default is 50%, which means a total of 2 jobs can run using HbaseIndex without overwhelming Region Servers.");
@@ -82,7 +82,7 @@ public class HoodieHBaseIndexConfig extends HoodieConfig {
   public static final ConfigOption<Integer> HBASE_MAX_QPS_PER_REGION_SERVER_PROP = ConfigOption
       .key("hoodie.index.hbase.max.qps.per.region.server")
       .defaultValue(1000)
-      .withDescription("Property to set maximum QPS allowed per Region Server. This should be same across various jobs. This is intended to\n"
+      .withDocumentation("Property to set maximum QPS allowed per Region Server. This should be same across various jobs. This is intended to\n"
           + " limit the aggregate QPS generated across various jobs to an Hbase Region Server. It is recommended to set this\n"
           + " value based on global indexing throughput needs and most importantly, how much the HBase installation in use is\n"
           + " able to tolerate without Region Servers going down.");
@@ -90,52 +90,52 @@ public class HoodieHBaseIndexConfig extends HoodieConfig {
   public static final ConfigOption<Boolean> HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY = ConfigOption
       .key("hoodie.index.hbase.dynamic_qps")
       .defaultValue(false)
-      .withDescription("Property to decide if HBASE_QPS_FRACTION_PROP is dynamically calculated based on volume");
+      .withDocumentation("Property to decide if HBASE_QPS_FRACTION_PROP is dynamically calculated based on volume");
 
   public static final ConfigOption<String> HBASE_MIN_QPS_FRACTION_PROP = ConfigOption
       .key("hoodie.index.hbase.min.qps.fraction")
       .noDefaultValue()
-      .withDescription("Min for HBASE_QPS_FRACTION_PROP to stabilize skewed volume workloads");
+      .withDocumentation("Min for HBASE_QPS_FRACTION_PROP to stabilize skewed volume workloads");
 
   public static final ConfigOption<String> HBASE_MAX_QPS_FRACTION_PROP = ConfigOption
       .key("hoodie.index.hbase.max.qps.fraction")
       .noDefaultValue()
-      .withDescription("Max for HBASE_QPS_FRACTION_PROP to stabilize skewed volume workloads");
+      .withDocumentation("Max for HBASE_QPS_FRACTION_PROP to stabilize skewed volume workloads");
 
   public static final ConfigOption<Integer> HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS = ConfigOption
       .key("hoodie.index.hbase.desired_puts_time_in_secs")
       .defaultValue(600)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HBASE_SLEEP_MS_PUT_BATCH_PROP = ConfigOption
       .key("hoodie.index.hbase.sleep.ms.for.put.batch")
       .noDefaultValue()
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HBASE_SLEEP_MS_GET_BATCH_PROP = ConfigOption
       .key("hoodie.index.hbase.sleep.ms.for.get.batch")
       .noDefaultValue()
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS = ConfigOption
       .key("hoodie.index.hbase.zk.session_timeout_ms")
       .defaultValue(60 * 1000)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS = ConfigOption
       .key("hoodie.index.hbase.zk.connection_timeout_ms")
       .defaultValue(15 * 1000)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> HBASE_ZK_PATH_QPS_ROOT = ConfigOption
       .key("hoodie.index.hbase.zkpath.qps_root")
       .defaultValue("/QPS_ROOT")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Boolean> HBASE_INDEX_UPDATE_PARTITION_PATH = ConfigOption
       .key("hoodie.hbase.index.update.partition.path")
       .defaultValue(false)
-      .withDescription("Only applies if index type is HBASE. "
+      .withDocumentation("Only applies if index type is HBASE. "
           + "When an already existing record is upserted to a new partition compared to whats in storage, "
           + "this config when set, will delete old record in old paritition "
           + "and will insert it as new record in new partition.");
@@ -143,7 +143,7 @@ public class HoodieHBaseIndexConfig extends HoodieConfig {
   public static final ConfigOption<Boolean> HBASE_INDEX_ROLLBACK_SYNC = ConfigOption
       .key("hoodie.index.hbase.rollback.sync")
       .defaultValue(false)
-      .withDescription("When set to true, the rollback method will delete the last failed task index. "
+      .withDocumentation("When set to true, the rollback method will delete the last failed task index. "
           + "The default value is false. Because deleting the index will add extra load on the Hbase cluster for each rollback");
 
   private HoodieHBaseIndexConfig() {

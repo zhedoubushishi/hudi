@@ -72,40 +72,40 @@ public class HoodieWriteConfig extends HoodieConfig {
   public static final ConfigOption<String> TABLE_NAME = ConfigOption
       .key("hoodie.table.name")
       .noDefaultValue()
-      .withDescription("Table name that will be used for registering with Hive. Needs to be same across runs.");
+      .withDocumentation("Table name that will be used for registering with Hive. Needs to be same across runs.");
 
   public static final ConfigOption<String> PRECOMBINE_FIELD_PROP = ConfigOption
       .key("hoodie.datasource.write.precombine.field")
       .defaultValue("ts")
-      .withDescription("Field used in preCombining before actual write. When two records have the same key value, "
+      .withDocumentation("Field used in preCombining before actual write. When two records have the same key value, "
           + "we will pick the one with the largest value for the precombine field, determined by Object.compareTo(..)");
 
   public static final ConfigOption<String> WRITE_PAYLOAD_CLASS = ConfigOption
       .key("hoodie.datasource.write.payload.class")
       .defaultValue(OverwriteWithLatestAvroPayload.class.getName())
-      .withDescription("Payload class used. Override this, if you like to roll your own merge logic, when upserting/inserting. "
+      .withDocumentation("Payload class used. Override this, if you like to roll your own merge logic, when upserting/inserting. "
           + "This will render any value set for PRECOMBINE_FIELD_OPT_VAL in-effective");
 
   public static final ConfigOption<String> KEYGENERATOR_CLASS_PROP = ConfigOption
       .key("hoodie.datasource.write.keygenerator.class")
       .defaultValue(SimpleAvroKeyGenerator.class.getName())
-      .withDescription("Key generator class, that implements will extract the key out of incoming Row object");
+      .withDocumentation("Key generator class, that implements will extract the key out of incoming Row object");
 
   public static final ConfigOption<String> ROLLBACK_USING_MARKERS = ConfigOption
       .key("hoodie.rollback.using.markers")
       .defaultValue("false")
-      .withDescription("Enables a more efficient mechanism for rollbacks based on the marker files generated "
+      .withDocumentation("Enables a more efficient mechanism for rollbacks based on the marker files generated "
           + "during the writes. Turned off by default.");
 
   public static final ConfigOption<String> TIMELINE_LAYOUT_VERSION = ConfigOption
       .key("hoodie.timeline.layout.version")
       .noDefaultValue()
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> BASE_PATH_PROP = ConfigOption
       .key("hoodie.base.path")
       .noDefaultValue()
-      .withDescription("Base DFS path under which all the data partitions are created. "
+      .withDocumentation("Base DFS path under which all the data partitions are created. "
           + "Always prefix it explicitly with the storage scheme (e.g hdfs://, s3:// etc). "
           + "Hudi stores all the main meta-data about commits, savepoints, cleaning audit logs "
           + "etc in .hoodie directory under the base directory.");
@@ -113,108 +113,108 @@ public class HoodieWriteConfig extends HoodieConfig {
   public static final ConfigOption<String> AVRO_SCHEMA = ConfigOption
       .key("hoodie.avro.schema")
       .noDefaultValue()
-      .withDescription("This is the current reader avro schema for the table. This is a string of the entire schema. "
+      .withDocumentation("This is the current reader avro schema for the table. This is a string of the entire schema. "
           + "HoodieWriteClient uses this schema to pass on to implementations of HoodieRecordPayload to convert "
           + "from the source format to avro record. This is also used when re-writing records during an update.");
 
   public static final ConfigOption<String> AVRO_SCHEMA_VALIDATE = ConfigOption
       .key("hoodie.avro.schema.validate")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> INSERT_PARALLELISM = ConfigOption
       .key("hoodie.insert.shuffle.parallelism")
       .defaultValue("1500")
-      .withDescription("Once data has been initially imported, this parallelism controls initial parallelism for reading input records. "
+      .withDocumentation("Once data has been initially imported, this parallelism controls initial parallelism for reading input records. "
           + "Ensure this value is high enough say: 1 partition for 1 GB of input data");
 
   public static final ConfigOption<String> BULKINSERT_PARALLELISM = ConfigOption
       .key("hoodie.bulkinsert.shuffle.parallelism")
       .defaultValue("1500")
-      .withDescription("Bulk insert is meant to be used for large initial imports and this parallelism determines "
+      .withDocumentation("Bulk insert is meant to be used for large initial imports and this parallelism determines "
           + "the initial number of files in your table. Tune this to achieve a desired optimal size during initial import.");
 
   public static final ConfigOption<String> BULKINSERT_USER_DEFINED_PARTITIONER_CLASS = ConfigOption
       .key("hoodie.bulkinsert.user.defined.partitioner.class")
       .noDefaultValue()
-      .withDescription("If specified, this class will be used to re-partition input records before they are inserted.");
+      .withDocumentation("If specified, this class will be used to re-partition input records before they are inserted.");
 
   public static final ConfigOption<String> BULKINSERT_INPUT_DATA_SCHEMA_DDL = ConfigOption
       .key("hoodie.bulkinsert.schema.ddl")
       .noDefaultValue()
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> UPSERT_PARALLELISM = ConfigOption
       .key("hoodie.upsert.shuffle.parallelism")
       .defaultValue("1500")
-      .withDescription("Once data has been initially imported, this parallelism controls initial parallelism for reading input records. "
+      .withDocumentation("Once data has been initially imported, this parallelism controls initial parallelism for reading input records. "
           + "Ensure this value is high enough say: 1 partition for 1 GB of input data");
 
   public static final ConfigOption<String> DELETE_PARALLELISM = ConfigOption
       .key("hoodie.delete.shuffle.parallelism")
       .defaultValue("1500")
-      .withDescription("This parallelism is Used for “delete” operation while deduping or repartioning.");
+      .withDocumentation("This parallelism is Used for “delete” operation while deduping or repartioning.");
 
   public static final ConfigOption<String> ROLLBACK_PARALLELISM = ConfigOption
       .key("hoodie.rollback.parallelism")
       .defaultValue("100")
-      .withDescription("Determines the parallelism for rollback of commits.");
+      .withDocumentation("Determines the parallelism for rollback of commits.");
 
   public static final ConfigOption<String> WRITE_BUFFER_LIMIT_BYTES = ConfigOption
       .key("hoodie.write.buffer.limit.bytes")
       .defaultValue(String.valueOf(4 * 1024 * 1024))
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> COMBINE_BEFORE_INSERT_PROP = ConfigOption
       .key("hoodie.combine.before.insert")
       .defaultValue("false")
-      .withDescription("Flag which first combines the input RDD and merges multiple partial records into a single record "
+      .withDocumentation("Flag which first combines the input RDD and merges multiple partial records into a single record "
           + "before inserting or updating in DFS");
 
   public static final ConfigOption<String> COMBINE_BEFORE_UPSERT_PROP = ConfigOption
       .key("hoodie.combine.before.upsert")
       .defaultValue("true")
-      .withDescription("Flag which first combines the input RDD and merges multiple partial records into a single record "
+      .withDocumentation("Flag which first combines the input RDD and merges multiple partial records into a single record "
           + "before inserting or updating in DFS");
 
   public static final ConfigOption<String> COMBINE_BEFORE_DELETE_PROP = ConfigOption
       .key("hoodie.combine.before.delete")
       .defaultValue("true")
-      .withDescription("Flag which first combines the input RDD and merges multiple partial records into a single record "
+      .withDocumentation("Flag which first combines the input RDD and merges multiple partial records into a single record "
           + "before deleting in DFS");
 
   public static final ConfigOption<String> WRITE_STATUS_STORAGE_LEVEL = ConfigOption
       .key("hoodie.write.status.storage.level")
       .defaultValue("MEMORY_AND_DISK_SER")
-      .withDescription("HoodieWriteClient.insert and HoodieWriteClient.upsert returns a persisted RDD[WriteStatus], "
+      .withDocumentation("HoodieWriteClient.insert and HoodieWriteClient.upsert returns a persisted RDD[WriteStatus], "
           + "this is because the Client can choose to inspect the WriteStatus and choose and commit or not based on the failures. "
           + "This is a configuration for the storage level for this RDD");
 
   public static final ConfigOption<String> HOODIE_AUTO_COMMIT_PROP = ConfigOption
       .key("hoodie.auto.commit")
       .defaultValue("true")
-      .withDescription("Should HoodieWriteClient autoCommit after insert and upsert. "
+      .withDocumentation("Should HoodieWriteClient autoCommit after insert and upsert. "
           + "The client can choose to turn off auto-commit and commit on a “defined success condition”");
 
   public static final ConfigOption<String> HOODIE_WRITE_STATUS_CLASS_PROP = ConfigOption
       .key("hoodie.writestatus.class")
       .defaultValue(WriteStatus.class.getName())
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> FINALIZE_WRITE_PARALLELISM = ConfigOption
       .key("hoodie.finalize.write.parallelism")
       .defaultValue("1500")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> MARKERS_DELETE_PARALLELISM = ConfigOption
       .key("hoodie.markers.delete.parallelism")
       .defaultValue("100")
-      .withDescription("Determines the parallelism for deleting marker files.");
+      .withDocumentation("Determines the parallelism for deleting marker files.");
 
   public static final ConfigOption<String> BULKINSERT_SORT_MODE = ConfigOption
       .key("hoodie.bulkinsert.sort.mode")
       .defaultValue(BulkInsertSortMode.GLOBAL_SORT.toString())
-      .withDescription("Sorting modes to use for sorting records for bulk insert. This is leveraged when user "
+      .withDocumentation("Sorting modes to use for sorting records for bulk insert. This is leveraged when user "
           + "defined partitioner is not configured. Default is GLOBAL_SORT. Available values are - GLOBAL_SORT: "
           + "this ensures best file sizes, with lowest memory overhead at cost of sorting. PARTITION_SORT: "
           + "Strikes a balance by only sorting within a partition, still keeping the memory overhead of writing "
@@ -224,84 +224,84 @@ public class HoodieWriteConfig extends HoodieConfig {
   public static final ConfigOption<String> EMBEDDED_TIMELINE_SERVER_ENABLED = ConfigOption
       .key("hoodie.embed.timeline.server")
       .defaultValue("true")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> EMBEDDED_TIMELINE_SERVER_PORT = ConfigOption
       .key("hoodie.embed.timeline.server.port")
       .defaultValue("0")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> EMBEDDED_TIMELINE_SERVER_THREADS = ConfigOption
       .key("hoodie.embed.timeline.server.threads")
       .defaultValue("-1")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> EMBEDDED_TIMELINE_SERVER_COMPRESS_OUTPUT = ConfigOption
       .key("hoodie.embed.timeline.server.gzip")
       .defaultValue("true")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> EMBEDDED_TIMELINE_SERVER_USE_ASYNC = ConfigOption
       .key("hoodie.embed.timeline.server.async")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> FAIL_ON_TIMELINE_ARCHIVING_ENABLED_PROP = ConfigOption
       .key("hoodie.fail.on.timeline.archiving")
       .defaultValue("true")
-      .withDescription("");
+      .withDocumentation("");
 
   // time between successive attempts to ensure written data's metadata is consistent on storage
   public static final ConfigOption<Long> INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP = ConfigOption
       .key("hoodie.consistency.check.initial_interval_ms")
       .defaultValue(2000L)
-      .withDescription("");
+      .withDocumentation("");
 
   // max interval time
   public static final ConfigOption<Long> MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP = ConfigOption
       .key("hoodie.consistency.check.max_interval_ms")
       .defaultValue(300000L)
-      .withDescription("");
+      .withDocumentation("");
 
   // maximum number of checks, for consistency of written data. Will wait upto 256 Secs
   public static final ConfigOption<Integer> MAX_CONSISTENCY_CHECKS_PROP = ConfigOption
       .key("hoodie.consistency.check.max_checks")
       .defaultValue(7)
-      .withDescription("");
+      .withDocumentation("");
 
   // Data validation check performed during merges before actual commits
   public static final ConfigOption<String> MERGE_DATA_VALIDATION_CHECK_ENABLED = ConfigOption
       .key("hoodie.merge.data.validation.enabled")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   // Allow duplicates with inserts while merging with existing records
   public static final ConfigOption<String> MERGE_ALLOW_DUPLICATE_ON_INSERTS = ConfigOption
       .key("hoodie.merge.allow.duplicate.on.inserts")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> CLIENT_HEARTBEAT_INTERVAL_IN_MS_PROP = ConfigOption
       .key("hoodie.client.heartbeat.interval_in_ms")
       .defaultValue(60 * 1000)
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<Integer> CLIENT_HEARTBEAT_NUM_TOLERABLE_MISSES_PROP = ConfigOption
       .key("hoodie.client.heartbeat.tolerable.misses")
       .defaultValue(2)
-      .withDescription("");
+      .withDocumentation("");
 
   // Enable different concurrency support
   public static final ConfigOption<String> WRITE_CONCURRENCY_MODE_PROP = ConfigOption
       .key("hoodie.write.concurrency.mode")
       .defaultValue(WriteConcurrencyMode.SINGLE_WRITER.name())
-      .withDescription("");
+      .withDocumentation("");
 
   // Comma separated metadata key prefixes to override from latest commit during overlapping commits via multi writing
   public static final ConfigOption<String> WRITE_META_KEY_PREFIXES_PROP = ConfigOption
       .key("hoodie.write.meta.key.prefixes")
       .defaultValue("")
-      .withDescription("");
+      .withDocumentation("");
 
   /**
    * HUDI-858 : There are users who had been directly using RDD APIs and have relied on a behavior in 0.4.x to allow
@@ -316,12 +316,12 @@ public class HoodieWriteConfig extends HoodieConfig {
   public static final ConfigOption<String> ALLOW_MULTI_WRITE_ON_SAME_INSTANT = ConfigOption
       .key("_.hoodie.allow.multi.write.on.same.instant")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   public static final ConfigOption<String> EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION = ConfigOption
       .key(AVRO_SCHEMA + ".externalTransformation")
       .defaultValue("false")
-      .withDescription("");
+      .withDocumentation("");
 
   private ConsistencyGuardConfig consistencyGuardConfig;
 

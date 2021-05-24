@@ -36,13 +36,13 @@ public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
       .key(CALLBACK_PREFIX + "on")
       .defaultValue(false)
       .withVersion("0.6.0")
-      .withDescription("Turn callback on/off. off by default.");
+      .withDocumentation("Turn callback on/off. off by default.");
 
   public static final ConfigOption<String> CALLBACK_CLASS_PROP = ConfigOption
       .key(CALLBACK_PREFIX + "class")
       .defaultValue("org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback")
       .withVersion("0.6.0")
-      .withDescription("Full path of callback class and must be a subclass of HoodieWriteCommitCallback class, "
+      .withDocumentation("Full path of callback class and must be a subclass of HoodieWriteCommitCallback class, "
           + "org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback by default");
 
   // ***** HTTP callback configs *****
@@ -50,19 +50,19 @@ public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
       .key(CALLBACK_PREFIX + "http.url")
       .noDefaultValue()
       .withVersion("0.6.0")
-      .withDescription("Callback host to be sent along with callback messages");
+      .withDocumentation("Callback host to be sent along with callback messages");
 
   public static final ConfigOption<String> CALLBACK_HTTP_API_KEY = ConfigOption
       .key(CALLBACK_PREFIX + "http.api.key")
       .defaultValue("hudi_write_commit_http_callback")
       .withVersion("0.6.0")
-      .withDescription("Http callback API key. hudi_write_commit_http_callback by default");
+      .withDocumentation("Http callback API key. hudi_write_commit_http_callback by default");
 
   public static final ConfigOption<Integer> CALLBACK_HTTP_TIMEOUT_SECONDS = ConfigOption
       .key(CALLBACK_PREFIX + "http.timeout.seconds")
       .defaultValue(3)
       .withVersion("0.6.0")
-      .withDescription("Callback timeout in seconds. 3 by default");
+      .withDocumentation("Callback timeout in seconds. 3 by default");
 
   private HoodieWriteCommitCallbackConfig() {
     super();

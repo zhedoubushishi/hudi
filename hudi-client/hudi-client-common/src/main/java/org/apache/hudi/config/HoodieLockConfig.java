@@ -57,7 +57,7 @@ public class HoodieLockConfig extends HoodieConfig {
       .key(LOCK_PREFIX + "provider")
       .defaultValue(ZookeeperBasedLockProvider.class.getName())
       .withVersion("0.8.0")
-      .withDescription("Lock provider class name, user can provide their own implementation of LockProvider "
+      .withDocumentation("Lock provider class name, user can provide their own implementation of LockProvider "
           + "which should be subclass of org.apache.hudi.common.lock.LockProvider");
 
   // Pluggable strategies to use when resolving conflicts
@@ -65,7 +65,7 @@ public class HoodieLockConfig extends HoodieConfig {
       .key(LOCK_PREFIX + "conflict.resolution.strategy")
       .defaultValue(SimpleConcurrentFileWritesConflictResolutionStrategy.class.getName())
       .withVersion("0.8.0")
-      .withDescription("Lock provider class name, this should be subclass of "
+      .withDocumentation("Lock provider class name, this should be subclass of "
           + "org.apache.hudi.client.transaction.ConflictResolutionStrategy");
 
   private HoodieLockConfig() {

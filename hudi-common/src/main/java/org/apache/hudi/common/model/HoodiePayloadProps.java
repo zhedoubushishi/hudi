@@ -35,7 +35,7 @@ public class HoodiePayloadProps {
   public static final ConfigOption<String> PAYLOAD_ORDERING_FIELD_PROP = ConfigOption
       .key("hoodie.payload.ordering.field")
       .defaultValue("ts")
-      .withDescription("Property to hold the payload ordering field name");
+      .withDocumentation("Property to hold the payload ordering field name");
 
   /**
    * Property for payload event time field; to be used to extract source event time info.
@@ -45,5 +45,5 @@ public class HoodiePayloadProps {
   public static final ConfigOption<String> PAYLOAD_EVENT_TIME_FIELD_PROP = ConfigOption
       .key("hoodie.payload.event.time.field")
       .defaultValue("ts")
-      .withDescription("Property for payload event time field");
+      .withDocumentation("Property for payload event time field");
 }
