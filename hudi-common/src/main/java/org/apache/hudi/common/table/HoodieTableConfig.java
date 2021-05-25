@@ -131,7 +131,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
 
   public HoodieTableConfig(FileSystem fs, String metaPath, String payloadClassName) {
     super();
-    Properties props = new Properties();
+    // Properties props = new Properties();
     Path propertyPath = new Path(metaPath, HOODIE_PROPERTIES_FILE);
     LOG.info("Loading table properties from " + propertyPath);
     try {
@@ -139,8 +139,8 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
         props.load(inputStream);
       }
       if (contains(props, HOODIE_PAYLOAD_CLASS_PROP_NAME) && payloadClassName != null
-          && !getString(props, HOODIE_PAYLOAD_CLASS_PROP_NAME).equals(payloadClassName)) {
-        set(props, HOODIE_PAYLOAD_CLASS_PROP_NAME, payloadClassName);
+          && !getString(HOODIE_PAYLOAD_CLASS_PROP_NAME).equals(payloadClassName)) {
+        set(HOODIE_PAYLOAD_CLASS_PROP_NAME, payloadClassName);
         try (FSDataOutputStream outputStream = fs.create(propertyPath)) {
           props.store(outputStream, "Properties saved on " + new Date(System.currentTimeMillis()));
         }
@@ -148,7 +148,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
     } catch (IOException e) {
       throw new HoodieIOException("Could not load Hoodie properties from " + propertyPath, e);
     }
-    this.props = props;
+    // this.props = props;
     ValidationUtils.checkArgument(props.containsKey(HOODIE_TABLE_TYPE_PROP_NAME.key()) && props.containsKey(HOODIE_TABLE_NAME_PROP_NAME.key()),
         "hoodie.properties file seems invalid. Please check for left over `.updated` files if any, manually copy it to hoodie.properties and retry");
   }
@@ -175,23 +175,24 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
     if (!fs.exists(metadataFolder)) {
       fs.mkdirs(metadataFolder);
     }
+    HoodieConfig hoodieConfig = new HoodieConfig(properties);
     Path propertyPath = new Path(metadataFolder, HOODIE_PROPERTIES_FILE);
     try (FSDataOutputStream outputStream = fs.create(propertyPath)) {
       if (!contains(properties, HOODIE_TABLE_NAME_PROP_NAME)) {
         throw new IllegalArgumentException(HOODIE_TABLE_NAME_PROP_NAME.key() + " property needs to be specified");
       }
-      setDefaultValue(properties, HOODIE_TABLE_TYPE_PROP_NAME);
-      if (getString(properties, HOODIE_TABLE_TYPE_PROP_NAME).equals(HoodieTableType.MERGE_ON_READ.name())) {
-        setDefaultValue(properties, HOODIE_PAYLOAD_CLASS_PROP_NAME);
+      hoodieConfig.setDefaultValue(HOODIE_TABLE_TYPE_PROP_NAME);
+      if (hoodieConfig.getString(HOODIE_TABLE_TYPE_PROP_NAME).equals(HoodieTableType.MERGE_ON_READ.name())) {
+        hoodieConfig.setDefaultValue(HOODIE_PAYLOAD_CLASS_PROP_NAME);
       }
-      setDefaultValue(properties, HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
+      hoodieConfig.setDefaultValue(HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
       if (!contains(properties, HOODIE_TIMELINE_LAYOUT_VERSION)) {
         // Use latest Version as default unless forced by client
-        set(properties, HOODIE_TIMELINE_LAYOUT_VERSION, TimelineLayoutVersion.CURR_VERSION.toString());
+        hoodieConfig.set(HOODIE_TIMELINE_LAYOUT_VERSION, TimelineLayoutVersion.CURR_VERSION.toString());
       }
       if (contains(properties, HOODIE_BOOTSTRAP_BASE_PATH)) {
         // Use the default bootstrap index class.
-        properties.setProperty(HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME.key(), getDefaultBootstrapIndexClass(properties));
+        hoodieConfig.setDefaultValue(HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME, getDefaultBootstrapIndexClass(properties));
       }
       properties.store(outputStream, "Properties saved on " + new Date(System.currentTimeMillis()));
     }
@@ -201,12 +202,12 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
    * Read the table type from the table properties and if not found, return the default.
    */
   public HoodieTableType getTableType() {
-    return HoodieTableType.valueOf(getStringOrDefault(props, HOODIE_TABLE_TYPE_PROP_NAME));
+    return HoodieTableType.valueOf(getStringOrDefault(HOODIE_TABLE_TYPE_PROP_NAME));
   }
 
   public Option<TimelineLayoutVersion> getTimelineLayoutVersion() {
     return contains(props, HOODIE_TIMELINE_LAYOUT_VERSION)
-        ? Option.of(new TimelineLayoutVersion(getInt(props, HOODIE_TIMELINE_LAYOUT_VERSION)))
+        ? Option.of(new TimelineLayoutVersion(getInt(HOODIE_TIMELINE_LAYOUT_VERSION)))
         : Option.empty();
   }
 
@@ -215,7 +216,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
    */
   public HoodieTableVersion getTableVersion() {
     return contains(props, HOODIE_TABLE_VERSION_PROP_NAME)
-        ? HoodieTableVersion.versionFromCode(getInt(props, HOODIE_TABLE_VERSION_PROP_NAME))
+        ? HoodieTableVersion.versionFromCode(getInt(HOODIE_TABLE_VERSION_PROP_NAME))
         : HOODIE_TABLE_VERSION_PROP_NAME.defaultValue();
   }
 
@@ -229,17 +230,17 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
   public String getPayloadClass() {
     // There could be tables written with payload class from com.uber.hoodie. Need to transparently
     // change to org.apache.hudi
-    return getStringOrDefault(props, HOODIE_PAYLOAD_CLASS_PROP_NAME).replace("com.uber.hoodie",
+    return getStringOrDefault(HOODIE_PAYLOAD_CLASS_PROP_NAME).replace("com.uber.hoodie",
         "org.apache.hudi");
   }
 
   public String getPreCombineField() {
-    return getString(props, HOODIE_TABLE_PRECOMBINE_FIELD);
+    return getString(HOODIE_TABLE_PRECOMBINE_FIELD);
   }
 
   public Option<String[]> getPartitionColumns() {
     if (contains(props, HOODIE_TABLE_PARTITION_COLUMNS)) {
-      return Option.of(Arrays.stream(getString(props, HOODIE_TABLE_PARTITION_COLUMNS).split(","))
+      return Option.of(Arrays.stream(getString(HOODIE_TABLE_PARTITION_COLUMNS).split(","))
         .filter(p -> p.length() > 0).collect(Collectors.toList()).toArray(new String[]{}));
     }
     return Option.empty();
@@ -251,7 +252,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
   public String getBootstrapIndexClass() {
     // There could be tables written with payload class from com.uber.hoodie. Need to transparently
     // change to org.apache.hudi
-    return getStringOrDefault(props, HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME, getDefaultBootstrapIndexClass(props));
+    return getStringOrDefault(HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME, getDefaultBootstrapIndexClass(props));
   }
 
   public static String getDefaultBootstrapIndexClass(Properties props) {
@@ -263,14 +264,14 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
   }
 
   public Option<String> getBootstrapBasePath() {
-    return Option.ofNullable(getString(props, HOODIE_BOOTSTRAP_BASE_PATH));
+    return Option.ofNullable(getString(HOODIE_BOOTSTRAP_BASE_PATH));
   }
 
   /**
    * Read the table name.
    */
   public String getTableName() {
-    return getString(props, HOODIE_TABLE_NAME_PROP_NAME);
+    return getString(HOODIE_TABLE_NAME_PROP_NAME);
   }
 
   /**
@@ -279,7 +280,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
    * @return HoodieFileFormat for the base file Storage format
    */
   public HoodieFileFormat getBaseFileFormat() {
-    return HoodieFileFormat.valueOf(getStringOrDefault(props, HOODIE_BASE_FILE_FORMAT_PROP_NAME));
+    return HoodieFileFormat.valueOf(getStringOrDefault(HOODIE_BASE_FILE_FORMAT_PROP_NAME));
   }
 
   /**
@@ -288,14 +289,14 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
    * @return HoodieFileFormat for the log Storage format
    */
   public HoodieFileFormat getLogFileFormat() {
-    return HoodieFileFormat.valueOf(getStringOrDefault(props, HOODIE_LOG_FILE_FORMAT_PROP_NAME));
+    return HoodieFileFormat.valueOf(getStringOrDefault(HOODIE_LOG_FILE_FORMAT_PROP_NAME));
   }
 
   /**
    * Get the relative path of archive log folder under metafolder, for this table.
    */
   public String getArchivelogFolder() {
-    return getStringOrDefault(props, HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
+    return getStringOrDefault(HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
   }
 
   public Map<String, String> getMapProps() {

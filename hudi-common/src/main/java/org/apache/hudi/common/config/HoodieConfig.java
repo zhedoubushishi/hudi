@@ -18,6 +18,8 @@
 
 package org.apache.hudi.common.config;
 
+import java.io.IOException;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hudi.common.util.Option;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -177,6 +179,14 @@ public class HoodieConfig implements Serializable {
 
   public <T> String getStringOrDefault(ConfigOption<T> configOption, String defaultVal) {
     return getStringOrDefault(props, configOption, defaultVal);
+  }
+
+  public <T> boolean contains(ConfigOption<T> configOption) {
+    return contains(props, configOption);
+  }
+
+  public void load(FSDataInputStream inputStream) throws IOException {
+    props.load(inputStream);
   }
 
 }

@@ -1171,7 +1171,7 @@ public class TestHoodieDeltaStreamer extends UtilitiesTestBase {
       props.load(inputStream);
     }
 
-    assertEquals(HoodieConfig.getString(props, HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME), DummyAvroPayload.class.getName());
+    assertEquals(new HoodieConfig(props).getString(HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME), DummyAvroPayload.class.getName());
   }
 
   @Test

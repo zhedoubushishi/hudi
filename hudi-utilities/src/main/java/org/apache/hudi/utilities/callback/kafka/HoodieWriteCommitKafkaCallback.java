@@ -49,22 +49,22 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
 
   private static final Logger LOG = LogManager.getLogger(HoodieWriteCommitKafkaCallback.class);
 
-  private Properties props;
+  private HoodieConfig hoodieConfig;
   private String bootstrapServers;
   private String topic;
 
   public HoodieWriteCommitKafkaCallback(HoodieWriteConfig config) {
-    this.props = config.getProps();
-    this.bootstrapServers = HoodieConfig.getString(props, CALLBACK_KAFKA_BOOTSTRAP_SERVERS);
-    this.topic = HoodieConfig.getString(props, CALLBACK_KAFKA_TOPIC);
+    this.hoodieConfig = config;
+    this.bootstrapServers = config.getString(CALLBACK_KAFKA_BOOTSTRAP_SERVERS);
+    this.topic = config.getString(CALLBACK_KAFKA_TOPIC);
     validateKafkaConfig();
   }
 
   @Override
   public void call(HoodieWriteCommitCallbackMessage callbackMessage) {
     String callbackMsg = HoodieWriteCommitCallbackUtil.convertToJsonString(callbackMessage);
-    try (KafkaProducer<String, String> producer = createProducer(props)) {
-      ProducerRecord<String, String> record = buildProducerRecord(props, callbackMsg);
+    try (KafkaProducer<String, String> producer = createProducer(hoodieConfig)) {
+      ProducerRecord<String, String> record = buildProducerRecord(hoodieConfig, callbackMsg);
       producer.send(record);
       LOG.info(String.format("Send callback message %s succeed", callbackMsg));
     } catch (Exception e) {
@@ -76,19 +76,19 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
    * Method helps to create {@link KafkaProducer}. Here we set acks = all and retries = 3 by default to ensure no data
    * loss.
    *
-   * @param props Kafka configs
+   * @param hoodieConfig Kafka configs
    * @return A {@link KafkaProducer}
    */
-  public KafkaProducer<String, String> createProducer(Properties props) {
+  public KafkaProducer<String, String> createProducer(HoodieConfig hoodieConfig) {
     Properties kafkaProducerProps = new Properties();
     // bootstrap.servers
     kafkaProducerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
     // default "all" to ensure no message loss
-    kafkaProducerProps.setProperty(ProducerConfig.ACKS_CONFIG, HoodieConfig
-        .getString(props, CALLBACK_KAFKA_ACKS));
+    kafkaProducerProps.setProperty(ProducerConfig.ACKS_CONFIG, hoodieConfig
+        .getString(CALLBACK_KAFKA_ACKS));
     // retries 3 times by default
-    kafkaProducerProps.setProperty(ProducerConfig.RETRIES_CONFIG, HoodieConfig
-        .getString(props, CALLBACK_KAFKA_RETRIES));
+    kafkaProducerProps.setProperty(ProducerConfig.RETRIES_CONFIG, hoodieConfig
+        .getString(CALLBACK_KAFKA_RETRIES));
     kafkaProducerProps.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
         "org.apache.kafka.common.serialization.StringSerializer");
     kafkaProducerProps.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
@@ -104,18 +104,18 @@ public class HoodieWriteCommitKafkaCallback implements HoodieWriteCommitCallback
    * that the callback message of the same table will goes to the same partition. Therefore, if user does not specify
    * the partition, we can use the table name as {@link ProducerRecord} key.
    *
-   * @param props       Kafka configs
+   * @param hoodieConfig       Kafka configs
    * @param callbackMsg Callback message
    * @return Callback {@link ProducerRecord}
    */
-  private ProducerRecord<String, String> buildProducerRecord(Properties props, String callbackMsg) {
-    String partition = HoodieConfig.getString(props, CALLBACK_KAFKA_PARTITION);
+  private ProducerRecord<String, String> buildProducerRecord(HoodieConfig hoodieConfig, String callbackMsg) {
+    String partition = hoodieConfig.getString(CALLBACK_KAFKA_PARTITION);
     if (null != partition) {
-      return new ProducerRecord<String, String>(topic, Integer.valueOf(partition), HoodieConfig
-          .getString(props, TABLE_NAME),
+      return new ProducerRecord<String, String>(topic, Integer.valueOf(partition), hoodieConfig
+          .getString(TABLE_NAME),
           callbackMsg);
     } else {
-      return new ProducerRecord<String, String>(topic, HoodieConfig.getString(props, TABLE_NAME), callbackMsg);
+      return new ProducerRecord<String, String>(topic, hoodieConfig.getString(TABLE_NAME), callbackMsg);
     }
   }
 
