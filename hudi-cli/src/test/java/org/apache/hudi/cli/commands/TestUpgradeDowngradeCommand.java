@@ -38,7 +38,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Properties;
 
 import static org.apache.hudi.common.testutils.HoodieTestDataGenerator.DEFAULT_FIRST_PARTITION_PATH;
 import static org.apache.hudi.common.testutils.HoodieTestDataGenerator.DEFAULT_PARTITION_PATHS;
@@ -110,10 +109,10 @@ public class TestUpgradeDowngradeCommand extends AbstractShellIntegrationTest {
     Path propertyFile = new Path(metaClient.getMetaPath() + "/" + HoodieTableConfig.HOODIE_PROPERTIES_FILE);
     // Load the properties and verify
     FSDataInputStream fsDataInputStream = metaClient.getFs().open(propertyFile);
-    Properties prop = new Properties();
-    prop.load(fsDataInputStream);
+    HoodieConfig hoodieConfig = new HoodieConfig();
+    hoodieConfig.load(fsDataInputStream);
     fsDataInputStream.close();
-    assertEquals(Integer.toString(HoodieTableVersion.ZERO.versionCode()), HoodieConfig
-        .getString(prop, HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
+    assertEquals(Integer.toString(HoodieTableVersion.ZERO.versionCode()), hoodieConfig
+        .getString(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
   }
 }

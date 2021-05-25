@@ -138,7 +138,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
       try (FSDataInputStream inputStream = fs.open(propertyPath)) {
         props.load(inputStream);
       }
-      if (contains(props, HOODIE_PAYLOAD_CLASS_PROP_NAME) && payloadClassName != null
+      if (contains(HOODIE_PAYLOAD_CLASS_PROP_NAME) && payloadClassName != null
           && !getString(HOODIE_PAYLOAD_CLASS_PROP_NAME).equals(payloadClassName)) {
         set(HOODIE_PAYLOAD_CLASS_PROP_NAME, payloadClassName);
         try (FSDataOutputStream outputStream = fs.create(propertyPath)) {
@@ -178,7 +178,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
     HoodieConfig hoodieConfig = new HoodieConfig(properties);
     Path propertyPath = new Path(metadataFolder, HOODIE_PROPERTIES_FILE);
     try (FSDataOutputStream outputStream = fs.create(propertyPath)) {
-      if (!contains(properties, HOODIE_TABLE_NAME_PROP_NAME)) {
+      if (!hoodieConfig.contains(HOODIE_TABLE_NAME_PROP_NAME)) {
         throw new IllegalArgumentException(HOODIE_TABLE_NAME_PROP_NAME.key() + " property needs to be specified");
       }
       hoodieConfig.setDefaultValue(HOODIE_TABLE_TYPE_PROP_NAME);
@@ -186,15 +186,15 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
         hoodieConfig.setDefaultValue(HOODIE_PAYLOAD_CLASS_PROP_NAME);
       }
       hoodieConfig.setDefaultValue(HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
-      if (!contains(properties, HOODIE_TIMELINE_LAYOUT_VERSION)) {
+      if (!hoodieConfig.contains(HOODIE_TIMELINE_LAYOUT_VERSION)) {
         // Use latest Version as default unless forced by client
         hoodieConfig.set(HOODIE_TIMELINE_LAYOUT_VERSION, TimelineLayoutVersion.CURR_VERSION.toString());
       }
-      if (contains(properties, HOODIE_BOOTSTRAP_BASE_PATH)) {
+      if (hoodieConfig.contains(HOODIE_BOOTSTRAP_BASE_PATH)) {
         // Use the default bootstrap index class.
         hoodieConfig.setDefaultValue(HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME, getDefaultBootstrapIndexClass(properties));
       }
-      properties.store(outputStream, "Properties saved on " + new Date(System.currentTimeMillis()));
+      hoodieConfig.getProps().store(outputStream, "Properties saved on " + new Date(System.currentTimeMillis()));
     }
   }
 
@@ -206,7 +206,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
   }
 
   public Option<TimelineLayoutVersion> getTimelineLayoutVersion() {
-    return contains(props, HOODIE_TIMELINE_LAYOUT_VERSION)
+    return contains(HOODIE_TIMELINE_LAYOUT_VERSION)
         ? Option.of(new TimelineLayoutVersion(getInt(HOODIE_TIMELINE_LAYOUT_VERSION)))
         : Option.empty();
   }
@@ -215,13 +215,13 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
    * @return the hoodie.table.version from hoodie.properties file.
    */
   public HoodieTableVersion getTableVersion() {
-    return contains(props, HOODIE_TABLE_VERSION_PROP_NAME)
+    return contains(HOODIE_TABLE_VERSION_PROP_NAME)
         ? HoodieTableVersion.versionFromCode(getInt(HOODIE_TABLE_VERSION_PROP_NAME))
         : HOODIE_TABLE_VERSION_PROP_NAME.defaultValue();
   }
 
   public void setTableVersion(HoodieTableVersion tableVersion) {
-    set(props, HOODIE_TABLE_VERSION_PROP_NAME, Integer.toString(tableVersion.versionCode()));
+    set(HOODIE_TABLE_VERSION_PROP_NAME, Integer.toString(tableVersion.versionCode()));
   }
 
   /**
@@ -239,7 +239,7 @@ public class HoodieTableConfig extends HoodieConfig implements Serializable {
   }
 
   public Option<String[]> getPartitionColumns() {
-    if (contains(props, HOODIE_TABLE_PARTITION_COLUMNS)) {
+    if (contains(HOODIE_TABLE_PARTITION_COLUMNS)) {
       return Option.of(Arrays.stream(getString(HOODIE_TABLE_PARTITION_COLUMNS).split(","))
         .filter(p -> p.length() > 0).collect(Collectors.toList()).toArray(new String[]{}));
     }

@@ -20,8 +20,6 @@ package org.apache.hudi.common.config;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,21 +39,22 @@ public class TestConfigOption {
 
   @Test
   public void testGetTypedValue() {
-    Properties props1 = new Properties();
-    assertNull(HoodieConfig.getInt(props1, FAKE_STRING_CONFIG));
-    HoodieConfig.set(props1, FAKE_STRING_CONFIG, "5");
-    assertEquals(5, HoodieConfig.getInt(props1, FAKE_STRING_CONFIG));
+    HoodieConfig hoodieConfig1 = new HoodieConfig();
+    assertNull(hoodieConfig1.getInt(FAKE_STRING_CONFIG));
+    hoodieConfig1.set(FAKE_STRING_CONFIG, "5");
+    assertEquals(5, hoodieConfig1.getInt(FAKE_STRING_CONFIG));
 
-    assertNull(HoodieConfig.getBoolean(props1, FAKE_BOOLEAN_CONFIG));
-    HoodieConfig.set(props1, FAKE_BOOLEAN_CONFIG, "true");
-    assertEquals(true, HoodieConfig.getBoolean(props1, FAKE_BOOLEAN_CONFIG));
+    assertNull(hoodieConfig1.getBoolean(FAKE_BOOLEAN_CONFIG));
+    hoodieConfig1.set(FAKE_BOOLEAN_CONFIG, "true");
+    assertEquals(true, hoodieConfig1.getBoolean(FAKE_BOOLEAN_CONFIG));
   }
 
   @Test
   public void testGetOrDefault() {
-    Map<String, String> props1 = new HashMap<>();
-    props1.put("test.unknown.config", "abc");
-    assertEquals("1", HoodieConfig.getStringOrDefault(props1, FAKE_STRING_CONFIG));
-    assertEquals("2", HoodieConfig.getStringOrDefault(props1, FAKE_STRING_CONFIG, "2"));
+    Properties props = new Properties();
+    props.put("test.unknown.config", "abc");
+    HoodieConfig hoodieConfig2 = new HoodieConfig(props);
+    assertEquals("1", hoodieConfig2.getStringOrDefault(FAKE_STRING_CONFIG));
+    assertEquals("2", hoodieConfig2.getStringOrDefault(FAKE_STRING_CONFIG, "2"));
   }
 }
