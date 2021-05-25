@@ -18,16 +18,14 @@
 package org.apache.hudi.utilities.callback.kafka;
 
 import org.apache.hudi.common.config.ConfigOption;
+import org.apache.hudi.common.config.HoodieConfig;
 
-import java.util.Properties;
-
-import static org.apache.hudi.common.config.HoodieConfig.setDefaultValue;
 import static org.apache.hudi.config.HoodieWriteCommitCallbackConfig.CALLBACK_PREFIX;
 
 /**
  * Kafka write callback related config.
  */
-public class HoodieWriteCommitKafkaCallbackConfig {
+public class HoodieWriteCommitKafkaCallbackConfig extends HoodieConfig {
 
   public static final ConfigOption<String> CALLBACK_KAFKA_BOOTSTRAP_SERVERS = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.bootstrap.servers")
@@ -57,9 +55,9 @@ public class HoodieWriteCommitKafkaCallbackConfig {
   /**
    * Set default value for {@link HoodieWriteCommitKafkaCallbackConfig} if needed.
    */
-  public static void setCallbackKafkaConfigIfNeeded(Properties props) {
-    setDefaultValue(props, CALLBACK_KAFKA_ACKS);
-    setDefaultValue(props, CALLBACK_KAFKA_RETRIES);
+  public static void setCallbackKafkaConfigIfNeeded(HoodieConfig config) {
+    config.setDefaultValue(CALLBACK_KAFKA_ACKS);
+    config.setDefaultValue(CALLBACK_KAFKA_RETRIES);
   }
 
 }

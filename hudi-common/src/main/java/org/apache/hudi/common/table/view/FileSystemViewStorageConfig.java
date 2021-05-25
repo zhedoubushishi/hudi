@@ -142,27 +142,27 @@ public class FileSystemViewStorageConfig extends HoodieConfig {
 
   public long getMaxMemoryForPendingCompaction() {
     long totalMemory = getLong(FILESYSTEM_VIEW_SPILLABLE_MEM);
-    return new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION))
+    return new Double(totalMemory * getDouble(FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION))
         .longValue();
   }
 
   public long getMaxMemoryForBootstrapBaseFile() {
     long totalMemory = getLong(FILESYSTEM_VIEW_SPILLABLE_MEM);
     long reservedForExternalDataFile =
-        new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION))
+        new Double(totalMemory * getDouble(FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION))
             .longValue();
     return reservedForExternalDataFile;
   }
 
   public long getMaxMemoryForReplacedFileGroups() {
     long totalMemory = getLong(FILESYSTEM_VIEW_SPILLABLE_MEM);
-    return new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_REPLACED_MEM_FRACTION))
+    return new Double(totalMemory * getDouble(FILESYSTEM_VIEW_REPLACED_MEM_FRACTION))
         .longValue();
   }
 
   public long getMaxMemoryForPendingClusteringFileGroups() {
     long totalMemory = getLong(FILESYSTEM_VIEW_SPILLABLE_MEM);
-    return new Double(totalMemory * getDouble(props, FILESYSTEM_VIEW_PENDING_CLUSTERING_MEM_FRACTION))
+    return new Double(totalMemory * getDouble(FILESYSTEM_VIEW_PENDING_CLUSTERING_MEM_FRACTION))
         .longValue();
   }
 

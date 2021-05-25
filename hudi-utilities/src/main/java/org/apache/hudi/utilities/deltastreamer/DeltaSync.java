@@ -653,7 +653,7 @@ public class DeltaSync implements Serializable {
 
     // set default value for {@link HoodieWriteCommitKafkaCallbackConfig} if needed.
     if (config.writeCommitCallbackOn() && HoodieWriteCommitKafkaCallback.class.getName().equals(config.getCallbackClass())) {
-      HoodieWriteCommitKafkaCallbackConfig.setCallbackKafkaConfigIfNeeded(config.getProps());
+      HoodieWriteCommitKafkaCallbackConfig.setCallbackKafkaConfigIfNeeded(config);
     }
 
     // Validate what deltastreamer assumes of write-config to be really safe

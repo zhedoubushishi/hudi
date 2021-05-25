@@ -331,7 +331,7 @@ public class HoodieTableMetaClient implements Serializable {
     }
 
     // if anything other than default archive log folder is specified, create that too
-    String archiveLogPropVal = HoodieConfig.getStringOrDefault(props, HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
+    String archiveLogPropVal = new HoodieConfig(props).getStringOrDefault(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME);
     if (!StringUtils.isNullOrEmpty(archiveLogPropVal)) {
       Path archiveLogDir = new Path(metaPathDir, archiveLogPropVal);
       if (!fs.exists(archiveLogDir)) {
@@ -671,39 +671,40 @@ public class HoodieTableMetaClient implements Serializable {
     }
 
     public PropertyBuilder fromProperties(Properties properties) {
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_TABLE_NAME_PROP_NAME)) {
-        setTableName(HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_TABLE_NAME_PROP_NAME));
+      HoodieConfig hoodieConfig = new HoodieConfig(properties);
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_TABLE_NAME_PROP_NAME)) {
+        setTableName(hoodieConfig.getString(HoodieTableConfig.HOODIE_TABLE_NAME_PROP_NAME));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_TABLE_TYPE_PROP_NAME)) {
-        setTableType(HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_TABLE_TYPE_PROP_NAME));
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_TABLE_TYPE_PROP_NAME)) {
+        setTableType(hoodieConfig.getString(HoodieTableConfig.HOODIE_TABLE_TYPE_PROP_NAME));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME)) {
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME)) {
         setArchiveLogFolder(
-            HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME));
+            hoodieConfig.getString(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME)) {
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME)) {
         setPayloadClassName(
-            HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME));
+            hoodieConfig.getString(HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_TIMELINE_LAYOUT_VERSION)) {
-        setTimelineLayoutVersion(HoodieConfig.getInt(properties, HoodieTableConfig.HOODIE_TIMELINE_LAYOUT_VERSION));
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_TIMELINE_LAYOUT_VERSION)) {
+        setTimelineLayoutVersion(hoodieConfig.getInt(HoodieTableConfig.HOODIE_TIMELINE_LAYOUT_VERSION));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME)) {
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME)) {
         setBaseFileFormat(
-            HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME));
+            hoodieConfig.getString(HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME)) {
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME)) {
         setBootstrapIndexClass(
-            HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME));
+            hoodieConfig.getString(HoodieTableConfig.HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH)) {
-        setBootstrapBasePath(HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH));
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH)) {
+        setBootstrapBasePath(hoodieConfig.getString(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_TABLE_PRECOMBINE_FIELD)) {
-        setPreCombineField(HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_TABLE_PRECOMBINE_FIELD));
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_TABLE_PRECOMBINE_FIELD)) {
+        setPreCombineField(hoodieConfig.getString(HoodieTableConfig.HOODIE_TABLE_PRECOMBINE_FIELD));
       }
-      if (HoodieConfig.contains(properties, HoodieTableConfig.HOODIE_TABLE_PARTITION_COLUMNS)) {
-        setPartitionColumns(HoodieConfig.getString(properties, HoodieTableConfig.HOODIE_TABLE_PARTITION_COLUMNS));
+      if (hoodieConfig.contains(HoodieTableConfig.HOODIE_TABLE_PARTITION_COLUMNS)) {
+        setPartitionColumns(hoodieConfig.getString(HoodieTableConfig.HOODIE_TABLE_PARTITION_COLUMNS));
       }
       return this;
     }

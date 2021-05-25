@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -415,10 +414,10 @@ public class TestUpgradeDowngrade extends HoodieClientTestBase {
     Path propertyFile = new Path(metaClient.getMetaPath() + "/" + HoodieTableConfig.HOODIE_PROPERTIES_FILE);
     // Load the properties and verify
     FSDataInputStream fsDataInputStream = metaClient.getFs().open(propertyFile);
-    Properties prop = new Properties();
-    prop.load(fsDataInputStream);
+    HoodieConfig hoodieConfig = new HoodieConfig();
+    hoodieConfig.load(fsDataInputStream);
     fsDataInputStream.close();
-    assertEquals(Integer.toString(expectedVersion.versionCode()), HoodieConfig
-        .getString(prop, HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
+    assertEquals(Integer.toString(expectedVersion.versionCode()), hoodieConfig
+        .getString(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME));
   }
 }

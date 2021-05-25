@@ -484,7 +484,7 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public boolean isEmbeddedTimelineServerReuseEnabled() {
-    return Boolean.parseBoolean(getStringOrDefault(props, EMBEDDED_TIMELINE_SERVER_REUSE_ENABLED));
+    return Boolean.parseBoolean(getStringOrDefault(EMBEDDED_TIMELINE_SERVER_REUSE_ENABLED));
   }
 
   public int getEmbeddedTimelineServerPort() {
