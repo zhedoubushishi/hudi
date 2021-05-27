@@ -73,7 +73,7 @@ private[hudi] object HoodieSparkSqlWriter {
 
     val sparkContext = sqlContext.sparkContext
     val path = parameters.get("path")
-    val hoodieConfig = convertToHoodieConfig(parameters)
+    val hoodieConfig = HoodieWriterUtils.convertMapToHoodieConfig(parameters)
     val tblNameOp = hoodieConfig.getStringOrThrow(HoodieWriteConfig.TABLE_NAME, s"'${HoodieWriteConfig.TABLE_NAME.key}' must be set.")
     asyncCompactionTriggerFnDefined = asyncCompactionTriggerFn.isDefined
     if (path.isEmpty) {
@@ -257,7 +257,7 @@ private[hudi] object HoodieSparkSqlWriter {
 
     val sparkContext = sqlContext.sparkContext
     val path = parameters.getOrElse("path", throw new HoodieException("'path' must be set."))
-    val hoodieConfig = convertToHoodieConfig(parameters)
+    val hoodieConfig = HoodieWriterUtils.convertMapToHoodieConfig(parameters)
     val tableName = hoodieConfig.getStringOrThrow(HoodieWriteConfig.TABLE_NAME, s"'${HoodieWriteConfig.TABLE_NAME.key}' must be set.")
     val tableType = hoodieConfig.getStringOrDefault(TABLE_TYPE_OPT_KEY)
     val bootstrapBasePath = hoodieConfig.getStringOrThrow(BOOTSTRAP_BASE_PATH_PROP,
@@ -348,7 +348,7 @@ private[hudi] object HoodieSparkSqlWriter {
       throw new HoodieException("Bulk insert using row writer is not supported with current Spark version."
         + " To use row writer please switch to spark 2 or spark 3")
     }
-    val hoodieConfig = convertToHoodieConfig(params)
+    val hoodieConfig = HoodieWriterUtils.convertMapToHoodieConfig(params)
     val hiveSyncEnabled = hoodieConfig.getStringOrDefault(HIVE_SYNC_ENABLED_OPT_KEY).toBoolean
     val metaSyncEnabled = hoodieConfig.getStringOrDefault(META_SYNC_ENABLED_OPT_KEY).toBoolean
     val syncHiveSuccess =
@@ -566,7 +566,8 @@ private[hudi] object HoodieSparkSqlWriter {
 
       log.info(s"Compaction Scheduled is $compactionInstant")
 
-      val metaSyncSuccess = metaSync(spark, convertToHoodieConfig(parameters), tableInstantInfo.basePath, schema)
+      val metaSyncSuccess = metaSync(spark, HoodieWriterUtils.convertMapToHoodieConfig(parameters),
+        tableInstantInfo.basePath, schema)
 
       log.info(s"Is Async Compaction Enabled ? $asyncCompactionEnabled")
       if (!asyncCompactionEnabled) {
@@ -613,11 +614,5 @@ private[hudi] object HoodieSparkSqlWriter {
     } else {
       null
     }
-  }
-
-  private def convertToHoodieConfig(parameters: Map[String, String]): HoodieConfig = {
-    val properties = new Properties()
-    properties.putAll(mapAsJavaMap(parameters))
-    new HoodieConfig(properties)
   }
 }
