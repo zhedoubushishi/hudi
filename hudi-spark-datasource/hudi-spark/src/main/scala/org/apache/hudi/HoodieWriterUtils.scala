@@ -17,9 +17,11 @@
 
 package org.apache.hudi
 
+import java.util.Properties
+
 import scala.collection.JavaConverters._
 import org.apache.hudi.DataSourceWriteOptions._
-import org.apache.hudi.common.config.TypedProperties
+import org.apache.hudi.common.config.{HoodieConfig, TypedProperties}
 
 import scala.collection.JavaConversions.mapAsJavaMap
 import scala.collection.JavaConverters.mapAsScalaMapConverter
@@ -107,5 +109,11 @@ object HoodieWriterUtils {
       case b: BaseKeyGenerator => b.getPartitionPathFields.asScala.mkString(",")
       case _=> null
     }
+  }
+
+  def convertMapToHoodieConfig(parameters: Map[String, String]): HoodieConfig = {
+    val properties = new Properties()
+    properties.putAll(mapAsJavaMap(parameters))
+    new HoodieConfig(properties)
   }
 }

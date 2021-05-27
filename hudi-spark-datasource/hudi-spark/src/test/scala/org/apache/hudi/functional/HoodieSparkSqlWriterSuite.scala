@@ -20,10 +20,12 @@ package org.apache.hudi.functional
 import java.time.Instant
 import java.util
 import java.util.{Collections, Date, UUID}
+
 import org.apache.commons.io.FileUtils
 import org.apache.hadoop.fs.Path
 import org.apache.hudi.DataSourceWriteOptions._
 import org.apache.hudi.client.{SparkRDDWriteClient, TestBootstrap}
+import org.apache.hudi.common.config.HoodieConfig
 import org.apache.hudi.common.model.{HoodieRecord, HoodieRecordPayload}
 import org.apache.hudi.common.testutils.HoodieTestDataGenerator
 import org.apache.hudi.config.{HoodieBootstrapConfig, HoodieWriteConfig}
@@ -493,7 +495,7 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
     initSparkContext("test build sync config")
     val addSqlTablePropertiesMethod =
         HoodieSparkSqlWriter.getClass.getDeclaredMethod("addSqlTableProperties",
-          classOf[SQLConf], classOf[StructType], classOf[Map[_,_]])
+          classOf[SQLConf], classOf[StructType], classOf[HoodieConfig])
     addSqlTablePropertiesMethod.setAccessible(true)
 
     val schema = DataSourceTestUtils.getStructTypeExampleSchema
@@ -506,17 +508,18 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
       DataSourceWriteOptions.HIVE_SKIP_RO_SUFFIX.key -> "true"
     )
     val parameters = HoodieWriterUtils.parametersWithWriteDefaults(params)
-    val newParams = addSqlTablePropertiesMethod.invoke(HoodieSparkSqlWriter,
-      spark.sessionState.conf, structType, parameters)
-      .asInstanceOf[Map[String, String]]
+    val hoodieConfig = HoodieWriterUtils.convertMapToHoodieConfig(parameters)
+    val newHoodieConfig = addSqlTablePropertiesMethod.invoke(HoodieSparkSqlWriter,
+      spark.sessionState.conf, structType, hoodieConfig)
+      .asInstanceOf[HoodieConfig]
 
     val buildSyncConfigMethod =
       HoodieSparkSqlWriter.getClass.getDeclaredMethod("buildSyncConfig", classOf[Path],
-        classOf[Map[_,_]])
+        classOf[HoodieConfig])
     buildSyncConfigMethod.setAccessible(true)
 
     val hiveSyncConfig = buildSyncConfigMethod.invoke(HoodieSparkSqlWriter,
-      new Path(basePath), newParams).asInstanceOf[HiveSyncConfig]
+      new Path(basePath), newHoodieConfig).asInstanceOf[HiveSyncConfig]
 
     assertTrue(hiveSyncConfig.skipROSuffix)
     assertResult("spark.sql.sources.provider=hudi\n" +
@@ -535,7 +538,7 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
     initSparkContext("test build sync config for skip Ro suffix vals")
     val addSqlTablePropertiesMethod =
       HoodieSparkSqlWriter.getClass.getDeclaredMethod("addSqlTableProperties",
-        classOf[SQLConf], classOf[StructType], classOf[Map[_, _]])
+        classOf[SQLConf], classOf[StructType], classOf[HoodieConfig])
     addSqlTablePropertiesMethod.setAccessible(true)
 
     val schema = DataSourceTestUtils.getStructTypeExampleSchema
@@ -547,17 +550,18 @@ class HoodieSparkSqlWriterSuite extends FunSuite with Matchers {
       DataSourceWriteOptions.HIVE_PARTITION_FIELDS_OPT_KEY.key -> "partition"
     )
     val parameters = HoodieWriterUtils.parametersWithWriteDefaults(params)
-    val newParams = addSqlTablePropertiesMethod.invoke(HoodieSparkSqlWriter,
-      spark.sessionState.conf, structType, parameters)
-      .asInstanceOf[Map[String, String]]
+    val hoodieConfig = HoodieWriterUtils.convertMapToHoodieConfig(parameters)
+    val newHoodieConfig = addSqlTablePropertiesMethod.invoke(HoodieSparkSqlWriter,
+      spark.sessionState.conf, structType, hoodieConfig)
+      .asInstanceOf[HoodieConfig]
 
     val buildSyncConfigMethod =
       HoodieSparkSqlWriter.getClass.getDeclaredMethod("buildSyncConfig", classOf[Path],
-        classOf[Map[_, _]])
+        classOf[HoodieConfig])
     buildSyncConfigMethod.setAccessible(true)
 
     val hiveSyncConfig = buildSyncConfigMethod.invoke(HoodieSparkSqlWriter,
-      new Path(basePath), newParams).asInstanceOf[HiveSyncConfig]
+      new Path(basePath), newHoodieConfig).asInstanceOf[HiveSyncConfig]
 
     assertFalse(hiveSyncConfig.skipROSuffix)
   }

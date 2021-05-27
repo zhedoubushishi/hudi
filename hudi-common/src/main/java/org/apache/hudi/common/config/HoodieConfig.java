@@ -124,7 +124,7 @@ public class HoodieConfig implements Serializable {
 
   public <T> String getStringOrDefault(ConfigOption<T> configOption, String defaultVal) {
     Option<Object> rawValue = getRawValue(configOption);
-    return rawValue.orElse(defaultVal).toString();
+    return rawValue.map(Object::toString).orElse(defaultVal);
   }
 
   public Properties getProps() {
