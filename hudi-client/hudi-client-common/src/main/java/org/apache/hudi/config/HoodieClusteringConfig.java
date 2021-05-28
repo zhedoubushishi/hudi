@@ -24,12 +24,16 @@ import org.apache.hudi.common.config.HoodieConfig;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
  * Clustering specific configs.
  */
 public class HoodieClusteringConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final ConfigOption<String> CLUSTERING_PLAN_STRATEGY_CLASS = ConfigOption
       .key("hoodie.clustering.plan.strategy.class")
@@ -193,17 +197,8 @@ public class HoodieClusteringConfig extends HoodieConfig {
     }
 
     public HoodieClusteringConfig build() {
-      clusteringConfig.setDefaultValue(CLUSTERING_PLAN_STRATEGY_CLASS);
-      clusteringConfig.setDefaultValue(CLUSTERING_EXECUTION_STRATEGY_CLASS);
-      clusteringConfig.setDefaultValue(CLUSTERING_MAX_BYTES_PER_GROUP);
-      clusteringConfig.setDefaultValue(CLUSTERING_MAX_NUM_GROUPS);
-      clusteringConfig.setDefaultValue(CLUSTERING_TARGET_FILE_MAX_BYTES);
-      clusteringConfig.setDefaultValue(INLINE_CLUSTERING_PROP);
-      clusteringConfig.setDefaultValue(INLINE_CLUSTERING_MAX_COMMIT_PROP);
-      clusteringConfig.setDefaultValue(CLUSTERING_TARGET_PARTITIONS);
-      clusteringConfig.setDefaultValue(CLUSTERING_PLAN_SMALL_FILE_LIMIT);
-      clusteringConfig.setDefaultValue(CLUSTERING_UPDATES_STRATEGY_PROP);
-      clusteringConfig.setDefaultValue(ASYNC_CLUSTERING_ENABLE_OPT_KEY);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          clusteringConfig::setDefaultValue);
       return clusteringConfig;
     }
   }

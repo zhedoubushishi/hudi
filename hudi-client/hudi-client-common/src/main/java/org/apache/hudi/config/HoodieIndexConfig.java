@@ -30,6 +30,8 @@ import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -37,6 +39,8 @@ import java.util.Properties;
  */
 @Immutable
 public class HoodieIndexConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final ConfigOption<String> INDEX_TYPE_PROP = ConfigOption
       .key("hoodie.index.type")
@@ -322,24 +326,8 @@ public class HoodieIndexConfig extends HoodieConfig {
 
     public HoodieIndexConfig build() {
       hoodieIndexConfig.setDefaultValue(INDEX_TYPE_PROP, getDefaultIndexType(engineType));
-      hoodieIndexConfig.setDefaultValue(INDEX_CLASS_PROP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_FILTER_NUM_ENTRIES);
-      hoodieIndexConfig.setDefaultValue(BLOOM_FILTER_FPP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_PARALLELISM_PROP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_PRUNE_BY_RANGES_PROP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_USE_CACHING_PROP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_INPUT_STORAGE_LEVEL);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_UPDATE_PARTITION_PATH);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_TREE_BASED_FILTER_PROP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_BUCKETIZED_CHECKING_PROP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_KEYS_PER_BUCKET_PROP);
-      hoodieIndexConfig.setDefaultValue(BLOOM_INDEX_FILTER_TYPE);
-      hoodieIndexConfig.setDefaultValue(HOODIE_BLOOM_INDEX_FILTER_DYNAMIC_MAX_ENTRIES);
-      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_PARALLELISM_PROP);
-      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_USE_CACHING_PROP);
-      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_INPUT_STORAGE_LEVEL);
-      hoodieIndexConfig.setDefaultValue(GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP);
-      hoodieIndexConfig.setDefaultValue(SIMPLE_INDEX_UPDATE_PARTITION_PATH);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          hoodieIndexConfig::setDefaultValue);
 
       // Throws IllegalArgumentException if the value set is not a known Hoodie Index Type
       HoodieIndex.IndexType.valueOf(hoodieIndexConfig.getString(INDEX_TYPE_PROP));

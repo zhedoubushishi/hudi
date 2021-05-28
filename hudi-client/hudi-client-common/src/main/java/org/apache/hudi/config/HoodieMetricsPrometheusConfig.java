@@ -21,11 +21,15 @@ package org.apache.hudi.config;
 import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.HoodieConfig;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.apache.hudi.config.HoodieMetricsConfig.METRIC_PREFIX;
 
 public class HoodieMetricsPrometheusConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   // Prometheus PushGateWay
   public static final String PUSHGATEWAY_PREFIX = METRIC_PREFIX + ".pushgateway";
@@ -98,13 +102,8 @@ public class HoodieMetricsPrometheusConfig extends HoodieConfig {
     }
 
     public HoodieMetricsPrometheusConfig build() {
-      hoodieMetricsPrometheusConfig.setDefaultValue(PROMETHEUS_PORT);
-      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_HOST);
-      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_PORT);
-      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_REPORT_PERIOD_SECONDS);
-      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_DELETE_ON_SHUTDOWN);
-      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_JOB_NAME);
-      hoodieMetricsPrometheusConfig.setDefaultValue(PUSHGATEWAY_RANDOM_JOB_NAME_SUFFIX);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          hoodieMetricsPrometheusConfig::setDefaultValue);
       return hoodieMetricsPrometheusConfig;
     }
   }

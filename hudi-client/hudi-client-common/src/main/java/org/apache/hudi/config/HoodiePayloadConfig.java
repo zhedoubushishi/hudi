@@ -18,20 +18,35 @@
 
 package org.apache.hudi.config;
 
+import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.HoodieConfig;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP;
-import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP;
+import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP_KEY;
+import static org.apache.hudi.common.model.HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP_KEY;
 
 /**
  * Hoodie payload related configs.
  */
 public class HoodiePayloadConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
+
+  public static final ConfigOption<String> PAYLOAD_ORDERING_FIELD_PROP = ConfigOption
+      .key(PAYLOAD_ORDERING_FIELD_PROP_KEY)
+      .defaultValue("ts")
+      .withDocumentation("Property to hold the payload ordering field name");
+
+  public static final ConfigOption<String> PAYLOAD_EVENT_TIME_FIELD_PROP = ConfigOption
+      .key(PAYLOAD_EVENT_TIME_FIELD_PROP_KEY)
+      .defaultValue("ts")
+      .withDocumentation("Property for payload event time field");
 
   private HoodiePayloadConfig() {
     super();
@@ -68,8 +83,8 @@ public class HoodiePayloadConfig extends HoodieConfig {
     }
 
     public HoodiePayloadConfig build() {
-      payloadConfig.setDefaultValue(PAYLOAD_ORDERING_FIELD_PROP);
-      payloadConfig.setDefaultValue(PAYLOAD_EVENT_TIME_FIELD_PROP);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          payloadConfig::setDefaultValue);
       return payloadConfig;
     }
   }

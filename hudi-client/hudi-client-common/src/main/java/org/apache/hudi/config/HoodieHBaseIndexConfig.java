@@ -25,9 +25,13 @@ import org.apache.hudi.index.hbase.DefaultHBaseQPSResourceAllocator;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class HoodieHBaseIndexConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final ConfigOption<String> HBASE_ZKQUORUM_PROP = ConfigOption
       .key("hoodie.index.hbase.zkquorum")
@@ -288,20 +292,8 @@ public class HoodieHBaseIndexConfig extends HoodieConfig {
     }
 
     public HoodieHBaseIndexConfig build() {
-      hBaseIndexConfig.setDefaultValue(HBASE_GET_BATCH_SIZE_PROP);
-      hBaseIndexConfig.setDefaultValue(HBASE_PUT_BATCH_SIZE_PROP);
-      hBaseIndexConfig.setDefaultValue(HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP);
-      hBaseIndexConfig.setDefaultValue(HBASE_QPS_FRACTION_PROP);
-      hBaseIndexConfig.setDefaultValue(HBASE_MAX_QPS_PER_REGION_SERVER_PROP);
-      hBaseIndexConfig.setDefaultValue(HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY);
-      hBaseIndexConfig.setDefaultValue(HBASE_INDEX_QPS_ALLOCATOR_CLASS);
-      hBaseIndexConfig.setDefaultValue(HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS);
-      hBaseIndexConfig.setDefaultValue(HBASE_ZK_PATH_QPS_ROOT);
-      hBaseIndexConfig.setDefaultValue(HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS);
-      hBaseIndexConfig.setDefaultValue(HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS);
-      hBaseIndexConfig.setDefaultValue(HBASE_INDEX_QPS_ALLOCATOR_CLASS);
-      hBaseIndexConfig.setDefaultValue(HBASE_INDEX_UPDATE_PARTITION_PATH);
-      hBaseIndexConfig.setDefaultValue(HBASE_INDEX_ROLLBACK_SYNC);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          hBaseIndexConfig::setDefaultValue);
       return hBaseIndexConfig;
     }
 

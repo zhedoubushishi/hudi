@@ -26,6 +26,8 @@ import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -33,6 +35,8 @@ import java.util.Properties;
  */
 @Immutable
 public class HoodieMemoryConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   // Default max memory fraction during hash-merge, excess spills to disk
   public static final ConfigOption<String> MAX_MEMORY_FRACTION_FOR_MERGE_PROP = ConfigOption
@@ -134,10 +138,8 @@ public class HoodieMemoryConfig extends HoodieConfig {
     }
 
     public HoodieMemoryConfig build() {
-      memoryConfig.setDefaultValue(MAX_DFS_STREAM_BUFFER_SIZE_PROP);
-      memoryConfig.setDefaultValue(SPILLABLE_MAP_BASE_PATH_PROP);
-      memoryConfig.setDefaultValue(MAX_MEMORY_FOR_MERGE_PROP);
-      memoryConfig.setDefaultValue(WRITESTATUS_FAILURE_FRACTION_PROP);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          memoryConfig::setDefaultValue);
       return memoryConfig;
     }
   }

@@ -24,17 +24,21 @@ import org.apache.hudi.client.bootstrap.translator.IdentityBootstrapPartitionPat
 import org.apache.hudi.common.bootstrap.index.HFileBootstrapIndex;
 import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.HoodieConfig;
+import org.apache.hudi.common.table.HoodieTableConfig;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import org.apache.hudi.common.table.HoodieTableConfig;
 
 /**
  * Bootstrap specific configs.
  */
 public class HoodieBootstrapConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final ConfigOption<String> BOOTSTRAP_BASE_PATH_PROP = ConfigOption
       .key("hoodie.bootstrap.base.path")
@@ -158,14 +162,11 @@ public class HoodieBootstrapConfig extends HoodieConfig {
     }
 
     public HoodieBootstrapConfig build() {
-      bootstrapConfig.setDefaultValue(BOOTSTRAP_PARALLELISM);
-      bootstrapConfig.setDefaultValue(BOOTSTRAP_PARTITION_PATH_TRANSLATOR_CLASS);
-      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR);
-      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX);
-      bootstrapConfig.setDefaultValue(BOOTSTRAP_MODE_SELECTOR_REGEX_MODE);
+      // TODO: use infer function instead
       bootstrapConfig.setDefaultValue(BOOTSTRAP_INDEX_CLASS_PROP, HoodieTableConfig.getDefaultBootstrapIndexClass(
           bootstrapConfig.getProps()));
-      bootstrapConfig.setDefaultValue(FULL_BOOTSTRAP_INPUT_PROVIDER);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          bootstrapConfig::setDefaultValue);
       return bootstrapConfig;
     }
   }

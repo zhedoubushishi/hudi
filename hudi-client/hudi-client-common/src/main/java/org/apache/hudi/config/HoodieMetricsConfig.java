@@ -27,6 +27,8 @@ import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -34,6 +36,8 @@ import java.util.Properties;
  */
 @Immutable
 public class HoodieMetricsConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final String METRIC_PREFIX = "hoodie.metrics";
 
@@ -169,22 +173,17 @@ public class HoodieMetricsConfig extends HoodieConfig {
     }
 
     public HoodieMetricsConfig build() {
-      hoodieMetricsConfig.setDefaultValue(METRICS_ON);
-      hoodieMetricsConfig.setDefaultValue(METRICS_REPORTER_TYPE);
-      hoodieMetricsConfig.setDefaultValue(GRAPHITE_SERVER_HOST);
-      hoodieMetricsConfig.setDefaultValue(GRAPHITE_SERVER_PORT);
-      hoodieMetricsConfig.setDefaultValue(JMX_HOST);
-      hoodieMetricsConfig.setDefaultValue(JMX_PORT);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          hoodieMetricsConfig::setDefaultValue);
+
       MetricsReporterType reporterType = MetricsReporterType.valueOf(hoodieMetricsConfig.getString(METRICS_REPORTER_TYPE));
 
       hoodieMetricsConfig.setDefaultOnCondition(reporterType == MetricsReporterType.DATADOG,
           HoodieMetricsDatadogConfig.newBuilder().fromProperties(hoodieMetricsConfig.getProps()).build());
-      hoodieMetricsConfig.setDefaultValue(METRICS_REPORTER_CLASS);
       hoodieMetricsConfig.setDefaultOnCondition(reporterType == MetricsReporterType.PROMETHEUS_PUSHGATEWAY,
               HoodieMetricsPrometheusConfig.newBuilder().fromProperties(hoodieMetricsConfig.getProps()).build());
       hoodieMetricsConfig.setDefaultOnCondition(reporterType == MetricsReporterType.PROMETHEUS,
               HoodieMetricsPrometheusConfig.newBuilder().fromProperties(hoodieMetricsConfig.getProps()).build());
-
       return hoodieMetricsConfig;
     }
   }

@@ -68,9 +68,9 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
      * and need to be dealt with separately.
      */
     Object persistedOrderingVal = getNestedFieldVal((GenericRecord) currentValue,
-        hoodieConfig.getString(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), true);
+        hoodieConfig.getString(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP_KEY), true);
     Comparable incomingOrderingVal = (Comparable) getNestedFieldVal(incomingRecord, hoodieConfig
-        .getString(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), false);
+        .getString(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP_KEY), false);
 
     // Null check is needed here to support schema evolution. The record in storage may be from old schema where
     // the new ordering column might not be present and hence returns null.
@@ -82,7 +82,7 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
      * We reached a point where the value is disk is older than the incoming record.
      */
     eventTime = Option.ofNullable(getNestedFieldVal(incomingRecord, hoodieConfig
-        .getString(HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP), true));
+        .getString(HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP_KEY), true));
 
     /*
      * Now check if the incoming record is a delete record.

@@ -145,13 +145,16 @@ public class ConfigOption<T> implements Serializable {
     }
 
     private void registerConfig(ConfigOption configOption) {
+      // This would get the Config class that the current ConfigOption belongs to
       String configClassName = Thread.currentThread().getStackTrace()[3].getClassName();
       try {
         Class<?> caller = Class.forName(configClassName);
-        List<ConfigOption<?>> configRegistry = (List<ConfigOption<?>>) caller.getDeclaredField("CONFIG_REGISTRY").get(null);
+        List<ConfigOption<?>> configRegistry = (List<ConfigOption<?>>) caller
+            .getDeclaredField("CONFIG_REGISTRY").get(null);
         configRegistry.add(configOption);
+      } catch (NoSuchFieldException ignored) {
       } catch (Exception e) {
-        e.printStackTrace();
+        throw new HoodieException("Failed to register the config");
       }
     }
   }

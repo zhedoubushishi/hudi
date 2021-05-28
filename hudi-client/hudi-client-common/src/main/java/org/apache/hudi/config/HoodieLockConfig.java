@@ -27,6 +27,8 @@ import org.apache.hudi.common.lock.LockProvider;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.apache.hudi.common.config.LockConfiguration.HIVE_DATABASE_NAME_PROP;
@@ -51,6 +53,8 @@ import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT
  * Hoodie Configs for Locks.
  */
 public class HoodieLockConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   // Pluggable type of lock provider
   public static final ConfigOption<String> LOCK_PROVIDER_CLASS_PROP = ConfigOption

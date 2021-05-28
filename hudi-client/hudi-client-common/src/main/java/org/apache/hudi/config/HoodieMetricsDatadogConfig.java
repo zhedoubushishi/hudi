@@ -23,6 +23,8 @@ import org.apache.hudi.common.config.HoodieConfig;
 
 import javax.annotation.concurrent.Immutable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.apache.hudi.config.HoodieMetricsConfig.METRIC_PREFIX;
@@ -34,6 +36,8 @@ import static org.apache.hudi.config.HoodieMetricsConfig.METRIC_PREFIX;
  */
 @Immutable
 public class HoodieMetricsDatadogConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final String DATADOG_PREFIX = METRIC_PREFIX + ".datadog";
 
@@ -157,9 +161,8 @@ public class HoodieMetricsDatadogConfig extends HoodieConfig {
     }
 
     public HoodieMetricsDatadogConfig build() {
-      metricsDatadogConfig.setDefaultValue(DATADOG_REPORT_PERIOD_SECONDS);
-      metricsDatadogConfig.setDefaultValue(DATADOG_API_KEY_SKIP_VALIDATION);
-      metricsDatadogConfig.setDefaultValue(DATADOG_API_TIMEOUT_SECONDS);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          metricsDatadogConfig::setDefaultValue);
       return metricsDatadogConfig;
     }
   }
