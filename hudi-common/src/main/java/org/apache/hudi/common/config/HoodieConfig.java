@@ -26,7 +26,9 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -46,7 +48,7 @@ public class HoodieConfig implements Serializable {
     this.props = props;
   }
 
-  public <T> void set(ConfigOption<T> cfg, String val) {
+  public <T> void setValue(ConfigOption<T> cfg, String val) {
     props.setProperty(cfg.key(), val);
   }
 

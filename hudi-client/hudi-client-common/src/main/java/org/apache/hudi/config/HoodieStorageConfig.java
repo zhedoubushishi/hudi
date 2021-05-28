@@ -127,57 +127,57 @@ public class HoodieStorageConfig extends HoodieConfig {
     }
 
     public Builder parquetMaxFileSize(long maxFileSize) {
-      storageConfig.set(PARQUET_FILE_MAX_BYTES, String.valueOf(maxFileSize));
+      storageConfig.setValue(PARQUET_FILE_MAX_BYTES, String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder parquetBlockSize(int blockSize) {
-      storageConfig.set(PARQUET_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
+      storageConfig.setValue(PARQUET_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
       return this;
     }
 
     public Builder parquetPageSize(int pageSize) {
-      storageConfig.set(PARQUET_PAGE_SIZE_BYTES, String.valueOf(pageSize));
+      storageConfig.setValue(PARQUET_PAGE_SIZE_BYTES, String.valueOf(pageSize));
       return this;
     }
 
     public Builder hfileMaxFileSize(long maxFileSize) {
-      storageConfig.set(HFILE_FILE_MAX_BYTES, String.valueOf(maxFileSize));
+      storageConfig.setValue(HFILE_FILE_MAX_BYTES, String.valueOf(maxFileSize));
       return this;
     }
 
     public Builder hfileBlockSize(int blockSize) {
-      storageConfig.set(HFILE_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
+      storageConfig.setValue(HFILE_BLOCK_SIZE_BYTES, String.valueOf(blockSize));
       return this;
     }
 
     public Builder logFileDataBlockMaxSize(int dataBlockSize) {
-      storageConfig.set(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES, String.valueOf(dataBlockSize));
+      storageConfig.setValue(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES, String.valueOf(dataBlockSize));
       return this;
     }
 
     public Builder logFileMaxSize(int logFileSize) {
-      storageConfig.set(LOGFILE_SIZE_MAX_BYTES, String.valueOf(logFileSize));
+      storageConfig.setValue(LOGFILE_SIZE_MAX_BYTES, String.valueOf(logFileSize));
       return this;
     }
 
     public Builder parquetCompressionRatio(double parquetCompressionRatio) {
-      storageConfig.set(PARQUET_COMPRESSION_RATIO, String.valueOf(parquetCompressionRatio));
+      storageConfig.setValue(PARQUET_COMPRESSION_RATIO, String.valueOf(parquetCompressionRatio));
       return this;
     }
 
     public Builder parquetCompressionCodec(String parquetCompressionCodec) {
-      storageConfig.set(PARQUET_COMPRESSION_CODEC, parquetCompressionCodec);
+      storageConfig.setValue(PARQUET_COMPRESSION_CODEC, parquetCompressionCodec);
       return this;
     }
 
     public Builder hfileCompressionAlgorithm(String hfileCompressionAlgorithm) {
-      storageConfig.set(HFILE_COMPRESSION_ALGORITHM, hfileCompressionAlgorithm);
+      storageConfig.setValue(HFILE_COMPRESSION_ALGORITHM, hfileCompressionAlgorithm);
       return this;
     }
 
     public Builder logFileToParquetCompressionRatio(double logFileToParquetCompressionRatio) {
-      storageConfig.set(LOGFILE_TO_PARQUET_COMPRESSION_RATIO, String.valueOf(logFileToParquetCompressionRatio));
+      storageConfig.setValue(LOGFILE_TO_PARQUET_COMPRESSION_RATIO, String.valueOf(logFileToParquetCompressionRatio));
       return this;
     }
 

@@ -713,41 +713,41 @@ public class HoodieTableMetaClient implements Serializable {
       ValidationUtils.checkArgument(tableName != null, "tableName is null");
 
       HoodieTableConfig tableConfig = new HoodieTableConfig();
-      tableConfig.set(HoodieTableConfig.HOODIE_TABLE_NAME_PROP_NAME, tableName);
-      tableConfig.set(HoodieTableConfig.HOODIE_TABLE_TYPE_PROP_NAME, tableType.name());
-      tableConfig.set(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME,
+      tableConfig.setValue(HoodieTableConfig.HOODIE_TABLE_NAME_PROP_NAME, tableName);
+      tableConfig.setValue(HoodieTableConfig.HOODIE_TABLE_TYPE_PROP_NAME, tableType.name());
+      tableConfig.setValue(HoodieTableConfig.HOODIE_TABLE_VERSION_PROP_NAME,
           String.valueOf(HoodieTableVersion.current().versionCode()));
       if (tableType == HoodieTableType.MERGE_ON_READ && payloadClassName != null) {
-        tableConfig.set(HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME, payloadClassName);
+        tableConfig.setValue(HoodieTableConfig.HOODIE_PAYLOAD_CLASS_PROP_NAME, payloadClassName);
       }
 
       if (null != archiveLogFolder) {
-        tableConfig.set(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME, archiveLogFolder);
+        tableConfig.setValue(HoodieTableConfig.HOODIE_ARCHIVELOG_FOLDER_PROP_NAME, archiveLogFolder);
       }
 
       if (null != timelineLayoutVersion) {
-        tableConfig.set(HoodieTableConfig.HOODIE_TIMELINE_LAYOUT_VERSION,
+        tableConfig.setValue(HoodieTableConfig.HOODIE_TIMELINE_LAYOUT_VERSION,
             String.valueOf(timelineLayoutVersion));
       }
 
       if (null != baseFileFormat) {
-        tableConfig.set(HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME, baseFileFormat.toUpperCase());
+        tableConfig.setValue(HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME, baseFileFormat.toUpperCase());
       }
 
       if (null != bootstrapIndexClass) {
-        tableConfig.set(HoodieTableConfig.HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME, bootstrapIndexClass);
+        tableConfig.setValue(HoodieTableConfig.HOODIE_BOOTSTRAP_INDEX_CLASS_PROP_NAME, bootstrapIndexClass);
       }
 
       if (null != bootstrapBasePath) {
-        tableConfig.set(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH, bootstrapBasePath);
+        tableConfig.setValue(HoodieTableConfig.HOODIE_BOOTSTRAP_BASE_PATH, bootstrapBasePath);
       }
 
       if (null != preCombineField) {
-        tableConfig.set(HoodieTableConfig.HOODIE_TABLE_PRECOMBINE_FIELD, preCombineField);
+        tableConfig.setValue(HoodieTableConfig.HOODIE_TABLE_PRECOMBINE_FIELD, preCombineField);
       }
 
       if (null != partitionColumns) {
-        tableConfig.set(HoodieTableConfig.HOODIE_TABLE_PARTITION_COLUMNS, partitionColumns);
+        tableConfig.setValue(HoodieTableConfig.HOODIE_TABLE_PARTITION_COLUMNS, partitionColumns);
       }
       return tableConfig.getProps();
     }

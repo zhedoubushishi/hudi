@@ -41,11 +41,11 @@ public class TestConfigOption {
   public void testGetTypedValue() {
     HoodieConfig hoodieConfig1 = new HoodieConfig();
     assertNull(hoodieConfig1.getInt(FAKE_STRING_CONFIG));
-    hoodieConfig1.set(FAKE_STRING_CONFIG, "5");
+    hoodieConfig1.setValue(FAKE_STRING_CONFIG, "5");
     assertEquals(5, hoodieConfig1.getInt(FAKE_STRING_CONFIG));
 
     assertNull(hoodieConfig1.getBoolean(FAKE_BOOLEAN_CONFIG));
-    hoodieConfig1.set(FAKE_BOOLEAN_CONFIG, "true");
+    hoodieConfig1.setValue(FAKE_BOOLEAN_CONFIG, "true");
     assertEquals(true, hoodieConfig1.getBoolean(FAKE_BOOLEAN_CONFIG));
   }
 

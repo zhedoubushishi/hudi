@@ -371,7 +371,7 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public void setSchema(String schemaStr) {
-    set(AVRO_SCHEMA, schemaStr);
+    setValue(AVRO_SCHEMA, schemaStr);
   }
 
   public boolean getAvroSchemaValidate() {
@@ -1224,94 +1224,94 @@ public class HoodieWriteConfig extends HoodieConfig {
     }
 
     public Builder withPath(String basePath) {
-      writeConfig.set(BASE_PATH_PROP, basePath);
+      writeConfig.setValue(BASE_PATH_PROP, basePath);
       return this;
     }
 
     public Builder withSchema(String schemaStr) {
-      writeConfig.set(AVRO_SCHEMA, schemaStr);
+      writeConfig.setValue(AVRO_SCHEMA, schemaStr);
       return this;
     }
 
     public Builder withAvroSchemaValidate(boolean enable) {
-      writeConfig.set(AVRO_SCHEMA_VALIDATE, String.valueOf(enable));
+      writeConfig.setValue(AVRO_SCHEMA_VALIDATE, String.valueOf(enable));
       return this;
     }
 
     public Builder forTable(String tableName) {
-      writeConfig.set(TABLE_NAME, tableName);
+      writeConfig.setValue(TABLE_NAME, tableName);
       return this;
     }
 
     public Builder withPreCombineField(String preCombineField) {
-      writeConfig.set(PRECOMBINE_FIELD_PROP, preCombineField);
+      writeConfig.setValue(PRECOMBINE_FIELD_PROP, preCombineField);
       return this;
     }
 
     public Builder withWritePayLoad(String payload) {
-      writeConfig.set(WRITE_PAYLOAD_CLASS, payload);
+      writeConfig.setValue(WRITE_PAYLOAD_CLASS, payload);
       return this;
     }
 
     public Builder withKeyGenerator(String keyGeneratorClass) {
-      writeConfig.set(KEYGENERATOR_CLASS_PROP, keyGeneratorClass);
+      writeConfig.setValue(KEYGENERATOR_CLASS_PROP, keyGeneratorClass);
       return this;
     }
 
     public Builder withTimelineLayoutVersion(int version) {
-      writeConfig.set(TIMELINE_LAYOUT_VERSION, String.valueOf(version));
+      writeConfig.setValue(TIMELINE_LAYOUT_VERSION, String.valueOf(version));
       return this;
     }
 
     public Builder withBulkInsertParallelism(int bulkInsertParallelism) {
-      writeConfig.set(BULKINSERT_PARALLELISM, String.valueOf(bulkInsertParallelism));
+      writeConfig.setValue(BULKINSERT_PARALLELISM, String.valueOf(bulkInsertParallelism));
       return this;
     }
 
     public Builder withUserDefinedBulkInsertPartitionerClass(String className) {
-      writeConfig.set(BULKINSERT_USER_DEFINED_PARTITIONER_CLASS, className);
+      writeConfig.setValue(BULKINSERT_USER_DEFINED_PARTITIONER_CLASS, className);
       return this;
     }
 
     public Builder withDeleteParallelism(int parallelism) {
-      writeConfig.set(DELETE_PARALLELISM, String.valueOf(parallelism));
+      writeConfig.setValue(DELETE_PARALLELISM, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withParallelism(int insertShuffleParallelism, int upsertShuffleParallelism) {
-      writeConfig.set(INSERT_PARALLELISM, String.valueOf(insertShuffleParallelism));
-      writeConfig.set(UPSERT_PARALLELISM, String.valueOf(upsertShuffleParallelism));
+      writeConfig.setValue(INSERT_PARALLELISM, String.valueOf(insertShuffleParallelism));
+      writeConfig.setValue(UPSERT_PARALLELISM, String.valueOf(upsertShuffleParallelism));
       return this;
     }
 
     public Builder withRollbackParallelism(int rollbackParallelism) {
-      writeConfig.set(ROLLBACK_PARALLELISM, String.valueOf(rollbackParallelism));
+      writeConfig.setValue(ROLLBACK_PARALLELISM, String.valueOf(rollbackParallelism));
       return this;
     }
 
     public Builder withRollbackUsingMarkers(boolean rollbackUsingMarkers) {
-      writeConfig.set(ROLLBACK_USING_MARKERS, String.valueOf(rollbackUsingMarkers));
+      writeConfig.setValue(ROLLBACK_USING_MARKERS, String.valueOf(rollbackUsingMarkers));
       return this;
     }
 
     public Builder withWriteBufferLimitBytes(int writeBufferLimit) {
-      writeConfig.set(WRITE_BUFFER_LIMIT_BYTES, String.valueOf(writeBufferLimit));
+      writeConfig.setValue(WRITE_BUFFER_LIMIT_BYTES, String.valueOf(writeBufferLimit));
       return this;
     }
 
     public Builder combineInput(boolean onInsert, boolean onUpsert) {
-      writeConfig.set(COMBINE_BEFORE_INSERT_PROP, String.valueOf(onInsert));
-      writeConfig.set(COMBINE_BEFORE_UPSERT_PROP, String.valueOf(onUpsert));
+      writeConfig.setValue(COMBINE_BEFORE_INSERT_PROP, String.valueOf(onInsert));
+      writeConfig.setValue(COMBINE_BEFORE_UPSERT_PROP, String.valueOf(onUpsert));
       return this;
     }
 
     public Builder combineDeleteInput(boolean onDelete) {
-      writeConfig.set(COMBINE_BEFORE_DELETE_PROP, String.valueOf(onDelete));
+      writeConfig.setValue(COMBINE_BEFORE_DELETE_PROP, String.valueOf(onDelete));
       return this;
     }
 
     public Builder withWriteStatusStorageLevel(String level) {
-      writeConfig.set(WRITE_STATUS_STORAGE_LEVEL, level);
+      writeConfig.setValue(WRITE_STATUS_STORAGE_LEVEL, level);
       return this;
     }
 
@@ -1376,12 +1376,12 @@ public class HoodieWriteConfig extends HoodieConfig {
     }
 
     public Builder withAutoCommit(boolean autoCommit) {
-      writeConfig.set(HOODIE_AUTO_COMMIT_PROP, String.valueOf(autoCommit));
+      writeConfig.setValue(HOODIE_AUTO_COMMIT_PROP, String.valueOf(autoCommit));
       return this;
     }
 
     public Builder withWriteStatusClass(Class<? extends WriteStatus> writeStatusClass) {
-      writeConfig.set(HOODIE_WRITE_STATUS_CLASS_PROP, writeStatusClass.getName());
+      writeConfig.setValue(HOODIE_WRITE_STATUS_CLASS_PROP, writeStatusClass.getName());
       return this;
     }
 
@@ -1404,67 +1404,67 @@ public class HoodieWriteConfig extends HoodieConfig {
     }
 
     public Builder withFinalizeWriteParallelism(int parallelism) {
-      writeConfig.set(FINALIZE_WRITE_PARALLELISM, String.valueOf(parallelism));
+      writeConfig.setValue(FINALIZE_WRITE_PARALLELISM, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withMarkersDeleteParallelism(int parallelism) {
-      writeConfig.set(MARKERS_DELETE_PARALLELISM, String.valueOf(parallelism));
+      writeConfig.setValue(MARKERS_DELETE_PARALLELISM, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withEmbeddedTimelineServerEnabled(boolean enabled) {
-      writeConfig.set(EMBEDDED_TIMELINE_SERVER_ENABLED, String.valueOf(enabled));
+      writeConfig.setValue(EMBEDDED_TIMELINE_SERVER_ENABLED, String.valueOf(enabled));
       return this;
     }
 
     public Builder withEmbeddedTimelineServerPort(int port) {
-      writeConfig.set(EMBEDDED_TIMELINE_SERVER_PORT, String.valueOf(port));
+      writeConfig.setValue(EMBEDDED_TIMELINE_SERVER_PORT, String.valueOf(port));
       return this;
     }
 
     public Builder withBulkInsertSortMode(String mode) {
-      writeConfig.set(BULKINSERT_SORT_MODE, mode);
+      writeConfig.setValue(BULKINSERT_SORT_MODE, mode);
       return this;
     }
 
     public Builder withAllowMultiWriteOnSameInstant(boolean allow) {
-      writeConfig.set(ALLOW_MULTI_WRITE_ON_SAME_INSTANT, String.valueOf(allow));
+      writeConfig.setValue(ALLOW_MULTI_WRITE_ON_SAME_INSTANT, String.valueOf(allow));
       return this;
     }
 
     public Builder withExternalSchemaTrasformation(boolean enabled) {
-      writeConfig.set(EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION, String.valueOf(enabled));
+      writeConfig.setValue(EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION, String.valueOf(enabled));
       return this;
     }
 
     public Builder withMergeDataValidationCheckEnabled(boolean enabled) {
-      writeConfig.set(MERGE_DATA_VALIDATION_CHECK_ENABLED, String.valueOf(enabled));
+      writeConfig.setValue(MERGE_DATA_VALIDATION_CHECK_ENABLED, String.valueOf(enabled));
       return this;
     }
 
     public Builder withMergeAllowDuplicateOnInserts(boolean routeInsertsToNewFiles) {
-      writeConfig.set(MERGE_ALLOW_DUPLICATE_ON_INSERTS, String.valueOf(routeInsertsToNewFiles));
+      writeConfig.setValue(MERGE_ALLOW_DUPLICATE_ON_INSERTS, String.valueOf(routeInsertsToNewFiles));
       return this;
     }
 
     public Builder withHeartbeatIntervalInMs(Integer heartbeatIntervalInMs) {
-      writeConfig.set(CLIENT_HEARTBEAT_INTERVAL_IN_MS_PROP, String.valueOf(heartbeatIntervalInMs));
+      writeConfig.setValue(CLIENT_HEARTBEAT_INTERVAL_IN_MS_PROP, String.valueOf(heartbeatIntervalInMs));
       return this;
     }
 
     public Builder withHeartbeatTolerableMisses(Integer heartbeatTolerableMisses) {
-      writeConfig.set(CLIENT_HEARTBEAT_NUM_TOLERABLE_MISSES_PROP, String.valueOf(heartbeatTolerableMisses));
+      writeConfig.setValue(CLIENT_HEARTBEAT_NUM_TOLERABLE_MISSES_PROP, String.valueOf(heartbeatTolerableMisses));
       return this;
     }
 
     public Builder withWriteConcurrencyMode(WriteConcurrencyMode concurrencyMode) {
-      writeConfig.set(WRITE_CONCURRENCY_MODE_PROP, concurrencyMode.value());
+      writeConfig.setValue(WRITE_CONCURRENCY_MODE_PROP, concurrencyMode.value());
       return this;
     }
 
     public Builder withWriteMetaKeyPrefixes(String writeMetaKeyPrefixes) {
-      writeConfig.set(WRITE_META_KEY_PREFIXES_PROP, writeMetaKeyPrefixes);
+      writeConfig.setValue(WRITE_META_KEY_PREFIXES_PROP, writeMetaKeyPrefixes);
       return this;
     }
 

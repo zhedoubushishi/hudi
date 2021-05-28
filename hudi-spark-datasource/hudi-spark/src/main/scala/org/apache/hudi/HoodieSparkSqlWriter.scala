@@ -476,7 +476,7 @@ private[hudi] object HoodieSparkSqlWriter {
     } else {
       sqlPropertyText
     }
-    hoodieConfig.set(HIVE_TABLE_PROPERTIES, sqlPropertyText)
+    hoodieConfig.setValue(HIVE_TABLE_PROPERTIES, sqlPropertyText)
     hoodieConfig
   }
 

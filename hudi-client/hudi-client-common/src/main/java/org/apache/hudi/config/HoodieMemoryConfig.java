@@ -108,28 +108,28 @@ public class HoodieMemoryConfig extends HoodieConfig {
     }
 
     public Builder withMaxMemoryFractionPerPartitionMerge(double maxMemoryFractionPerPartitionMerge) {
-      memoryConfig.set(MAX_MEMORY_FRACTION_FOR_MERGE_PROP, String.valueOf(maxMemoryFractionPerPartitionMerge));
+      memoryConfig.setValue(MAX_MEMORY_FRACTION_FOR_MERGE_PROP, String.valueOf(maxMemoryFractionPerPartitionMerge));
       return this;
     }
 
     public Builder withMaxMemoryMaxSize(long mergeMaxSize, long compactionMaxSize) {
-      memoryConfig.set(MAX_MEMORY_FOR_MERGE_PROP, String.valueOf(mergeMaxSize));
-      memoryConfig.set(MAX_MEMORY_FOR_COMPACTION_PROP, String.valueOf(compactionMaxSize));
+      memoryConfig.setValue(MAX_MEMORY_FOR_MERGE_PROP, String.valueOf(mergeMaxSize));
+      memoryConfig.setValue(MAX_MEMORY_FOR_COMPACTION_PROP, String.valueOf(compactionMaxSize));
       return this;
     }
 
     public Builder withMaxMemoryFractionPerCompaction(double maxMemoryFractionPerCompaction) {
-      memoryConfig.set(MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP, String.valueOf(maxMemoryFractionPerCompaction));
+      memoryConfig.setValue(MAX_MEMORY_FRACTION_FOR_COMPACTION_PROP, String.valueOf(maxMemoryFractionPerCompaction));
       return this;
     }
 
     public Builder withMaxDFSStreamBufferSize(int maxStreamBufferSize) {
-      memoryConfig.set(MAX_DFS_STREAM_BUFFER_SIZE_PROP, String.valueOf(maxStreamBufferSize));
+      memoryConfig.setValue(MAX_DFS_STREAM_BUFFER_SIZE_PROP, String.valueOf(maxStreamBufferSize));
       return this;
     }
 
     public Builder withWriteStatusFailureFraction(double failureFraction) {
-      memoryConfig.set(WRITESTATUS_FAILURE_FRACTION_PROP, String.valueOf(failureFraction));
+      memoryConfig.setValue(WRITESTATUS_FAILURE_FRACTION_PROP, String.valueOf(failureFraction));
       return this;
     }
 
