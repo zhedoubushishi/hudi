@@ -22,6 +22,8 @@ import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -29,6 +31,8 @@ import java.util.Properties;
  */
 @Immutable
 public final class HoodieMetadataConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final String METADATA_PREFIX = "hoodie.metadata";
 
@@ -237,19 +241,8 @@ public final class HoodieMetadataConfig extends HoodieConfig {
     }
 
     public HoodieMetadataConfig build() {
-      metadataConfig.setDefaultValue(METADATA_ENABLE_PROP);
-      metadataConfig.setDefaultValue(METADATA_METRICS_ENABLE_PROP);
-      metadataConfig.setDefaultValue(METADATA_VALIDATE_PROP);
-      metadataConfig.setDefaultValue(METADATA_INSERT_PARALLELISM_PROP);
-      metadataConfig.setDefaultValue(METADATA_ASYNC_CLEAN_PROP);
-      metadataConfig.setDefaultValue(METADATA_COMPACT_NUM_DELTA_COMMITS_PROP);
-      metadataConfig.setDefaultValue(CLEANER_COMMITS_RETAINED_PROP);
-      metadataConfig.setDefaultValue(MAX_COMMITS_TO_KEEP_PROP);
-      metadataConfig.setDefaultValue(MIN_COMMITS_TO_KEEP_PROP);
-      metadataConfig.setDefaultValue(FILE_LISTING_PARALLELISM_PROP);
-      metadataConfig.setDefaultValue(HOODIE_ASSUME_DATE_PARTITIONING_PROP);
-      metadataConfig.setDefaultValue(ENABLE_FALLBACK_PROP);
-      metadataConfig.setDefaultValue(DIRECTORY_FILTER_REGEX);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          metadataConfig::setDefaultValue);
       return metadataConfig;
     }
   }

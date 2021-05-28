@@ -33,6 +33,8 @@ import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -40,6 +42,8 @@ import java.util.Properties;
  */
 @Immutable
 public class HoodieCompactionConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final ConfigOption<String> CLEANER_POLICY_PROP = ConfigOption
       .key("hoodie.cleaner.policy")
@@ -363,33 +367,10 @@ public class HoodieCompactionConfig extends HoodieConfig {
     }
 
     public HoodieCompactionConfig build() {
-      compactionConfig.setDefaultValue(AUTO_CLEAN_PROP);
-      compactionConfig.setDefaultValue(ASYNC_CLEAN_PROP);
-      compactionConfig.setDefaultValue(CLEANER_INCREMENTAL_MODE);
-      compactionConfig.setDefaultValue(INLINE_COMPACT_PROP);
-      compactionConfig.setDefaultValue(INLINE_COMPACT_NUM_DELTA_COMMITS_PROP);
-      compactionConfig.setDefaultValue(INLINE_COMPACT_TIME_DELTA_SECONDS_PROP);
-      compactionConfig.setDefaultValue(INLINE_COMPACT_TRIGGER_STRATEGY_PROP);
-      compactionConfig.setDefaultValue(CLEANER_POLICY_PROP);
-      compactionConfig.setDefaultValue(CLEANER_FILE_VERSIONS_RETAINED_PROP);
-      compactionConfig.setDefaultValue(CLEANER_COMMITS_RETAINED_PROP);
-      compactionConfig.setDefaultValue(MAX_COMMITS_TO_KEEP_PROP);
-      compactionConfig.setDefaultValue(MIN_COMMITS_TO_KEEP_PROP);
-      compactionConfig.setDefaultValue(PARQUET_SMALL_FILE_LIMIT_BYTES);
-      compactionConfig.setDefaultValue(RECORD_SIZE_ESTIMATION_THRESHOLD_PROP);
-      compactionConfig.setDefaultValue(COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE);
-      compactionConfig.setDefaultValue(COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS);
-      compactionConfig.setDefaultValue(COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE);
-      compactionConfig.setDefaultValue(CLEANER_PARALLELISM);
-      compactionConfig.setDefaultValue(COMPACTION_STRATEGY_PROP);
-      compactionConfig.setDefaultValue(PAYLOAD_CLASS_PROP);
-      compactionConfig.setDefaultValue(TARGET_IO_PER_COMPACTION_IN_MB_PROP);
-      compactionConfig.setDefaultValue(COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP);
-      compactionConfig.setDefaultValue(COMPACTION_REVERSE_LOG_READ_ENABLED_PROP);
-      compactionConfig.setDefaultValue(TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP);
-      compactionConfig.setDefaultValue(COMMITS_ARCHIVAL_BATCH_SIZE_PROP);
-      compactionConfig.setDefaultValue(CLEANER_BOOTSTRAP_BASE_FILE_ENABLED);
-      compactionConfig.setDefaultValue(FAILED_WRITES_CLEANER_POLICY_PROP);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          compactionConfig::setDefaultValue);
+
+      // validation
       HoodieCleaningPolicy.valueOf(compactionConfig.getString(CLEANER_POLICY_PROP));
 
       // Ensure minInstantsToKeep > cleanerCommitsRetained, otherwise we will archive some

@@ -25,12 +25,16 @@ import org.apache.hudi.common.util.ValidationUtils;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
  * File System View Storage Configurations.
  */
 public class FileSystemViewStorageConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   // Property Names
   public static final ConfigOption<FileSystemViewStorageType> FILESYSTEM_VIEW_STORAGE_TYPE = ConfigOption
@@ -262,21 +266,8 @@ public class FileSystemViewStorageConfig extends HoodieConfig {
     }
 
     public FileSystemViewStorageConfig build() {
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_STORAGE_TYPE);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_INCREMENTAL_SYNC_MODE);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_REMOTE_HOST);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_REMOTE_PORT);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_SPILLABLE_DIR);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_SPILLABLE_MEM);
-      fileSystemViewStorageConfig.setDefaultValue(FILESTYSTEM_REMOTE_TIMELINE_CLIENT_TIMEOUT_SECS);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_PENDING_COMPACTION_MEM_FRACTION);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_BOOTSTRAP_BASE_FILE_FRACTION);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_REPLACED_MEM_FRACTION);
-      fileSystemViewStorageConfig.setDefaultValue(FILESYSTEM_VIEW_PENDING_CLUSTERING_MEM_FRACTION);
-      fileSystemViewStorageConfig.setDefaultValue(ROCKSDB_BASE_PATH_PROP);
-      fileSystemViewStorageConfig.setDefaultValue(REMOTE_BACKUP_VIEW_HANDLER_ENABLE);
-
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          fileSystemViewStorageConfig::setDefaultValue);
       // Validations
       FileSystemViewStorageType.valueOf(fileSystemViewStorageConfig.getString(FILESYSTEM_VIEW_STORAGE_TYPE));
       FileSystemViewStorageType.valueOf(fileSystemViewStorageConfig.getString(FILESYSTEM_SECONDARY_VIEW_STORAGE_TYPE));

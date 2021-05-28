@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,8 @@ import static org.apache.hudi.common.config.LockConfiguration.HIVE_TABLE_NAME_PR
  */
 @Immutable
 public class HoodieWriteConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   private static final long serialVersionUID = 0L;
 
@@ -1475,37 +1478,9 @@ public class HoodieWriteConfig extends HoodieConfig {
 
     protected void setDefaults() {
       // Check for mandatory properties
-      writeConfig.setDefaultValue(INSERT_PARALLELISM);
-      writeConfig.setDefaultValue(BULKINSERT_PARALLELISM);
-      writeConfig.setDefaultValue(UPSERT_PARALLELISM);
-      writeConfig.setDefaultValue(DELETE_PARALLELISM);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          writeConfig::setDefaultValue);
 
-      writeConfig.setDefaultValue(ROLLBACK_PARALLELISM);
-      writeConfig.setDefaultValue(KEYGENERATOR_CLASS_PROP);
-      writeConfig.setDefaultValue(WRITE_PAYLOAD_CLASS);
-      writeConfig.setDefaultValue(ROLLBACK_USING_MARKERS);
-      writeConfig.setDefaultValue(COMBINE_BEFORE_INSERT_PROP);
-      writeConfig.setDefaultValue(COMBINE_BEFORE_UPSERT_PROP);
-      writeConfig.setDefaultValue(COMBINE_BEFORE_DELETE_PROP);
-      writeConfig.setDefaultValue(ALLOW_MULTI_WRITE_ON_SAME_INSTANT);
-      writeConfig.setDefaultValue(WRITE_STATUS_STORAGE_LEVEL);
-      writeConfig.setDefaultValue(HOODIE_AUTO_COMMIT_PROP);
-      writeConfig.setDefaultValue(HOODIE_WRITE_STATUS_CLASS_PROP);
-      writeConfig.setDefaultValue(FINALIZE_WRITE_PARALLELISM);
-      writeConfig.setDefaultValue(MARKERS_DELETE_PARALLELISM);
-      writeConfig.setDefaultValue(EMBEDDED_TIMELINE_SERVER_ENABLED);
-      writeConfig.setDefaultValue(INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
-      writeConfig.setDefaultValue(MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
-      writeConfig.setDefaultValue(MAX_CONSISTENCY_CHECKS_PROP);
-      writeConfig.setDefaultValue(FAIL_ON_TIMELINE_ARCHIVING_ENABLED_PROP);
-      writeConfig.setDefaultValue(AVRO_SCHEMA_VALIDATE);
-      writeConfig.setDefaultValue(BULKINSERT_SORT_MODE);
-      writeConfig.setDefaultValue(MERGE_DATA_VALIDATION_CHECK_ENABLED);
-      writeConfig.setDefaultValue(MERGE_ALLOW_DUPLICATE_ON_INSERTS);
-      writeConfig.setDefaultValue(CLIENT_HEARTBEAT_INTERVAL_IN_MS_PROP);
-      writeConfig.setDefaultValue(CLIENT_HEARTBEAT_NUM_TOLERABLE_MISSES_PROP);
-      writeConfig.setDefaultValue(WRITE_CONCURRENCY_MODE_PROP);
-      writeConfig.setDefaultValue(WRITE_META_KEY_PREFIXES_PROP);
       // Make sure the props is propagated
       writeConfig.setDefaultOnCondition(
           !isIndexConfigSet, HoodieIndexConfig.newBuilder().withEngineType(engineType).fromProperties(
@@ -1535,7 +1510,6 @@ public class HoodieWriteConfig extends HoodieConfig {
       writeConfig.setDefaultOnCondition(!isLockConfigSet,
           HoodieLockConfig.newBuilder().fromProperties(writeConfig.getProps()).build());
 
-      writeConfig.setDefaultValue(EXTERNAL_RECORD_AND_SCHEMA_TRANSFORMATION);
       writeConfig.setDefaultValue(TIMELINE_LAYOUT_VERSION, String.valueOf(TimelineLayoutVersion.CURR_VERSION));
 
     }

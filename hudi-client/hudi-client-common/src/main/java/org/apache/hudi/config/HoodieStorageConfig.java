@@ -26,6 +26,8 @@ import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -33,6 +35,8 @@ import java.util.Properties;
  */
 @Immutable
 public class HoodieStorageConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   public static final ConfigOption<String> PARQUET_FILE_MAX_BYTES = ConfigOption
       .key("hoodie.parquet.max.file.size")
@@ -182,18 +186,8 @@ public class HoodieStorageConfig extends HoodieConfig {
     }
 
     public HoodieStorageConfig build() {
-      storageConfig.setDefaultValue(PARQUET_FILE_MAX_BYTES);
-      storageConfig.setDefaultValue(PARQUET_BLOCK_SIZE_BYTES);
-      storageConfig.setDefaultValue(PARQUET_PAGE_SIZE_BYTES);
-      storageConfig.setDefaultValue(LOGFILE_DATA_BLOCK_SIZE_MAX_BYTES);
-      storageConfig.setDefaultValue(LOGFILE_SIZE_MAX_BYTES);
-      storageConfig.setDefaultValue(PARQUET_COMPRESSION_RATIO);
-      storageConfig.setDefaultValue(PARQUET_COMPRESSION_CODEC);
-      storageConfig.setDefaultValue(LOGFILE_TO_PARQUET_COMPRESSION_RATIO);
-      storageConfig.setDefaultValue(HFILE_BLOCK_SIZE_BYTES);
-      storageConfig.setDefaultValue(HFILE_COMPRESSION_ALGORITHM);
-      storageConfig.setDefaultValue(HFILE_FILE_MAX_BYTES);
-
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          storageConfig::setDefaultValue);
       return storageConfig;
     }
   }

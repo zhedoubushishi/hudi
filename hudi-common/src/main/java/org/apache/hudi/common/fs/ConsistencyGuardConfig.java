@@ -24,12 +24,16 @@ import org.apache.hudi.common.config.HoodieConfig;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
  * The consistency guard relevant config options.
  */
 public class ConsistencyGuardConfig extends HoodieConfig {
+
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
 
   // time between successive attempts to ensure written data's metadata is consistent on storage
   @Deprecated
@@ -156,12 +160,8 @@ public class ConsistencyGuardConfig extends HoodieConfig {
     }
 
     public ConsistencyGuardConfig build() {
-      consistencyGuardConfig.setDefaultValue(CONSISTENCY_CHECK_ENABLED_PROP);
-      consistencyGuardConfig.setDefaultValue(INITIAL_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
-      consistencyGuardConfig.setDefaultValue(MAX_CONSISTENCY_CHECK_INTERVAL_MS_PROP);
-      consistencyGuardConfig.setDefaultValue(MAX_CONSISTENCY_CHECKS_PROP);
-      consistencyGuardConfig.setDefaultValue(OPTIMISTIC_CONSISTENCY_GUARD_SLEEP_TIME_MS_PROP);
-      consistencyGuardConfig.setDefaultValue(ENABLE_OPTIMISTIC_CONSISTENCY_GUARD_PROP);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          consistencyGuardConfig::setDefaultValue);
       return consistencyGuardConfig;
     }
   }
