@@ -232,133 +232,133 @@ public class HoodieCompactionConfig extends HoodieConfig {
     }
 
     public Builder withAutoClean(Boolean autoClean) {
-      compactionConfig.set(AUTO_CLEAN_PROP, String.valueOf(autoClean));
+      compactionConfig.setValue(AUTO_CLEAN_PROP, String.valueOf(autoClean));
       return this;
     }
 
     public Builder withAsyncClean(Boolean asyncClean) {
-      compactionConfig.set(ASYNC_CLEAN_PROP, String.valueOf(asyncClean));
+      compactionConfig.setValue(ASYNC_CLEAN_PROP, String.valueOf(asyncClean));
       return this;
     }
 
     public Builder withIncrementalCleaningMode(Boolean incrementalCleaningMode) {
-      compactionConfig.set(CLEANER_INCREMENTAL_MODE, String.valueOf(incrementalCleaningMode));
+      compactionConfig.setValue(CLEANER_INCREMENTAL_MODE, String.valueOf(incrementalCleaningMode));
       return this;
     }
 
     public Builder withInlineCompaction(Boolean inlineCompaction) {
-      compactionConfig.set(INLINE_COMPACT_PROP, String.valueOf(inlineCompaction));
+      compactionConfig.setValue(INLINE_COMPACT_PROP, String.valueOf(inlineCompaction));
       return this;
     }
 
     public Builder withInlineCompactionTriggerStrategy(CompactionTriggerStrategy compactionTriggerStrategy) {
-      compactionConfig.set(INLINE_COMPACT_TRIGGER_STRATEGY_PROP, compactionTriggerStrategy.name());
+      compactionConfig.setValue(INLINE_COMPACT_TRIGGER_STRATEGY_PROP, compactionTriggerStrategy.name());
       return this;
     }
 
     public Builder withCleanerPolicy(HoodieCleaningPolicy policy) {
-      compactionConfig.set(CLEANER_POLICY_PROP, policy.name());
+      compactionConfig.setValue(CLEANER_POLICY_PROP, policy.name());
       return this;
     }
 
     public Builder retainFileVersions(int fileVersionsRetained) {
-      compactionConfig.set(CLEANER_FILE_VERSIONS_RETAINED_PROP, String.valueOf(fileVersionsRetained));
+      compactionConfig.setValue(CLEANER_FILE_VERSIONS_RETAINED_PROP, String.valueOf(fileVersionsRetained));
       return this;
     }
 
     public Builder retainCommits(int commitsRetained) {
-      compactionConfig.set(CLEANER_COMMITS_RETAINED_PROP, String.valueOf(commitsRetained));
+      compactionConfig.setValue(CLEANER_COMMITS_RETAINED_PROP, String.valueOf(commitsRetained));
       return this;
     }
 
     public Builder archiveCommitsWith(int minToKeep, int maxToKeep) {
-      compactionConfig.set(MIN_COMMITS_TO_KEEP_PROP, String.valueOf(minToKeep));
-      compactionConfig.set(MAX_COMMITS_TO_KEEP_PROP, String.valueOf(maxToKeep));
+      compactionConfig.setValue(MIN_COMMITS_TO_KEEP_PROP, String.valueOf(minToKeep));
+      compactionConfig.setValue(MAX_COMMITS_TO_KEEP_PROP, String.valueOf(maxToKeep));
       return this;
     }
 
     public Builder compactionSmallFileSize(long smallFileLimitBytes) {
-      compactionConfig.set(PARQUET_SMALL_FILE_LIMIT_BYTES, String.valueOf(smallFileLimitBytes));
+      compactionConfig.setValue(PARQUET_SMALL_FILE_LIMIT_BYTES, String.valueOf(smallFileLimitBytes));
       return this;
     }
 
     public Builder compactionRecordSizeEstimateThreshold(double threshold) {
-      compactionConfig.set(RECORD_SIZE_ESTIMATION_THRESHOLD_PROP, String.valueOf(threshold));
+      compactionConfig.setValue(RECORD_SIZE_ESTIMATION_THRESHOLD_PROP, String.valueOf(threshold));
       return this;
     }
 
     public Builder insertSplitSize(int insertSplitSize) {
-      compactionConfig.set(COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE, String.valueOf(insertSplitSize));
+      compactionConfig.setValue(COPY_ON_WRITE_TABLE_INSERT_SPLIT_SIZE, String.valueOf(insertSplitSize));
       return this;
     }
 
     public Builder autoTuneInsertSplits(boolean autoTuneInsertSplits) {
-      compactionConfig.set(COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS, String.valueOf(autoTuneInsertSplits));
+      compactionConfig.setValue(COPY_ON_WRITE_TABLE_AUTO_SPLIT_INSERTS, String.valueOf(autoTuneInsertSplits));
       return this;
     }
 
     public Builder approxRecordSize(int recordSizeEstimate) {
-      compactionConfig.set(COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE, String.valueOf(recordSizeEstimate));
+      compactionConfig.setValue(COPY_ON_WRITE_TABLE_RECORD_SIZE_ESTIMATE, String.valueOf(recordSizeEstimate));
       return this;
     }
 
     public Builder withCleanerParallelism(int cleanerParallelism) {
-      compactionConfig.set(CLEANER_PARALLELISM, String.valueOf(cleanerParallelism));
+      compactionConfig.setValue(CLEANER_PARALLELISM, String.valueOf(cleanerParallelism));
       return this;
     }
 
     public Builder withCompactionStrategy(CompactionStrategy compactionStrategy) {
-      compactionConfig.set(COMPACTION_STRATEGY_PROP, compactionStrategy.getClass().getName());
+      compactionConfig.setValue(COMPACTION_STRATEGY_PROP, compactionStrategy.getClass().getName());
       return this;
     }
 
     public Builder withPayloadClass(String payloadClassName) {
-      compactionConfig.set(PAYLOAD_CLASS_PROP, payloadClassName);
+      compactionConfig.setValue(PAYLOAD_CLASS_PROP, payloadClassName);
       return this;
     }
 
     public Builder withTargetIOPerCompactionInMB(long targetIOPerCompactionInMB) {
-      compactionConfig.set(TARGET_IO_PER_COMPACTION_IN_MB_PROP, String.valueOf(targetIOPerCompactionInMB));
+      compactionConfig.setValue(TARGET_IO_PER_COMPACTION_IN_MB_PROP, String.valueOf(targetIOPerCompactionInMB));
       return this;
     }
 
     public Builder withMaxNumDeltaCommitsBeforeCompaction(int maxNumDeltaCommitsBeforeCompaction) {
-      compactionConfig.set(INLINE_COMPACT_NUM_DELTA_COMMITS_PROP, String.valueOf(maxNumDeltaCommitsBeforeCompaction));
+      compactionConfig.setValue(INLINE_COMPACT_NUM_DELTA_COMMITS_PROP, String.valueOf(maxNumDeltaCommitsBeforeCompaction));
       return this;
     }
 
     public Builder withMaxDeltaSecondsBeforeCompaction(int maxDeltaSecondsBeforeCompaction) {
-      compactionConfig.set(INLINE_COMPACT_TIME_DELTA_SECONDS_PROP, String.valueOf(maxDeltaSecondsBeforeCompaction));
+      compactionConfig.setValue(INLINE_COMPACT_TIME_DELTA_SECONDS_PROP, String.valueOf(maxDeltaSecondsBeforeCompaction));
       return this;
     }
 
     public Builder withCompactionLazyBlockReadEnabled(Boolean compactionLazyBlockReadEnabled) {
-      compactionConfig.set(COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP, String.valueOf(compactionLazyBlockReadEnabled));
+      compactionConfig.setValue(COMPACTION_LAZY_BLOCK_READ_ENABLED_PROP, String.valueOf(compactionLazyBlockReadEnabled));
       return this;
     }
 
     public Builder withCompactionReverseLogReadEnabled(Boolean compactionReverseLogReadEnabled) {
-      compactionConfig.set(COMPACTION_REVERSE_LOG_READ_ENABLED_PROP, String.valueOf(compactionReverseLogReadEnabled));
+      compactionConfig.setValue(COMPACTION_REVERSE_LOG_READ_ENABLED_PROP, String.valueOf(compactionReverseLogReadEnabled));
       return this;
     }
 
     public Builder withTargetPartitionsPerDayBasedCompaction(int targetPartitionsPerCompaction) {
-      compactionConfig.set(TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP, String.valueOf(targetPartitionsPerCompaction));
+      compactionConfig.setValue(TARGET_PARTITIONS_PER_DAYBASED_COMPACTION_PROP, String.valueOf(targetPartitionsPerCompaction));
       return this;
     }
 
     public Builder withCommitsArchivalBatchSize(int batchSize) {
-      compactionConfig.set(COMMITS_ARCHIVAL_BATCH_SIZE_PROP, String.valueOf(batchSize));
+      compactionConfig.setValue(COMMITS_ARCHIVAL_BATCH_SIZE_PROP, String.valueOf(batchSize));
       return this;
     }
 
     public Builder withCleanBootstrapBaseFileEnabled(Boolean cleanBootstrapSourceFileEnabled) {
-      compactionConfig.set(CLEANER_BOOTSTRAP_BASE_FILE_ENABLED, String.valueOf(cleanBootstrapSourceFileEnabled));
+      compactionConfig.setValue(CLEANER_BOOTSTRAP_BASE_FILE_ENABLED, String.valueOf(cleanBootstrapSourceFileEnabled));
       return this;
     }
 
     public Builder withFailedWritesCleaningPolicy(HoodieFailedWritesCleaningPolicy failedWritesPolicy) {
-      compactionConfig.set(FAILED_WRITES_CLEANER_POLICY_PROP, failedWritesPolicy.name());
+      compactionConfig.setValue(FAILED_WRITES_CLEANER_POLICY_PROP, failedWritesPolicy.name());
       return this;
     }
 

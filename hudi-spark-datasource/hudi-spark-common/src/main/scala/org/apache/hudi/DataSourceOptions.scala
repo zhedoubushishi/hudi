@@ -486,8 +486,8 @@ object DataSourceOptionsHelper {
   val allConfigsWithAlternatives = List(
     DataSourceReadOptions.QUERY_TYPE_OPT_KEY,
     DataSourceWriteOptions.TABLE_TYPE_OPT_KEY,
-    HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP_NAME,
-    HoodieTableConfig.HOODIE_LOG_FILE_FORMAT_PROP_NAME
+    HoodieTableConfig.HOODIE_BASE_FILE_FORMAT_PROP,
+    HoodieTableConfig.HOODIE_LOG_FILE_FORMAT_PROP
   )
 
   // put all the deprecated configs here

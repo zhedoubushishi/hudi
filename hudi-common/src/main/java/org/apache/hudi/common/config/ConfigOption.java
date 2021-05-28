@@ -23,7 +23,7 @@ import org.apache.hudi.exception.HoodieException;
 
 import java.io.Serializable;
 import java.util.function.Function;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -47,10 +47,10 @@ public class ConfigOption<T> implements Serializable {
   private final String[] alternatives;
 
   // provide the ability to infer config value based on other configs
-  private final Option<Function<Map, Option<T>>> inferFunction;
+  private final Option<Function<HoodieConfig, Option<T>>> inferFunction;
 
   ConfigOption(String key, T defaultValue, String doc, Option<String> version,
-      Option<Function<Map, Option<T>>> inferFunc, String... alternatives) {
+      Option<Function<HoodieConfig, Option<T>>> inferFunc, String... alternatives) {
     this.key = Objects.requireNonNull(key);
     this.defaultValue = defaultValue;
     this.doc = doc;
@@ -70,7 +70,11 @@ public class ConfigOption<T> implements Serializable {
     return defaultValue;
   }
 
-  Option<Function<Map, Option<T>>> getInferFunc() {
+  public boolean hasDefaultValue() {
+    return defaultValue != null;
+  }
+
+  Option<Function<HoodieConfig, Option<T>>> getInferFunc() {
     return inferFunction;
   }
 
@@ -88,12 +92,12 @@ public class ConfigOption<T> implements Serializable {
     return new ConfigOption<>(key, defaultValue, doc, version, inferFunction, alternatives);
   }
 
-  public ConfigOption<T> withVersion(String version) {
+  public ConfigOption<T> sinceVersion(String version) {
     Objects.requireNonNull(version);
     return new ConfigOption<>(key, defaultValue, doc, Option.of(version), inferFunction, alternatives);
   }
 
-  public ConfigOption<T> withInferFunction(Function<Map, Option<T>> inferFunction) {
+  public ConfigOption<T> withInferFunction(Function<HoodieConfig, Option<T>> inferFunction) {
     Objects.requireNonNull(inferFunction);
     return new ConfigOption<>(key, defaultValue, doc, version, Option.of(inferFunction), alternatives);
   }
@@ -129,11 +133,26 @@ public class ConfigOption<T> implements Serializable {
 
     public <T> ConfigOption<T> defaultValue(T value) {
       Objects.requireNonNull(value);
-      return new ConfigOption<>(key, value, "", Option.empty(), Option.empty());
+      ConfigOption<T> configOption = new ConfigOption<>(key, value, "", Option.empty(), Option.empty());
+      registerConfig(configOption);
+      return configOption;
     }
 
     public ConfigOption<String> noDefaultValue() {
-      return new ConfigOption<>(key, null, "", Option.empty(), Option.empty());
+      ConfigOption<String> configOption = new ConfigOption<>(key, null, "", Option.empty(), Option.empty());
+      registerConfig(configOption);
+      return configOption;
+    }
+
+    private void registerConfig(ConfigOption configOption) {
+      String configClassName = Thread.currentThread().getStackTrace()[3].getClassName();
+      try {
+        Class<?> caller = Class.forName(configClassName);
+        List<ConfigOption<?>> configRegistry = (List<ConfigOption<?>>) caller.getDeclaredField("CONFIG_REGISTRY").get(null);
+        configRegistry.add(configOption);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 }

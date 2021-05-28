@@ -23,6 +23,8 @@ import org.apache.hudi.common.config.HoodieConfig;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -30,18 +32,20 @@ import java.util.Properties;
  */
 public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
 
+  public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
+
   public static final String CALLBACK_PREFIX = "hoodie.write.commit.callback.";
 
   public static final ConfigOption<Boolean> CALLBACK_ON = ConfigOption
       .key(CALLBACK_PREFIX + "on")
       .defaultValue(false)
-      .withVersion("0.6.0")
+      .sinceVersion("0.6.0")
       .withDocumentation("Turn callback on/off. off by default.");
 
   public static final ConfigOption<String> CALLBACK_CLASS_PROP = ConfigOption
       .key(CALLBACK_PREFIX + "class")
       .defaultValue("org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback")
-      .withVersion("0.6.0")
+      .sinceVersion("0.6.0")
       .withDocumentation("Full path of callback class and must be a subclass of HoodieWriteCommitCallback class, "
           + "org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback by default");
 
@@ -49,19 +53,19 @@ public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
   public static final ConfigOption<String> CALLBACK_HTTP_URL_PROP = ConfigOption
       .key(CALLBACK_PREFIX + "http.url")
       .noDefaultValue()
-      .withVersion("0.6.0")
+      .sinceVersion("0.6.0")
       .withDocumentation("Callback host to be sent along with callback messages");
 
   public static final ConfigOption<String> CALLBACK_HTTP_API_KEY = ConfigOption
       .key(CALLBACK_PREFIX + "http.api.key")
       .defaultValue("hudi_write_commit_http_callback")
-      .withVersion("0.6.0")
+      .sinceVersion("0.6.0")
       .withDocumentation("Http callback API key. hudi_write_commit_http_callback by default");
 
   public static final ConfigOption<Integer> CALLBACK_HTTP_TIMEOUT_SECONDS = ConfigOption
       .key(CALLBACK_PREFIX + "http.timeout.seconds")
       .defaultValue(3)
-      .withVersion("0.6.0")
+      .sinceVersion("0.6.0")
       .withDocumentation("Callback timeout in seconds. 3 by default");
 
   private HoodieWriteCommitCallbackConfig() {
@@ -89,36 +93,33 @@ public class HoodieWriteCommitCallbackConfig extends HoodieConfig {
     }
 
     public HoodieWriteCommitCallbackConfig.Builder writeCommitCallbackOn(String callbackOn) {
-      writeCommitCallbackConfig.set(CALLBACK_ON, callbackOn);
+      writeCommitCallbackConfig.setValue(CALLBACK_ON, callbackOn);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackClass(String callbackClass) {
-      writeCommitCallbackConfig.set(CALLBACK_CLASS_PROP, callbackClass);
+      writeCommitCallbackConfig.setValue(CALLBACK_CLASS_PROP, callbackClass);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig.Builder withCallbackHttpUrl(String url) {
-      writeCommitCallbackConfig.set(CALLBACK_HTTP_URL_PROP, url);
+      writeCommitCallbackConfig.setValue(CALLBACK_HTTP_URL_PROP, url);
       return this;
     }
 
     public Builder withCallbackHttpTimeoutSeconds(String timeoutSeconds) {
-      writeCommitCallbackConfig.set(CALLBACK_HTTP_TIMEOUT_SECONDS, timeoutSeconds);
+      writeCommitCallbackConfig.setValue(CALLBACK_HTTP_TIMEOUT_SECONDS, timeoutSeconds);
       return this;
     }
 
     public Builder withCallbackHttpApiKey(String apiKey) {
-      writeCommitCallbackConfig.set(CALLBACK_HTTP_API_KEY, apiKey);
+      writeCommitCallbackConfig.setValue(CALLBACK_HTTP_API_KEY, apiKey);
       return this;
     }
 
     public HoodieWriteCommitCallbackConfig build() {
-      writeCommitCallbackConfig.setDefaultValue(CALLBACK_ON);
-      writeCommitCallbackConfig.setDefaultValue(CALLBACK_CLASS_PROP);
-      writeCommitCallbackConfig.setDefaultValue(CALLBACK_HTTP_API_KEY);
-      writeCommitCallbackConfig.setDefaultValue(CALLBACK_HTTP_TIMEOUT_SECONDS);
-
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          writeCommitCallbackConfig::setDefaultValue);
       return writeCommitCallbackConfig;
     }
   }

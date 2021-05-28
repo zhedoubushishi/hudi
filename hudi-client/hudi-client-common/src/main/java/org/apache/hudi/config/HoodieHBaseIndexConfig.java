@@ -171,102 +171,102 @@ public class HoodieHBaseIndexConfig extends HoodieConfig {
     }
 
     public HoodieHBaseIndexConfig.Builder hbaseZkQuorum(String zkString) {
-      hBaseIndexConfig.set(HBASE_ZKQUORUM_PROP, zkString);
+      hBaseIndexConfig.setValue(HBASE_ZKQUORUM_PROP, zkString);
       return this;
     }
 
     public HoodieHBaseIndexConfig.Builder hbaseZkPort(int port) {
-      hBaseIndexConfig.set(HBASE_ZKPORT_PROP, String.valueOf(port));
+      hBaseIndexConfig.setValue(HBASE_ZKPORT_PROP, String.valueOf(port));
       return this;
     }
 
     public HoodieHBaseIndexConfig.Builder hbaseTableName(String tableName) {
-      hBaseIndexConfig.set(HBASE_TABLENAME_PROP, tableName);
+      hBaseIndexConfig.setValue(HBASE_TABLENAME_PROP, tableName);
       return this;
     }
 
     public Builder hbaseZkZnodeQPSPath(String zkZnodeQPSPath) {
-      hBaseIndexConfig.set(HBASE_ZK_PATH_QPS_ROOT, zkZnodeQPSPath);
+      hBaseIndexConfig.setValue(HBASE_ZK_PATH_QPS_ROOT, zkZnodeQPSPath);
       return this;
     }
 
     public Builder hbaseIndexGetBatchSize(int getBatchSize) {
-      hBaseIndexConfig.set(HBASE_GET_BATCH_SIZE_PROP, String.valueOf(getBatchSize));
+      hBaseIndexConfig.setValue(HBASE_GET_BATCH_SIZE_PROP, String.valueOf(getBatchSize));
       return this;
     }
 
     public Builder hbaseIndexPutBatchSize(int putBatchSize) {
-      hBaseIndexConfig.set(HBASE_PUT_BATCH_SIZE_PROP, String.valueOf(putBatchSize));
+      hBaseIndexConfig.setValue(HBASE_PUT_BATCH_SIZE_PROP, String.valueOf(putBatchSize));
       return this;
     }
 
     public Builder hbaseIndexPutBatchSizeAutoCompute(boolean putBatchSizeAutoCompute) {
-      hBaseIndexConfig.set(HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP, String.valueOf(putBatchSizeAutoCompute));
+      hBaseIndexConfig.setValue(HBASE_PUT_BATCH_SIZE_AUTO_COMPUTE_PROP, String.valueOf(putBatchSizeAutoCompute));
       return this;
     }
 
     public Builder hbaseIndexDesiredPutsTime(int desiredPutsTime) {
-      hBaseIndexConfig.set(HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS, String.valueOf(desiredPutsTime));
+      hBaseIndexConfig.setValue(HOODIE_INDEX_DESIRED_PUTS_TIME_IN_SECS, String.valueOf(desiredPutsTime));
       return this;
     }
 
     public Builder hbaseIndexShouldComputeQPSDynamically(boolean shouldComputeQPsDynamically) {
-      hBaseIndexConfig.set(HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY, String.valueOf(shouldComputeQPsDynamically));
+      hBaseIndexConfig.setValue(HOODIE_INDEX_COMPUTE_QPS_DYNAMICALLY, String.valueOf(shouldComputeQPsDynamically));
       return this;
     }
 
     public Builder hbaseIndexQPSFraction(float qpsFraction) {
-      hBaseIndexConfig.set(HBASE_QPS_FRACTION_PROP, String.valueOf(qpsFraction));
+      hBaseIndexConfig.setValue(HBASE_QPS_FRACTION_PROP, String.valueOf(qpsFraction));
       return this;
     }
 
     public Builder hbaseIndexMinQPSFraction(float minQPSFraction) {
-      hBaseIndexConfig.set(HBASE_MIN_QPS_FRACTION_PROP, String.valueOf(minQPSFraction));
+      hBaseIndexConfig.setValue(HBASE_MIN_QPS_FRACTION_PROP, String.valueOf(minQPSFraction));
       return this;
     }
 
     public Builder hbaseIndexMaxQPSFraction(float maxQPSFraction) {
-      hBaseIndexConfig.set(HBASE_MAX_QPS_FRACTION_PROP, String.valueOf(maxQPSFraction));
+      hBaseIndexConfig.setValue(HBASE_MAX_QPS_FRACTION_PROP, String.valueOf(maxQPSFraction));
       return this;
     }
 
     public Builder hbaseIndexSleepMsBetweenPutBatch(int sleepMsBetweenPutBatch) {
-      hBaseIndexConfig.set(HBASE_SLEEP_MS_PUT_BATCH_PROP, String.valueOf(sleepMsBetweenPutBatch));
+      hBaseIndexConfig.setValue(HBASE_SLEEP_MS_PUT_BATCH_PROP, String.valueOf(sleepMsBetweenPutBatch));
       return this;
     }
 
     public Builder hbaseIndexSleepMsBetweenGetBatch(int sleepMsBetweenGetBatch) {
-      hBaseIndexConfig.set(HBASE_SLEEP_MS_GET_BATCH_PROP, String.valueOf(sleepMsBetweenGetBatch));
+      hBaseIndexConfig.setValue(HBASE_SLEEP_MS_GET_BATCH_PROP, String.valueOf(sleepMsBetweenGetBatch));
       return this;
     }
 
     public Builder hbaseIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      hBaseIndexConfig.set(HBASE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
+      hBaseIndexConfig.setValue(HBASE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 
     public Builder hbaseIndexRollbackSync(boolean rollbackSync) {
-      hBaseIndexConfig.set(HBASE_INDEX_ROLLBACK_SYNC, String.valueOf(rollbackSync));
+      hBaseIndexConfig.setValue(HBASE_INDEX_ROLLBACK_SYNC, String.valueOf(rollbackSync));
       return this;
     }
 
     public Builder withQPSResourceAllocatorType(String qpsResourceAllocatorClass) {
-      hBaseIndexConfig.set(HBASE_INDEX_QPS_ALLOCATOR_CLASS, qpsResourceAllocatorClass);
+      hBaseIndexConfig.setValue(HBASE_INDEX_QPS_ALLOCATOR_CLASS, qpsResourceAllocatorClass);
       return this;
     }
 
     public Builder hbaseIndexZkSessionTimeout(int zkSessionTimeout) {
-      hBaseIndexConfig.set(HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS, String.valueOf(zkSessionTimeout));
+      hBaseIndexConfig.setValue(HOODIE_INDEX_HBASE_ZK_SESSION_TIMEOUT_MS, String.valueOf(zkSessionTimeout));
       return this;
     }
 
     public Builder hbaseIndexZkConnectionTimeout(int zkConnectionTimeout) {
-      hBaseIndexConfig.set(HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS, String.valueOf(zkConnectionTimeout));
+      hBaseIndexConfig.setValue(HOODIE_INDEX_HBASE_ZK_CONNECTION_TIMEOUT_MS, String.valueOf(zkConnectionTimeout));
       return this;
     }
 
     public Builder hbaseZkZnodeParent(String zkZnodeParent) {
-      hBaseIndexConfig.set(HBASE_ZK_ZNODEPARENT, zkZnodeParent);
+      hBaseIndexConfig.setValue(HBASE_ZK_ZNODEPARENT, zkZnodeParent);
       return this;
     }
 
@@ -282,7 +282,7 @@ public class HoodieHBaseIndexConfig extends HoodieConfig {
      */
     public HoodieHBaseIndexConfig.Builder hbaseIndexMaxQPSPerRegionServer(int maxQPSPerRegionServer) {
       // This should be same across various jobs
-      hBaseIndexConfig.set(HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP,
+      hBaseIndexConfig.setValue(HoodieHBaseIndexConfig.HBASE_MAX_QPS_PER_REGION_SERVER_PROP,
           String.valueOf(maxQPSPerRegionServer));
       return this;
     }

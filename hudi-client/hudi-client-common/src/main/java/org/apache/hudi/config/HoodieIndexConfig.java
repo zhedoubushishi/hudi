@@ -226,12 +226,12 @@ public class HoodieIndexConfig extends HoodieConfig {
     }
 
     public Builder withIndexType(HoodieIndex.IndexType indexType) {
-      hoodieIndexConfig.set(INDEX_TYPE_PROP, indexType.name());
+      hoodieIndexConfig.setValue(INDEX_TYPE_PROP, indexType.name());
       return this;
     }
 
     public Builder withIndexClass(String indexClass) {
-      hoodieIndexConfig.set(INDEX_CLASS_PROP, indexClass);
+      hoodieIndexConfig.setValue(INDEX_CLASS_PROP, indexClass);
       return this;
     }
 
@@ -241,77 +241,77 @@ public class HoodieIndexConfig extends HoodieConfig {
     }
 
     public Builder bloomFilterNumEntries(int numEntries) {
-      hoodieIndexConfig.set(BLOOM_FILTER_NUM_ENTRIES, String.valueOf(numEntries));
+      hoodieIndexConfig.setValue(BLOOM_FILTER_NUM_ENTRIES, String.valueOf(numEntries));
       return this;
     }
 
     public Builder bloomFilterFPP(double fpp) {
-      hoodieIndexConfig.set(BLOOM_FILTER_FPP, String.valueOf(fpp));
+      hoodieIndexConfig.setValue(BLOOM_FILTER_FPP, String.valueOf(fpp));
       return this;
     }
 
     public Builder bloomIndexParallelism(int parallelism) {
-      hoodieIndexConfig.set(BLOOM_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
+      hoodieIndexConfig.setValue(BLOOM_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder bloomIndexPruneByRanges(boolean pruneRanges) {
-      hoodieIndexConfig.set(BLOOM_INDEX_PRUNE_BY_RANGES_PROP, String.valueOf(pruneRanges));
+      hoodieIndexConfig.setValue(BLOOM_INDEX_PRUNE_BY_RANGES_PROP, String.valueOf(pruneRanges));
       return this;
     }
 
     public Builder bloomIndexUseCaching(boolean useCaching) {
-      hoodieIndexConfig.set(BLOOM_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
+      hoodieIndexConfig.setValue(BLOOM_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
       return this;
     }
 
     public Builder bloomIndexTreebasedFilter(boolean useTreeFilter) {
-      hoodieIndexConfig.set(BLOOM_INDEX_TREE_BASED_FILTER_PROP, String.valueOf(useTreeFilter));
+      hoodieIndexConfig.setValue(BLOOM_INDEX_TREE_BASED_FILTER_PROP, String.valueOf(useTreeFilter));
       return this;
     }
 
     public Builder bloomIndexBucketizedChecking(boolean bucketizedChecking) {
-      hoodieIndexConfig.set(BLOOM_INDEX_BUCKETIZED_CHECKING_PROP, String.valueOf(bucketizedChecking));
+      hoodieIndexConfig.setValue(BLOOM_INDEX_BUCKETIZED_CHECKING_PROP, String.valueOf(bucketizedChecking));
       return this;
     }
 
     public Builder bloomIndexKeysPerBucket(int keysPerBucket) {
-      hoodieIndexConfig.set(BLOOM_INDEX_KEYS_PER_BUCKET_PROP, String.valueOf(keysPerBucket));
+      hoodieIndexConfig.setValue(BLOOM_INDEX_KEYS_PER_BUCKET_PROP, String.valueOf(keysPerBucket));
       return this;
     }
 
     public Builder withBloomIndexInputStorageLevel(String level) {
-      hoodieIndexConfig.set(BLOOM_INDEX_INPUT_STORAGE_LEVEL, level);
+      hoodieIndexConfig.setValue(BLOOM_INDEX_INPUT_STORAGE_LEVEL, level);
       return this;
     }
 
     public Builder withBloomIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      hoodieIndexConfig.set(BLOOM_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
+      hoodieIndexConfig.setValue(BLOOM_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 
     public Builder withSimpleIndexParallelism(int parallelism) {
-      hoodieIndexConfig.set(SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
+      hoodieIndexConfig.setValue(SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder simpleIndexUseCaching(boolean useCaching) {
-      hoodieIndexConfig.set(SIMPLE_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
+      hoodieIndexConfig.setValue(SIMPLE_INDEX_USE_CACHING_PROP, String.valueOf(useCaching));
       return this;
     }
 
     public Builder withSimpleIndexInputStorageLevel(String level) {
-      hoodieIndexConfig.set(SIMPLE_INDEX_INPUT_STORAGE_LEVEL, level);
+      hoodieIndexConfig.setValue(SIMPLE_INDEX_INPUT_STORAGE_LEVEL, level);
       return this;
     }
 
     public Builder withGlobalSimpleIndexParallelism(int parallelism) {
-      hoodieIndexConfig.set(GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
+      hoodieIndexConfig.setValue(GLOBAL_SIMPLE_INDEX_PARALLELISM_PROP, String.valueOf(parallelism));
       return this;
     }
 
     public Builder withGlobalSimpleIndexUpdatePartitionPath(boolean updatePartitionPath) {
-      hoodieIndexConfig.set(SIMPLE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
+      hoodieIndexConfig.setValue(SIMPLE_INDEX_UPDATE_PARTITION_PATH, String.valueOf(updatePartitionPath));
       return this;
     }
 

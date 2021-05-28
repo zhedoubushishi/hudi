@@ -30,26 +30,31 @@ public class HoodieWriteCommitKafkaCallbackConfig extends HoodieConfig {
   public static final ConfigOption<String> CALLBACK_KAFKA_BOOTSTRAP_SERVERS = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.bootstrap.servers")
       .noDefaultValue()
+      .sinceVersion("0.7.0")
       .withDocumentation("Bootstrap servers of kafka callback cluster");
 
   public static final ConfigOption<String> CALLBACK_KAFKA_TOPIC = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.topic")
       .noDefaultValue()
+      .sinceVersion("0.7.0")
       .withDocumentation("Kafka topic to be sent along with callback messages");
 
   public static final ConfigOption<String> CALLBACK_KAFKA_PARTITION = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.partition")
       .noDefaultValue()
+      .sinceVersion("0.7.0")
       .withDocumentation("partition of CALLBACK_KAFKA_TOPIC, 0 by default");
 
   public static final ConfigOption<String> CALLBACK_KAFKA_ACKS = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.acks")
       .defaultValue("all")
+      .sinceVersion("0.7.0")
       .withDocumentation("kafka acks level, all by default");
 
   public static final ConfigOption<Integer> CALLBACK_KAFKA_RETRIES = ConfigOption
       .key(CALLBACK_PREFIX + "kafka.retries")
       .defaultValue(3)
+      .sinceVersion("0.7.0")
       .withDocumentation("Times to retry. 3 by default");
 
   /**
