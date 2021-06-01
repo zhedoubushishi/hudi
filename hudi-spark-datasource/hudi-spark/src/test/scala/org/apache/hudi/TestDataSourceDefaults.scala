@@ -573,7 +573,7 @@ class TestDataSourceDefaults {
     val baseOrderingVal: Object = baseRecord.get("favoriteIntNumber")
     val fieldSchema: Schema = baseRecord.getSchema().getField("favoriteIntNumber").schema()
     val props = new TypedProperties()
-    props.put(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP.key, "favoriteIntNumber");
+    props.put(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP_KEY, "favoriteIntNumber");
 
     val basePayload = new OverwriteWithLatestAvroPayload(baseRecord, HoodieAvroUtils.convertValueForSpecificDataTypes(fieldSchema, baseOrderingVal).asInstanceOf[Comparable[_]])
 

@@ -93,6 +93,10 @@ public class HoodieConfig implements Serializable {
     return rawValue.map(Object::toString).orElse(null);
   }
 
+  public String getString(String key) {
+    return props.getProperty(key);
+  }
+
   public <T> Integer getInt(ConfigOption<T> configOption) {
     Option<Object> rawValue = getRawValue(configOption);
     return rawValue.map(v -> Integer.parseInt(v.toString())).orElse(null);

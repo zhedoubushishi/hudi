@@ -149,13 +149,12 @@ public class ConfigOption<T> implements Serializable {
       String configClassName = Thread.currentThread().getStackTrace()[3].getClassName();
       try {
         Class<?> caller = Class.forName(configClassName);
-        if (caller.getSuperclass().getName().equals(HoodieConfig.class.getName())) {
-          List<ConfigOption<?>> configRegistry = (List<ConfigOption<?>>) caller
-              .getDeclaredField("CONFIG_REGISTRY").get(null);
-          configRegistry.add(configOption);
-        }
+        List<ConfigOption<?>> configRegistry = (List<ConfigOption<?>>) caller
+            .getDeclaredField("CONFIG_REGISTRY").get(null);
+        configRegistry.add(configOption);
+      } catch (NoSuchFieldException ignored) {
       } catch (Exception e) {
-        e.printStackTrace();
+        throw new HoodieException("Failed to register the config");
       }
     }
   }
