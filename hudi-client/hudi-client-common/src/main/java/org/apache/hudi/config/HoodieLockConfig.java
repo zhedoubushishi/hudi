@@ -31,22 +31,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static org.apache.hudi.common.config.LockConfiguration.HIVE_DATABASE_NAME_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.HIVE_METASTORE_URI_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.HIVE_TABLE_NAME_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_NUM_RETRIES_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_LOCK_ACQUIRE_NUM_RETRIES;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_ZK_CONNECTION_TIMEOUT_MS;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_ZK_SESSION_TIMEOUT_MS;
+import static org.apache.hudi.common.config.LockConfiguration.FILESYSTEM_LOCK_PATH_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.HIVE_DATABASE_NAME_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.HIVE_METASTORE_URI_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.HIVE_TABLE_NAME_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_NUM_RETRIES_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY;
 import static org.apache.hudi.common.config.LockConfiguration.LOCK_PREFIX;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_BASE_PATH_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECTION_TIMEOUT_MS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECT_URL_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_LOCK_KEY_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_PORT_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT_MS_PROP;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_BASE_PATH_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECTION_TIMEOUT_MS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECT_URL_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_LOCK_KEY_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_PORT_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT_MS_PROP_KEY;
 
 
 /**
@@ -55,6 +60,106 @@ import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT
 public class HoodieLockConfig extends HoodieConfig {
 
   public static final List<ConfigOption<?>> CONFIG_REGISTRY = new ArrayList<>();
+
+  public static final ConfigOption<String> LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP = ConfigOption
+      .key(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY)
+      .defaultValue(DEFAULT_LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS)
+      .sinceVersion("0.8.0")
+      .withDocumentation("Parameter used in the exponential backoff retry policy. Stands for the Initial amount "
+          + "of time to wait between retries by lock provider client");
+
+  public static final ConfigOption<String> LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP = ConfigOption
+      .key(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP_KEY)
+      .defaultValue(String.valueOf(5000L))
+      .sinceVersion("0.8.0")
+      .withDocumentation("Parameter used in the exponential backoff retry policy. Stands for the maximum amount "
+          + "of time to wait between retries by lock provider client");
+
+  public static final ConfigOption<String> LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP = ConfigOption
+      .key(LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY)
+      .defaultValue(String.valueOf(10000L))
+      .sinceVersion("0.8.0")
+      .withDocumentation("Amount of time to wait between retries from the hudi client");
+
+  public static final ConfigOption<String> LOCK_ACQUIRE_NUM_RETRIES_PROP = ConfigOption
+      .key(LOCK_ACQUIRE_NUM_RETRIES_PROP_KEY)
+      .defaultValue(DEFAULT_LOCK_ACQUIRE_NUM_RETRIES)
+      .sinceVersion("0.8.0")
+      .withDocumentation("Maximum number of times to retry by lock provider client");
+
+  public static final ConfigOption<String> LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP = ConfigOption
+      .key(LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP_KEY)
+      .defaultValue(String.valueOf(0))
+      .sinceVersion("0.8.0")
+      .withDocumentation("Maximum number of times to retry to acquire lock additionally from the hudi client");
+
+  public static final ConfigOption<Integer> LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP = ConfigOption
+      .key(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY)
+      .defaultValue(60 * 1000)
+      .sinceVersion("0.8.0")
+      .withDocumentation("");
+
+  public static final ConfigOption<String> FILESYSTEM_LOCK_PATH_PROP = ConfigOption
+      .key(FILESYSTEM_LOCK_PATH_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("");
+
+  public static final ConfigOption<String> HIVE_DATABASE_NAME_PROP = ConfigOption
+      .key(HIVE_DATABASE_NAME_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("The Hive database to acquire lock against");
+
+  public static final ConfigOption<String> HIVE_TABLE_NAME_PROP = ConfigOption
+      .key(HIVE_TABLE_NAME_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("The Hive table under the hive database to acquire lock against");
+
+  public static final ConfigOption<String> HIVE_METASTORE_URI_PROP = ConfigOption
+      .key(HIVE_METASTORE_URI_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("");
+
+  public static final ConfigOption<String> ZK_BASE_PATH_PROP = ConfigOption
+      .key(ZK_BASE_PATH_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("The base path on Zookeeper under which to create a ZNode to acquire the lock. "
+          + "This should be common for all jobs writing to the same table");
+
+  public static final ConfigOption<Integer> ZK_SESSION_TIMEOUT_MS_PROP = ConfigOption
+      .key(ZK_SESSION_TIMEOUT_MS_PROP_KEY)
+      .defaultValue(DEFAULT_ZK_SESSION_TIMEOUT_MS)
+      .sinceVersion("0.8.0")
+      .withDocumentation("How long to wait after losing a connection to ZooKeeper before the session is expired");
+
+  public static final ConfigOption<Integer> ZK_CONNECTION_TIMEOUT_MS_PROP = ConfigOption
+      .key(ZK_CONNECTION_TIMEOUT_MS_PROP_KEY)
+      .defaultValue(DEFAULT_ZK_CONNECTION_TIMEOUT_MS)
+      .sinceVersion("0.8.0")
+      .withDocumentation("How long to wait when connecting to ZooKeeper before considering the connection a failure");
+
+  public static final ConfigOption<String> ZK_CONNECT_URL_PROP = ConfigOption
+      .key(ZK_CONNECT_URL_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("Set the list of comma separated servers to connect to");
+
+  public static final ConfigOption<String> ZK_PORT_PROP = ConfigOption
+      .key(ZK_PORT_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("The connection port to be used for Zookeeper");
+
+  public static final ConfigOption<String> ZK_LOCK_KEY_PROP = ConfigOption
+      .key(ZK_LOCK_KEY_PROP_KEY)
+      .noDefaultValue()
+      .sinceVersion("0.8.0")
+      .withDocumentation("Key name under base_path at which to create a ZNode and acquire lock. "
+          + "Final path on zk will look like base_path/lock_key. We recommend setting this to the table name");
 
   // Pluggable type of lock provider
   public static final ConfigOption<String> LOCK_PROVIDER_CLASS_PROP = ConfigOption
@@ -182,16 +287,8 @@ public class HoodieLockConfig extends HoodieConfig {
     }
 
     public HoodieLockConfig build() {
-      lockConfig.setDefaultValue(LOCK_PROVIDER_CLASS_PROP);
-      lockConfig.setDefaultValue(WRITE_CONFLICT_RESOLUTION_STRATEGY_CLASS_PROP);
-      lockConfig.setDefaultValue(LOCK_ACQUIRE_NUM_RETRIES_PROP);
-      lockConfig.setDefaultValue(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP);
-      lockConfig.setDefaultValue(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP);
-      lockConfig.setDefaultValue(LOCK_ACQUIRE_CLIENT_NUM_RETRIES_PROP);
-      lockConfig.setDefaultValue(LOCK_ACQUIRE_CLIENT_RETRY_WAIT_TIME_IN_MILLIS_PROP);
-      lockConfig.setDefaultValue(ZK_CONNECTION_TIMEOUT_MS_PROP);
-      lockConfig.setDefaultValue(ZK_SESSION_TIMEOUT_MS_PROP);
-      lockConfig.setDefaultValue(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP);
+      CONFIG_REGISTRY.stream().filter(ConfigOption::hasDefaultValue).forEach(
+          lockConfig::setDefaultValue);
       return lockConfig;
     }
   }

@@ -35,15 +35,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.hudi.common.config.LockConfiguration.HIVE_DATABASE_NAME_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.HIVE_TABLE_NAME_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_NUM_RETRIES_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECTION_TIMEOUT_MS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECT_URL_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_PORT_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT_MS_PROP;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_LOCK_ACQUIRE_NUM_RETRIES;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_ZK_CONNECTION_TIMEOUT_MS;
+import static org.apache.hudi.common.config.LockConfiguration.HIVE_DATABASE_NAME_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.HIVE_TABLE_NAME_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_NUM_RETRIES_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECTION_TIMEOUT_MS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECT_URL_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_PORT_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT_MS_PROP_KEY;
 
 /**
  * For all tests, we need to set LockComponent.setOperationType(DataOperationType.NO_TXN).
@@ -63,15 +66,15 @@ public class TestHiveMetastoreBasedLockProvider {
     createHiveConnection();
     connection.createStatement().execute("create database if not exists testdb");
     TypedProperties properties = new TypedProperties();
-    properties.setProperty(HIVE_DATABASE_NAME_PROP.key(), "testdb");
-    properties.setProperty(HIVE_TABLE_NAME_PROP.key(), "testtable");
-    properties.setProperty(LOCK_ACQUIRE_NUM_RETRIES_PROP.key(), LOCK_ACQUIRE_NUM_RETRIES_PROP.defaultValue());
-    properties.setProperty(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP.key(), LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP.defaultValue());
-    properties.setProperty(ZK_CONNECT_URL_PROP.key(), HiveTestUtil.getZkService().connectString());
-    properties.setProperty(ZK_PORT_PROP.key(), HiveTestUtil.getHiveConf().get("hive.zookeeper.client.port"));
-    properties.setProperty(ZK_SESSION_TIMEOUT_MS_PROP.key(), HiveTestUtil.getHiveConf().get("hive.zookeeper.session.timeout"));
-    properties.setProperty(ZK_CONNECTION_TIMEOUT_MS_PROP.key(), String.valueOf(ZK_CONNECTION_TIMEOUT_MS_PROP.defaultValue()));
-    properties.setProperty(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key(), String.valueOf(1000));
+    properties.setProperty(HIVE_DATABASE_NAME_PROP_KEY, "testdb");
+    properties.setProperty(HIVE_TABLE_NAME_PROP_KEY, "testtable");
+    properties.setProperty(LOCK_ACQUIRE_NUM_RETRIES_PROP_KEY, DEFAULT_LOCK_ACQUIRE_NUM_RETRIES);
+    properties.setProperty(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY, DEFAULT_LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS);
+    properties.setProperty(ZK_CONNECT_URL_PROP_KEY, HiveTestUtil.getZkService().connectString());
+    properties.setProperty(ZK_PORT_PROP_KEY, HiveTestUtil.getHiveConf().get("hive.zookeeper.client.port"));
+    properties.setProperty(ZK_SESSION_TIMEOUT_MS_PROP_KEY, HiveTestUtil.getHiveConf().get("hive.zookeeper.session.timeout"));
+    properties.setProperty(ZK_CONNECTION_TIMEOUT_MS_PROP_KEY, String.valueOf(DEFAULT_ZK_CONNECTION_TIMEOUT_MS));
+    properties.setProperty(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY, String.valueOf(1000));
     lockConfiguration = new LockConfiguration(properties);
     lockComponent.setTablename("testtable");
   }
@@ -86,10 +89,10 @@ public class TestHiveMetastoreBasedLockProvider {
     HiveMetastoreBasedLockProvider lockProvider = new HiveMetastoreBasedLockProvider(lockConfiguration, HiveTestUtil.getHiveConf());
     lockComponent.setOperationType(DataOperationType.NO_TXN);
     Assertions.assertTrue(lockProvider.acquireLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS, lockComponent));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY), TimeUnit.MILLISECONDS, lockComponent));
     try {
       Assertions.assertTrue(lockProvider.acquireLock(lockConfiguration.getConfig()
-          .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS, lockComponent));
+          .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY), TimeUnit.MILLISECONDS, lockComponent));
       Assertions.fail();
     } catch (Exception e) {
       // Expected since lock is already acquired
@@ -97,7 +100,7 @@ public class TestHiveMetastoreBasedLockProvider {
     lockProvider.unlock();
     // try to lock again after unlocking
     Assertions.assertTrue(lockProvider.acquireLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS, lockComponent));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY), TimeUnit.MILLISECONDS, lockComponent));
     lockProvider.close();
   }
 
@@ -106,11 +109,11 @@ public class TestHiveMetastoreBasedLockProvider {
     HiveMetastoreBasedLockProvider lockProvider = new HiveMetastoreBasedLockProvider(lockConfiguration, HiveTestUtil.getHiveConf());
     lockComponent.setOperationType(DataOperationType.NO_TXN);
     Assertions.assertTrue(lockProvider.acquireLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS, lockComponent));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY), TimeUnit.MILLISECONDS, lockComponent));
     lockProvider.unlock();
     // try to lock again after unlocking
     Assertions.assertTrue(lockProvider.acquireLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS, lockComponent));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY), TimeUnit.MILLISECONDS, lockComponent));
     lockProvider.close();
   }
 
@@ -119,10 +122,10 @@ public class TestHiveMetastoreBasedLockProvider {
     HiveMetastoreBasedLockProvider lockProvider = new HiveMetastoreBasedLockProvider(lockConfiguration, HiveTestUtil.getHiveConf());
     lockComponent.setOperationType(DataOperationType.NO_TXN);
     Assertions.assertTrue(lockProvider.acquireLock(lockConfiguration.getConfig()
-        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS, lockComponent));
+        .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY), TimeUnit.MILLISECONDS, lockComponent));
     try {
       lockProvider.acquireLock(lockConfiguration.getConfig()
-          .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP.key()), TimeUnit.MILLISECONDS, lockComponent);
+          .getLong(LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP_KEY), TimeUnit.MILLISECONDS, lockComponent);
       Assertions.fail();
     } catch (IllegalArgumentException e) {
       // expected
