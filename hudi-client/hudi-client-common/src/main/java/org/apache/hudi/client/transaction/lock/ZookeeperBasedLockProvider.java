@@ -36,14 +36,16 @@ import org.apache.log4j.Logger;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_NUM_RETRIES_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_BASE_PATH_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECTION_TIMEOUT_MS_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECT_URL_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_LOCK_KEY_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT_MS_PROP;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_ZK_CONNECTION_TIMEOUT_MS;
+import static org.apache.hudi.common.config.LockConfiguration.DEFAULT_ZK_SESSION_TIMEOUT_MS;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_NUM_RETRIES_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_BASE_PATH_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECTION_TIMEOUT_MS_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_CONNECT_URL_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_LOCK_KEY_PROP_KEY;
+import static org.apache.hudi.common.config.LockConfiguration.ZK_SESSION_TIMEOUT_MS_PROP_KEY;
 
 /**
  * A zookeeper based lock. This {@link LockProvider} implementation allows to lock table operations
@@ -62,11 +64,11 @@ public class ZookeeperBasedLockProvider implements LockProvider<InterProcessMute
     checkRequiredProps(lockConfiguration);
     this.lockConfiguration = lockConfiguration;
     this.curatorFrameworkClient = CuratorFrameworkFactory.builder()
-        .connectString(lockConfiguration.getConfig().getString(ZK_CONNECT_URL_PROP.key()))
-        .retryPolicy(new BoundedExponentialBackoffRetry(lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP.key()),
-            lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP.key()), lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_NUM_RETRIES_PROP.key())))
-        .sessionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_SESSION_TIMEOUT_MS_PROP.key(), ZK_SESSION_TIMEOUT_MS_PROP.defaultValue()))
-        .connectionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_CONNECTION_TIMEOUT_MS_PROP.key(), ZK_CONNECTION_TIMEOUT_MS_PROP.defaultValue()))
+        .connectString(lockConfiguration.getConfig().getString(ZK_CONNECT_URL_PROP_KEY))
+        .retryPolicy(new BoundedExponentialBackoffRetry(lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_WAIT_TIME_IN_MILLIS_PROP_KEY),
+            lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_RETRY_MAX_WAIT_TIME_IN_MILLIS_PROP_KEY), lockConfiguration.getConfig().getInteger(LOCK_ACQUIRE_NUM_RETRIES_PROP_KEY)))
+        .sessionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_SESSION_TIMEOUT_MS_PROP_KEY, DEFAULT_ZK_SESSION_TIMEOUT_MS))
+        .connectionTimeoutMs(lockConfiguration.getConfig().getInteger(ZK_CONNECTION_TIMEOUT_MS_PROP_KEY, DEFAULT_ZK_CONNECTION_TIMEOUT_MS))
         .build();
     this.curatorFrameworkClient.start();
   }
@@ -134,8 +136,8 @@ public class ZookeeperBasedLockProvider implements LockProvider<InterProcessMute
   private void acquireLock(long time, TimeUnit unit) throws Exception {
     ValidationUtils.checkArgument(this.lock == null, generateLogStatement(LockState.ALREADY_ACQUIRED, generateLogSuffixString()));
     InterProcessMutex newLock = new InterProcessMutex(
-        this.curatorFrameworkClient, lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP.key()) + "/"
-        + this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP.key()));
+        this.curatorFrameworkClient, lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP_KEY) + "/"
+        + this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP_KEY));
     boolean acquired = newLock.acquire(time, unit);
     if (!acquired) {
       throw new HoodieLockException(generateLogStatement(LockState.FAILED_TO_ACQUIRE, generateLogSuffixString()));
@@ -148,16 +150,16 @@ public class ZookeeperBasedLockProvider implements LockProvider<InterProcessMute
   }
 
   private void checkRequiredProps(final LockConfiguration config) {
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECT_URL_PROP.key()) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_BASE_PATH_PROP.key()) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_SESSION_TIMEOUT_MS_PROP.key()) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECTION_TIMEOUT_MS_PROP.key()) != null);
-    ValidationUtils.checkArgument(config.getConfig().getString(ZK_LOCK_KEY_PROP.key()) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECT_URL_PROP_KEY) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_BASE_PATH_PROP_KEY) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_SESSION_TIMEOUT_MS_PROP_KEY) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_CONNECTION_TIMEOUT_MS_PROP_KEY) != null);
+    ValidationUtils.checkArgument(config.getConfig().getString(ZK_LOCK_KEY_PROP_KEY) != null);
   }
 
   private String generateLogSuffixString() {
-    String zkBasePath = this.lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP.key());
-    String lockKey = this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP.key());
+    String zkBasePath = this.lockConfiguration.getConfig().getString(ZK_BASE_PATH_PROP_KEY);
+    String lockKey = this.lockConfiguration.getConfig().getString(ZK_LOCK_KEY_PROP_KEY);
     return StringUtils.join("ZkBasePath = ", zkBasePath, ", lock key = ", lockKey);
   }
 

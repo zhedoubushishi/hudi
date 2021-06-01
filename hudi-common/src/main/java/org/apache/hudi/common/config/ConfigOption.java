@@ -153,6 +153,7 @@ public class ConfigOption<T> implements Serializable {
             .getDeclaredField("CONFIG_REGISTRY").get(null);
         configRegistry.add(configOption);
       } catch (NoSuchFieldException ignored) {
+        // ignored
       } catch (Exception e) {
         throw new HoodieException("Failed to register the config");
       }

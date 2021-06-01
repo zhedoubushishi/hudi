@@ -25,7 +25,6 @@ import org.apache.hudi.client.transaction.ConflictResolutionStrategy;
 import org.apache.hudi.common.config.ConfigOption;
 import org.apache.hudi.common.config.HoodieConfig;
 import org.apache.hudi.common.config.HoodieMetadataConfig;
-import org.apache.hudi.common.config.LockConfiguration;
 import org.apache.hudi.common.engine.EngineType;
 import org.apache.hudi.common.fs.ConsistencyGuardConfig;
 import org.apache.hudi.common.model.HoodieFailedWritesCleaningPolicy;
@@ -58,9 +57,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import static org.apache.hudi.common.config.LockConfiguration.HIVE_DATABASE_NAME_PROP;
-import static org.apache.hudi.common.config.LockConfiguration.HIVE_TABLE_NAME_PROP;
 
 /**
  * Class storing configs for the HoodieWriteClient.
@@ -1155,11 +1151,11 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public String getLockHiveDatabaseName() {
-    return getString(HIVE_DATABASE_NAME_PROP);
+    return getString(HoodieLockConfig.HIVE_DATABASE_NAME_PROP);
   }
 
   public String getLockHiveTableName() {
-    return getString(HIVE_TABLE_NAME_PROP);
+    return getString(HoodieLockConfig.HIVE_TABLE_NAME_PROP);
   }
 
   public ConflictResolutionStrategy getWriteConflictResolutionStrategy() {
@@ -1167,7 +1163,7 @@ public class HoodieWriteConfig extends HoodieConfig {
   }
 
   public Long getLockAcquireWaitTimeoutInMs() {
-    return getLong(LockConfiguration.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP);
+    return getLong(HoodieLockConfig.LOCK_ACQUIRE_WAIT_TIMEOUT_MS_PROP);
   }
 
   public WriteConcurrencyMode getWriteConcurrencyMode() {
