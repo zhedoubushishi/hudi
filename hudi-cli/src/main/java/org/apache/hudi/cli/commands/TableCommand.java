@@ -22,16 +22,22 @@ import org.apache.hudi.cli.HoodieCLI;
 import org.apache.hudi.cli.HoodiePrintHelper;
 import org.apache.hudi.cli.TableHeader;
 import org.apache.hudi.common.fs.ConsistencyGuardConfig;
-import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
+import org.apache.hudi.common.table.TableSchemaResolver;
 import org.apache.hudi.exception.TableNotFoundException;
 
+import org.apache.avro.Schema;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +47,8 @@ import java.util.List;
  */
 @Component
 public class TableCommand implements CommandMarker {
+
+  private static final Logger LOG = LogManager.getLogger(TableCommand.class);
 
   static {
     System.out.println("Table command getting loaded");
@@ -95,7 +103,7 @@ public class TableCommand implements CommandMarker {
 
     boolean existing = false;
     try {
-      new HoodieTableMetaClient(HoodieCLI.conf, path);
+      HoodieTableMetaClient.builder().setConf(HoodieCLI.conf).setBasePath(path).build();
       existing = true;
     } catch (TableNotFoundException dfe) {
       // expected
@@ -106,10 +114,13 @@ public class TableCommand implements CommandMarker {
       throw new IllegalStateException("Table already existing in path : " + path);
     }
 
-    final HoodieTableType tableType = HoodieTableType.valueOf(tableTypeStr);
-    HoodieTableMetaClient.initTableType(HoodieCLI.conf, path, tableType, name, archiveFolder,
-        payloadClass, layoutVersion);
-
+    HoodieTableMetaClient.withPropertyBuilder()
+      .setTableType(tableTypeStr)
+      .setTableName(name)
+      .setArchiveLogFolder(archiveFolder)
+      .setPayloadClassName(payloadClass)
+      .setTimelineLayoutVersion(layoutVersion)
+      .initTable(HoodieCLI.conf, path);
     // Now connect to ensure loading works
     return connect(path, layoutVersion, false, 0, 0, 0);
   }
@@ -139,5 +150,42 @@ public class TableCommand implements CommandMarker {
   public String refreshMetadata() {
     HoodieCLI.refreshTableMetadata();
     return "Metadata for table " + HoodieCLI.getTableMetaClient().getTableConfig().getTableName() + " refreshed.";
+  }
+
+  /**
+   * Fetches table schema in avro format.
+   */
+  @CliCommand(value = "fetch table schema", help = "Fetches latest table schema")
+  public String fetchTableSchema(
+      @CliOption(key = {"outputFilePath"}, mandatory = false, help = "File path to write schema") final String outputFilePath) throws Exception {
+    HoodieTableMetaClient client = HoodieCLI.getTableMetaClient();
+    TableSchemaResolver tableSchemaResolver = new TableSchemaResolver(client);
+    Schema schema = tableSchemaResolver.getTableAvroSchema();
+    if (outputFilePath != null) {
+      LOG.info("Latest table schema : " + schema.toString(true));
+      writeToFile(outputFilePath, schema.toString(true));
+      return String.format("Latest table schema written to %s", outputFilePath);
+    } else {
+      return String.format("Latest table schema %s", schema.toString(true));
+    }
+  }
+
+  /**
+   * Use Streams when you are dealing with raw data.
+   * @param filePath output file path.
+   * @param data to be written to file.
+   */
+  private static void writeToFile(String filePath, String data) throws IOException {
+    File outFile = new File(filePath);
+    if (outFile.exists()) {
+      outFile.delete();
+    }
+    OutputStream os = null;
+    try {
+      os = new FileOutputStream(outFile);
+      os.write(data.getBytes(), 0, data.length());
+    } finally {
+      os.close();
+    }
   }
 }

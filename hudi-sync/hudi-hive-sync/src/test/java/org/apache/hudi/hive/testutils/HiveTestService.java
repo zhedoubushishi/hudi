@@ -79,8 +79,9 @@ public class HiveTestService {
   private TServer tServer;
   private HiveServer2 hiveServer;
 
-  public HiveTestService(Configuration configuration) throws IOException {
+  public HiveTestService(Configuration hadoopConf) throws IOException {
     this.workDir = Files.createTempDirectory(System.currentTimeMillis() + "-").toFile().getAbsolutePath();
+    this.hadoopConf = hadoopConf;
   }
 
   public Configuration getHadoopConf() {
@@ -148,7 +149,19 @@ public class HiveTestService {
     hadoopConf = null;
   }
 
-  private HiveConf configureHive(Configuration conf, String localHiveLocation) throws IOException {
+  public HiveServer2 getHiveServer() {
+    return hiveServer;
+  }
+
+  public int getHiveServerPort() {
+    return serverPort;
+  }
+
+  public String getJdbcHive2Url() {
+    return String.format("jdbc:hive2://%s:%s/default", bindIP, serverPort);
+  }
+
+  public HiveConf configureHive(Configuration conf, String localHiveLocation) throws IOException {
     conf.set("hive.metastore.local", "false");
     conf.set(HiveConf.ConfVars.METASTOREURIS.varname, "thrift://" + bindIP + ":" + metastorePort);
     conf.set(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_BIND_HOST.varname, bindIP);

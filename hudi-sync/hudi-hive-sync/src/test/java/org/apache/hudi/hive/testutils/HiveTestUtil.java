@@ -38,7 +38,6 @@ import org.apache.hudi.common.table.log.block.HoodieLogBlock;
 import org.apache.hudi.common.table.log.block.HoodieLogBlock.HeaderMetadataType;
 import org.apache.hudi.common.table.timeline.HoodieTimeline;
 import org.apache.hudi.common.testutils.SchemaTestUtil;
-import org.apache.hudi.common.testutils.minicluster.HdfsTestService;
 import org.apache.hudi.common.testutils.minicluster.ZookeeperTestService;
 import org.apache.hudi.common.util.FileIOUtils;
 import org.apache.hudi.hive.HiveSyncConfig;
@@ -51,7 +50,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hive.service.server.HiveServer2;
 import org.apache.parquet.avro.AvroSchemaConverter;
@@ -67,6 +65,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,10 +82,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 @SuppressWarnings("SameParameterValue")
 public class HiveTestUtil {
 
-  private static MiniDFSCluster dfsCluster;
   private static ZooKeeperServer zkServer;
   private static HiveServer2 hiveServer;
-  private static HiveTestService hiveTestService;
+  public static HiveTestService hiveTestService;
+  private static ZookeeperTestService zkService;
   private static Configuration configuration;
   public static HiveSyncConfig hiveSyncConfig;
   private static DateTimeFormatter dtfOut;
@@ -93,13 +93,9 @@ public class HiveTestUtil {
   private static Set<String> createdTablesSet = new HashSet<>();
 
   public static void setUp() throws IOException, InterruptedException {
-    if (dfsCluster == null) {
-      HdfsTestService service = new HdfsTestService();
-      dfsCluster = service.start(true);
-      configuration = service.getHadoopConf();
-    }
+    configuration = new Configuration();
     if (zkServer == null) {
-      ZookeeperTestService zkService = new ZookeeperTestService(configuration);
+      zkService = new ZookeeperTestService(configuration);
       zkServer = zkService.start();
     }
     if (hiveServer == null) {
@@ -109,12 +105,12 @@ public class HiveTestUtil {
     fileSystem = FileSystem.get(configuration);
 
     hiveSyncConfig = new HiveSyncConfig();
-    hiveSyncConfig.jdbcUrl = "jdbc:hive2://127.0.0.1:9999/";
+    hiveSyncConfig.jdbcUrl = hiveTestService.getJdbcHive2Url();
     hiveSyncConfig.hiveUser = "";
     hiveSyncConfig.hivePass = "";
     hiveSyncConfig.databaseName = "testdb";
     hiveSyncConfig.tableName = "test1";
-    hiveSyncConfig.basePath = "/tmp/hdfs/TestHiveSyncTool/";
+    hiveSyncConfig.basePath = Files.createTempDirectory("hivesynctest" + Instant.now().toEpochMilli()).toUri().toString();
     hiveSyncConfig.assumeDatePartitioning = true;
     hiveSyncConfig.usePreApacheInputFormat = false;
     hiveSyncConfig.partitionFields = Collections.singletonList("datestr");
@@ -126,8 +122,11 @@ public class HiveTestUtil {
 
   public static void clear() throws IOException {
     fileSystem.delete(new Path(hiveSyncConfig.basePath), true);
-    HoodieTableMetaClient.initTableType(configuration, hiveSyncConfig.basePath, HoodieTableType.COPY_ON_WRITE,
-        hiveSyncConfig.tableName, HoodieAvroPayload.class.getName());
+    HoodieTableMetaClient.withPropertyBuilder()
+      .setTableType(HoodieTableType.COPY_ON_WRITE)
+      .setTableName(hiveSyncConfig.tableName)
+      .setPayloadClass(HoodieAvroPayload.class)
+      .initTable(configuration, hiveSyncConfig.basePath);
 
     HoodieHiveClient client = new HoodieHiveClient(hiveSyncConfig, hiveServer.getHiveConf(), fileSystem);
     for (String tableName : createdTablesSet) {
@@ -149,9 +148,6 @@ public class HiveTestUtil {
     if (hiveTestService != null) {
       hiveTestService.stop();
     }
-    if (dfsCluster != null) {
-      dfsCluster.shutdown();
-    }
     if (zkServer != null) {
       zkServer.shutdown();
     }
@@ -161,8 +157,12 @@ public class HiveTestUtil {
       throws IOException, URISyntaxException {
     Path path = new Path(hiveSyncConfig.basePath);
     FileIOUtils.deleteDirectory(new File(hiveSyncConfig.basePath));
-    HoodieTableMetaClient.initTableType(configuration, hiveSyncConfig.basePath, HoodieTableType.COPY_ON_WRITE,
-        hiveSyncConfig.tableName, HoodieAvroPayload.class.getName());
+    HoodieTableMetaClient.withPropertyBuilder()
+      .setTableType(HoodieTableType.COPY_ON_WRITE)
+      .setTableName(hiveSyncConfig.tableName)
+      .setPayloadClass(HoodieAvroPayload.class)
+      .initTable(configuration, hiveSyncConfig.basePath);
+
     boolean result = fileSystem.mkdirs(path);
     checkResult(result);
     DateTime dateTime = DateTime.now();
@@ -177,15 +177,19 @@ public class HiveTestUtil {
       throws IOException, URISyntaxException, InterruptedException {
     Path path = new Path(hiveSyncConfig.basePath);
     FileIOUtils.deleteDirectory(new File(hiveSyncConfig.basePath));
-    HoodieTableMetaClient.initTableType(configuration, hiveSyncConfig.basePath, HoodieTableType.MERGE_ON_READ,
-        hiveSyncConfig.tableName, HoodieAvroPayload.class.getName());
+    HoodieTableMetaClient.withPropertyBuilder()
+      .setTableType(HoodieTableType.MERGE_ON_READ)
+      .setTableName(hiveSyncConfig.tableName)
+      .setPayloadClass(HoodieAvroPayload.class)
+      .initTable(configuration, hiveSyncConfig.basePath);
 
     boolean result = fileSystem.mkdirs(path);
     checkResult(result);
     DateTime dateTime = DateTime.now();
     HoodieCommitMetadata commitMetadata = createPartitions(numberOfPartitions, true,
         useSchemaFromCommitMetadata, dateTime, commitTime);
-    createdTablesSet.add(hiveSyncConfig.databaseName + "." + hiveSyncConfig.tableName);
+    createdTablesSet
+      .add(hiveSyncConfig.databaseName + "." + hiveSyncConfig.tableName + HiveSyncTool.SUFFIX_READ_OPTIMIZED_TABLE);
     createdTablesSet
         .add(hiveSyncConfig.databaseName + "." + hiveSyncConfig.tableName + HiveSyncTool.SUFFIX_SNAPSHOT_TABLE);
     HoodieCommitMetadata compactionMetadata = new HoodieCommitMetadata();

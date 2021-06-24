@@ -85,7 +85,7 @@ public class HoodieSnapshotExporter {
   public static class OutputFormatValidator implements IValueValidator<String> {
 
     public static final String HUDI = "hudi";
-    public static final List<String> FORMATS = CollectionUtils.createImmutableList("json", "parquet", HUDI);
+    public static final List<String> FORMATS = CollectionUtils.createImmutableList("json", "parquet", "orc", HUDI);
 
     @Override
     public void validate(String name, String value) {
@@ -104,7 +104,7 @@ public class HoodieSnapshotExporter {
     @Parameter(names = {"--target-output-path"}, description = "Base path for the target output files (snapshots)", required = true)
     public String targetOutputPath;
 
-    @Parameter(names = {"--output-format"}, description = "Output format for the exported dataset; accept these values: json|parquet|hudi", required = true,
+    @Parameter(names = {"--output-format"}, description = "Output format for the exported dataset; accept these values: json|parquet|orc|hudi", required = true,
         validateValueWith = OutputFormatValidator.class)
     public String outputFormat;
 
@@ -148,8 +148,8 @@ public class HoodieSnapshotExporter {
   }
 
   private Option<String> getLatestCommitTimestamp(FileSystem fs, Config cfg) {
-    final HoodieTableMetaClient tableMetadata = new HoodieTableMetaClient(fs.getConf(), cfg.sourceBasePath);
-    Option<HoodieInstant> latestCommit = tableMetadata.getActiveTimeline().getCommitsAndCompactionTimeline()
+    final HoodieTableMetaClient tableMetadata = HoodieTableMetaClient.builder().setConf(fs.getConf()).setBasePath(cfg.sourceBasePath).build();
+    Option<HoodieInstant> latestCommit = tableMetadata.getActiveTimeline().getWriteTimeline()
         .filterCompletedInstants().lastInstant();
     return latestCommit.isPresent() ? Option.of(latestCommit.get().getTimestamp()) : Option.empty();
   }
@@ -259,9 +259,9 @@ public class HoodieSnapshotExporter {
 
   private BaseFileOnlyView getBaseFileOnlyView(JavaSparkContext jsc, Config cfg) {
     FileSystem fs = FSUtils.getFs(cfg.sourceBasePath, jsc.hadoopConfiguration());
-    HoodieTableMetaClient tableMetadata = new HoodieTableMetaClient(fs.getConf(), cfg.sourceBasePath);
+    HoodieTableMetaClient tableMetadata = HoodieTableMetaClient.builder().setConf(fs.getConf()).setBasePath(cfg.sourceBasePath).build();
     return new HoodieTableFileSystemView(tableMetadata, tableMetadata
-        .getActiveTimeline().getCommitsAndCompactionTimeline().filterCompletedInstants());
+        .getActiveTimeline().getWriteTimeline().filterCompletedInstants());
   }
 
   public static void main(String[] args) throws IOException {

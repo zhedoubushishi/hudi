@@ -25,6 +25,8 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.IndexedRecord;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import static org.apache.hudi.avro.HoodieAvroUtils.bytesToAvro;
@@ -37,12 +39,15 @@ import static org.apache.hudi.avro.HoodieAvroUtils.getNestedFieldVal;
  */
 public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
 
+  public static final String METADATA_EVENT_TIME_KEY = "metadata.event_time.key";
+  private Option<Object> eventTime = Option.empty();
+
   public DefaultHoodieRecordPayload(GenericRecord record, Comparable orderingVal) {
     super(record, orderingVal);
   }
 
   public DefaultHoodieRecordPayload(Option<GenericRecord> record) {
-    this(record.isPresent() ? record.get() : null, (record1) -> 0); // natural order
+    this(record.isPresent() ? record.get() : null, 0); // natural order
   }
 
   @Override
@@ -51,6 +56,39 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
       return Option.empty();
     }
     GenericRecord incomingRecord = bytesToAvro(recordBytes, schema);
+
+    // Null check is needed here to support schema evolution. The record in storage may be from old schema where
+    // the new ordering column might not be present and hence returns null.
+    if (!needUpdatingPersistedRecord(currentValue, incomingRecord, properties)) {
+      return Option.of(currentValue);
+    }
+
+    /*
+     * We reached a point where the value is disk is older than the incoming record.
+     */
+    eventTime = Option.ofNullable(getNestedFieldVal(incomingRecord, properties.getProperty(HoodiePayloadProps.PAYLOAD_EVENT_TIME_FIELD_PROP), true));
+
+    /*
+     * Now check if the incoming record is a delete record.
+     */
+    if (isDeleteRecord(incomingRecord)) {
+      return Option.empty();
+    } else {
+      return Option.of(incomingRecord);
+    }
+  }
+
+  @Override
+  public Option<Map<String, String>> getMetadata() {
+    Map<String, String> metadata = new HashMap<>();
+    if (eventTime.isPresent()) {
+      metadata.put(METADATA_EVENT_TIME_KEY, String.valueOf(eventTime.get()));
+    }
+    return metadata.isEmpty() ? Option.empty() : Option.of(metadata);
+  }
+
+  protected boolean needUpdatingPersistedRecord(IndexedRecord currentValue,
+                                                IndexedRecord incomingRecord, Properties properties) {
     /*
      * Combining strategy here returns currentValue on disk if incoming record is older.
      * The incoming record can be either a delete (sent as an upsert with _hoodie_is_deleted set to true)
@@ -60,23 +98,10 @@ public class DefaultHoodieRecordPayload extends OverwriteWithLatestAvroPayload {
      * NOTE: Deletes sent via EmptyHoodieRecordPayload and/or Delete operation type do not hit this code path
      * and need to be dealt with separately.
      */
-    Object persistedOrderingVal = getNestedFieldVal((GenericRecord) currentValue, properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), true);
-    Comparable incomingOrderingVal = (Comparable) getNestedFieldVal(incomingRecord, properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), false);
-
-    // Null check is needed here to support schema evolution. The record in storage may be from old schema where
-    // the new ordering column might not be present and hence returns null.
-    if (persistedOrderingVal != null && ((Comparable) persistedOrderingVal).compareTo(incomingOrderingVal) > 0) {
-      return Option.of(currentValue);
-    }
-
-    /*
-     * We reached a point where the value is disk is older than the incoming record.
-     * Now check if the incoming record is a delete record.
-     */
-    if (isDeleteRecord(incomingRecord)) {
-      return Option.empty();
-    } else {
-      return Option.of(incomingRecord);
-    }
+    Object persistedOrderingVal = getNestedFieldVal((GenericRecord) currentValue,
+        properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), true);
+    Comparable incomingOrderingVal = (Comparable) getNestedFieldVal((GenericRecord) incomingRecord,
+        properties.getProperty(HoodiePayloadProps.PAYLOAD_ORDERING_FIELD_PROP), false);
+    return persistedOrderingVal == null || ((Comparable) persistedOrderingVal).compareTo(incomingOrderingVal) <= 0;
   }
 }

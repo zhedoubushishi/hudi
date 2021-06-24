@@ -79,7 +79,14 @@ public class OverwriteWithLatestAvroPayload extends BaseAvroPayload
    * @returns {@code true} if record represents a delete record. {@code false} otherwise.
    */
   protected boolean isDeleteRecord(GenericRecord genericRecord) {
-    Object deleteMarker = genericRecord.get("_hoodie_is_deleted");
+    final String isDeleteKey = "_hoodie_is_deleted";
+    // Modify to be compatible with new version Avro.
+    // The new version Avro throws for GenericRecord.get if the field name
+    // does not exist in the schema.
+    if (genericRecord.getSchema().getField(isDeleteKey) == null) {
+      return false;
+    }
+    Object deleteMarker = genericRecord.get(isDeleteKey);
     return (deleteMarker instanceof Boolean && (boolean) deleteMarker);
   }
 
@@ -87,6 +94,6 @@ public class OverwriteWithLatestAvroPayload extends BaseAvroPayload
    * Return true if value equals defaultValue otherwise false.
    */
   public Boolean overwriteField(Object value, Object defaultValue) {
-    return defaultValue == null ? value == null : defaultValue.toString().equals(value.toString());
+    return defaultValue == null ? value == null : defaultValue.toString().equals(String.valueOf(value));
   }
 }
