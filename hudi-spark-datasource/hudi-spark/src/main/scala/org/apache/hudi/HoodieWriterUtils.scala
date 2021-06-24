@@ -21,12 +21,14 @@ import org.apache.hudi.DataSourceWriteOptions._
 import org.apache.hudi.common.config.{DFSPropertiesConfiguration, TypedProperties}
 
 import scala.collection.JavaConversions.mapAsJavaMap
-import scala.collection.JavaConverters.mapAsScalaMapConverter
-
+import scala.collection.JavaConverters._
 import org.apache.hudi.common.config.HoodieMetadataConfig.DEFAULT_METADATA_ENABLE
 import org.apache.hudi.common.config.HoodieMetadataConfig.DEFAULT_METADATA_VALIDATE
 import org.apache.hudi.common.config.HoodieMetadataConfig.METADATA_ENABLE_PROP
 import org.apache.hudi.common.config.HoodieMetadataConfig.METADATA_VALIDATE_PROP
+import org.apache.hudi.config.HoodieWriteConfig
+import org.apache.hudi.hive.MultiPartKeysValueExtractor
+import org.apache.hudi.keygen.{ComplexKeyGenerator, NonpartitionedKeyGenerator, SimpleKeyGenerator}
 
 /**
  * WriterUtils to assist in write path in Datasource and tests.
@@ -44,7 +46,8 @@ object HoodieWriterUtils {
     * @return
     */
   def parametersWithWriteDefaults(parameters: Map[String, String]): Map[String, String] = {
-    val globalProps = DFSPropertiesConfiguration.getGlobalConfig.asScala.asInstanceOf[Map[String, String]]
+    val inferredProps = inferParameters(parameters)
+    val globalProps = DFSPropertiesConfiguration.getGlobalConfig.asScala
     Map(OPERATION_OPT_KEY -> DEFAULT_OPERATION_OPT_VAL,
       TABLE_TYPE_OPT_KEY -> DEFAULT_TABLE_TYPE_OPT_VAL,
       PRECOMBINE_FIELD_OPT_KEY -> DEFAULT_PRECOMBINE_FIELD_OPT_VAL,
@@ -74,12 +77,44 @@ object HoodieWriterUtils {
       HIVE_USE_JDBC_OPT_KEY -> DEFAULT_HIVE_USE_JDBC_OPT_VAL,
       ASYNC_COMPACT_ENABLE_OPT_KEY -> DEFAULT_ASYNC_COMPACT_ENABLE_OPT_VAL,
       ENABLE_ROW_WRITER_OPT_KEY -> DEFAULT_ENABLE_ROW_WRITER_OPT_VAL
-    ) ++ globalProps ++ translateStorageTypeToTableType(parameters)
+    ) ++ inferredProps ++ globalProps ++ translateStorageTypeToTableType(parameters)
   }
 
   def toProperties(params: Map[String, String]): TypedProperties = {
     val props = new TypedProperties()
     params.foreach(kv => props.setProperty(kv._1, kv._2))
     props
+  }
+
+  def inferParameters(params: Map[String, String]): Map[String, String] = {
+    val inferredParams = collection.mutable.Map[String, String]()
+    // infer HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY
+    if (!params.contains(PARTITIONPATH_FIELD_OPT_KEY)) {
+      inferredParams(HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY) = classOf[NonpartitionedKeyGenerator].getName
+    } else {
+      inferredParams(HIVE_PARTITION_EXTRACTOR_CLASS_OPT_KEY) = classOf[MultiPartKeysValueExtractor].getName
+    }
+    // infer HIVE_PARTITION_FIELDS_OPT_KEY
+    if (params.contains(PARTITIONPATH_FIELD_OPT_KEY)) {
+      inferredParams(HIVE_PARTITION_FIELDS_OPT_KEY) = params(PARTITIONPATH_FIELD_OPT_KEY)
+    }
+    // infer HIVE_TABLE_OPT_KEY
+    if (params.contains(TABLE_NAME_OPT_KEY)) {
+      inferredParams(HIVE_TABLE_OPT_KEY) = params(TABLE_NAME_OPT_KEY)
+    } else if (params.contains(HoodieWriteConfig.TABLE_NAME)) {
+      inferredParams(HIVE_TABLE_OPT_KEY) = params(HoodieWriteConfig.TABLE_NAME)
+    }
+    // infer KEYGENERATOR_CLASS_OPT_KEY
+    if (!params.contains(PARTITIONPATH_FIELD_OPT_KEY)) {
+      inferredParams(KEYGENERATOR_CLASS_OPT_KEY) = classOf[NonpartitionedKeyGenerator].getName
+    } else {
+      val numOfPartFields = params(PARTITIONPATH_FIELD_OPT_KEY).split(",").length
+      if (numOfPartFields == 1) {
+        inferredParams(KEYGENERATOR_CLASS_OPT_KEY) = classOf[SimpleKeyGenerator].getName
+      } else {
+        inferredParams(KEYGENERATOR_CLASS_OPT_KEY) = classOf[ComplexKeyGenerator].getName
+      }
+    }
+    Map() ++ inferredParams
   }
 }
