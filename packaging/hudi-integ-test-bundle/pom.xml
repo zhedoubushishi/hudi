@@ -388,7 +388,7 @@
       <exclusions>
         <exclusion>
           <groupId>org.pentaho</groupId>
-          <artifactId>*</artifactId>
+          <artifactId>pentaho-aggdesigner-algorithm</artifactId>
         </exclusion>
       </exclusions>
       <scope>compile</scope>
