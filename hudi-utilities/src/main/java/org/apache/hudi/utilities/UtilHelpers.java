@@ -183,8 +183,8 @@ public class UtilHelpers {
     return conf;
   }
 
-  public static TypedProperties buildProperties(List<String> props) {
-    TypedProperties properties = new TypedProperties();
+  public static TypedProperties buildProperties(List<String> props, Boolean includeHudiConf) {
+    TypedProperties properties = includeHudiConf ? DFSPropertiesConfiguration.getGlobalConfig() : new TypedProperties();
     props.forEach(x -> {
       String[] kv = x.split("=");
       ValidationUtils.checkArgument(kv.length == 2);

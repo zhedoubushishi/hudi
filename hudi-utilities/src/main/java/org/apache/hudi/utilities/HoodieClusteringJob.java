@@ -25,7 +25,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.client.WriteStatus;
-import org.apache.hudi.common.config.DFSPropertiesConfiguration;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.common.table.HoodieTableMetaClient;
@@ -53,12 +52,9 @@ public class HoodieClusteringJob {
   public HoodieClusteringJob(JavaSparkContext jsc, Config cfg) {
     this.cfg = cfg;
     this.jsc = jsc;
-    this.props = DFSPropertiesConfiguration.getGlobalConfig();
-    if (cfg.propsFilePath == null) {
-      this.props.putAll(UtilHelpers.buildProperties(cfg.configs));
-    } else {
-      this.props.putAll(readConfigFromFileSystem(jsc, cfg));
-    }
+    this.props = cfg.propsFilePath == null
+            ? UtilHelpers.buildProperties(cfg.configs, true)
+            : readConfigFromFileSystem(jsc, cfg);
   }
 
   private TypedProperties readConfigFromFileSystem(JavaSparkContext jsc, Config cfg) {
@@ -66,7 +62,7 @@ public class HoodieClusteringJob {
 
     return UtilHelpers
         .readConfig(fs, new Path(cfg.propsFilePath), cfg.configs)
-        .getConfig();
+        .getConfig(true);
   }
 
   public static class Config implements Serializable {

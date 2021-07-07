@@ -20,7 +20,6 @@ package org.apache.hudi.utilities;
 
 import org.apache.hudi.client.SparkRDDWriteClient;
 import org.apache.hudi.client.common.HoodieSparkEngineContext;
-import org.apache.hudi.common.config.DFSPropertiesConfiguration;
 import org.apache.hudi.common.config.TypedProperties;
 import org.apache.hudi.common.fs.FSUtils;
 import org.apache.hudi.config.HoodieWriteConfig;
@@ -63,12 +62,8 @@ public class HoodieCleaner {
      * Filesystem used.
      */
     FileSystem fs = FSUtils.getFs(cfg.basePath, jssc.hadoopConfiguration());
-    this.props = DFSPropertiesConfiguration.getGlobalConfig();
-    if (cfg.propsFilePath == null) {
-      this.props.putAll(UtilHelpers.buildProperties(cfg.configs));
-    } else {
-      this.props.putAll(UtilHelpers.readConfig(fs, new Path(cfg.propsFilePath), cfg.configs).getConfig());
-    }
+    this.props = cfg.propsFilePath == null ? UtilHelpers.buildProperties(cfg.configs, true)
+            : UtilHelpers.readConfig(fs, new Path(cfg.propsFilePath), cfg.configs).getConfig(true);
     LOG.info("Creating Cleaner with configs : " + props.toString());
   }
 

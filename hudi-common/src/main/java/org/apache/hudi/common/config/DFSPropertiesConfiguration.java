@@ -50,10 +50,10 @@ public class DFSPropertiesConfiguration {
   public static final String CONF_FILE_DIR_ENV_NAME = "HUDI_CONF_DIR";
 
   // props read from hudi-defaults.conf
-  private static final TypedProperties GLOBAL_PROPS = loadGlobalProps();
+  private static final TypedProperties HUDI_CONF_PROPS = loadGlobalProps();
 
   // props read from user defined configuration file or input stream
-  private final TypedProperties externalProps;
+  private final TypedProperties props;
 
   // Keep track of files visited, to detect loops
   private final Set<String> visitedFilePaths;
@@ -63,15 +63,15 @@ public class DFSPropertiesConfiguration {
   private Path currentFilePath;
 
   public DFSPropertiesConfiguration(FileSystem fs, Path filePath) {
-    this.externalProps = new TypedProperties();
+    this.props = new TypedProperties();
     this.visitedFilePaths = new HashSet<>();
     this.fs = fs;
     this.currentFilePath = filePath;
-    addPropsFromFile(filePath);
+    visitFile(filePath);
   }
 
   public DFSPropertiesConfiguration() {
-    this.externalProps = new TypedProperties();
+    this.props = new TypedProperties();
     this.visitedFilePaths = new HashSet<>();
     this.fs = null;
     this.currentFilePath = null;
@@ -85,7 +85,7 @@ public class DFSPropertiesConfiguration {
     DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
     Path defaultConfPath = getDefaultConfPath();
     if (defaultConfPath != null) {
-      conf.addPropsFromFile(defaultConfPath);
+      conf.visitFile(defaultConfPath);
     }
     return conf.getConfig();
   }
@@ -95,7 +95,7 @@ public class DFSPropertiesConfiguration {
    *
    * @param filePath File path for configuration file
    */
-  public void addPropsFromFile(Path filePath) {
+  public void visitFile(Path filePath) {
     try {
       if (visitedFilePaths.contains(filePath.toString())) {
         throw new IllegalStateException("Loop detected; file " + filePath + " already referenced");
@@ -103,8 +103,9 @@ public class DFSPropertiesConfiguration {
       visitedFilePaths.add(filePath.toString());
       currentFilePath = filePath;
       FileSystem fileSystem = fs != null ? fs : filePath.getFileSystem(new Configuration());
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(filePath)));
-      addPropsFromInputStream(reader);
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(filePath)))) {
+        addPropsFromInputStream(reader);
+      }
     } catch (IOException ioe) {
       LOG.error("Error reading in properties from dfs", ioe);
       throw new IllegalArgumentException("Cannot read properties from dfs", ioe);
@@ -127,9 +128,9 @@ public class DFSPropertiesConfiguration {
         String[] split = splitProperty(line);
         if (line.startsWith("include=") || line.startsWith("include =")) {
           Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
-          addPropsFromFile(includeFilePath);
+          visitFile(includeFilePath);
         } else {
-          externalProps.setProperty(split[0], split[1]);
+          props.setProperty(split[0], split[1]);
         }
       }
     } finally {
@@ -138,12 +139,23 @@ public class DFSPropertiesConfiguration {
   }
 
   public TypedProperties getConfig() {
-    return externalProps;
+    return props;
+  }
+
+  public TypedProperties getConfig(Boolean includeHudiConf) {
+    if (includeHudiConf) {
+      TypedProperties mergedProps = new TypedProperties();
+      mergedProps.putAll(HUDI_CONF_PROPS);
+      mergedProps.putAll(props);
+      return mergedProps;
+    } else {
+      return getConfig();
+    }
   }
 
   public static TypedProperties getGlobalConfig() {
     final TypedProperties globalProps = new TypedProperties();
-    globalProps.putAll(GLOBAL_PROPS);
+    globalProps.putAll(HUDI_CONF_PROPS);
     return globalProps;
   }
 
