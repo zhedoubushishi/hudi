@@ -144,7 +144,11 @@ public class TestDFSPropertiesConfiguration {
 
   @Test
   public void testLoadGlobalConfFile() {
-    assertEquals(5, DFSPropertiesConfiguration.loadGlobalProps().size());
-    assertEquals("BLOOM", DFSPropertiesConfiguration.loadGlobalProps().get("hoodie.index.type"));
+    assertEquals(5, DFSPropertiesConfiguration.getGlobalConfig().size());
+    assertEquals("jdbc:hive2://localhost:10000", DFSPropertiesConfiguration.getGlobalConfig().get("hoodie.datasource.hive_sync.jdbcurl"));
+    assertEquals("true", DFSPropertiesConfiguration.getGlobalConfig().get("hoodie.datasource.hive_sync.use_jdbc"));
+    assertEquals("false", DFSPropertiesConfiguration.getGlobalConfig().get("hoodie.datasource.hive_sync.support_timestamp"));
+    assertEquals("BLOOM", DFSPropertiesConfiguration.getGlobalConfig().get("hoodie.index.type"));
+    assertEquals("true", DFSPropertiesConfiguration.getGlobalConfig().get("hoodie.metadata.enable"));
   }
 }

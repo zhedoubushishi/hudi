@@ -52,36 +52,36 @@ public class DFSPropertiesConfiguration {
   // props read from hudi-defaults.conf
   private static final TypedProperties HUDI_CONF_PROPS = loadGlobalProps();
 
+  private final FileSystem fs;
+
+  private Path rootFile;
+
   // props read from user defined configuration file or input stream
   private final TypedProperties props;
 
   // Keep track of files visited, to detect loops
   private final Set<String> visitedFilePaths;
 
-  private final FileSystem fs;
-
-  private Path currentFilePath;
-
-  public DFSPropertiesConfiguration(FileSystem fs, Path filePath) {
+  public DFSPropertiesConfiguration(FileSystem fs, Path rootFile) {
+    this.fs = fs;
+    this.rootFile = rootFile;
     this.props = new TypedProperties();
     this.visitedFilePaths = new HashSet<>();
-    this.fs = fs;
-    this.currentFilePath = filePath;
-    visitFile(filePath);
+    visitFile(rootFile);
   }
 
   public DFSPropertiesConfiguration() {
+    this.fs = null;
+    this.rootFile = null;
     this.props = new TypedProperties();
     this.visitedFilePaths = new HashSet<>();
-    this.fs = null;
-    this.currentFilePath = null;
   }
 
   /**
    * Load global props from hudi-defaults.conf which is under CONF_FILE_DIR_ENV_NAME folder.
    * @return Typed Properties
    */
-  public static TypedProperties loadGlobalProps() {
+  private static TypedProperties loadGlobalProps() {
     DFSPropertiesConfiguration conf = new DFSPropertiesConfiguration();
     Path defaultConfPath = getDefaultConfPath();
     if (defaultConfPath != null) {
@@ -101,10 +101,10 @@ public class DFSPropertiesConfiguration {
         throw new IllegalStateException("Loop detected; file " + filePath + " already referenced");
       }
       visitedFilePaths.add(filePath.toString());
-      currentFilePath = filePath;
+      rootFile = filePath;
       FileSystem fileSystem = fs != null ? fs : filePath.getFileSystem(new Configuration());
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileSystem.open(filePath)))) {
-        addPropsFromInputStream(reader);
+        addProperties(reader);
       }
     } catch (IOException ioe) {
       LOG.error("Error reading in properties from dfs", ioe);
@@ -118,7 +118,7 @@ public class DFSPropertiesConfiguration {
    * @param reader Buffered Reader
    * @throws IOException
    */
-  public void addPropsFromInputStream(BufferedReader reader) throws IOException {
+  public void addProperties(BufferedReader reader) throws IOException {
     try {
       String line;
       while ((line = reader.readLine()) != null) {
@@ -127,7 +127,7 @@ public class DFSPropertiesConfiguration {
         }
         String[] split = splitProperty(line);
         if (line.startsWith("include=") || line.startsWith("include =")) {
-          Path includeFilePath = new Path(currentFilePath.getParent(), split[1]);
+          Path includeFilePath = new Path(rootFile.getParent(), split[1]);
           visitFile(includeFilePath);
         } else {
           props.setProperty(split[0], split[1]);

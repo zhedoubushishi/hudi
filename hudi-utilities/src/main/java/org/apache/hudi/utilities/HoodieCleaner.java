@@ -62,7 +62,7 @@ public class HoodieCleaner {
      * Filesystem used.
      */
     FileSystem fs = FSUtils.getFs(cfg.basePath, jssc.hadoopConfiguration());
-    this.props = cfg.propsFilePath == null ? UtilHelpers.buildProperties(cfg.configs, true)
+    this.props = cfg.propsFilePath == null ? UtilHelpers.buildProperties(cfg.configs)
             : UtilHelpers.readConfig(fs, new Path(cfg.propsFilePath), cfg.configs).getConfig(true);
     LOG.info("Creating Cleaner with configs : " + props.toString());
   }

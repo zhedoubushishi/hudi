@@ -109,7 +109,7 @@ public class StreamerUtil {
     try {
       if (!overriddenProps.isEmpty()) {
         LOG.info("Adding overridden properties to file properties.");
-        conf.addPropsFromInputStream(new BufferedReader(new StringReader(String.join("\n", overriddenProps))));
+        conf.addProperties(new BufferedReader(new StringReader(String.join("\n", overriddenProps))));
       }
     } catch (IOException ioe) {
       throw new HoodieIOException("Unexpected error adding config overrides", ioe);

@@ -318,8 +318,8 @@ public class SparkMain {
       String bootstrapIndexClass, String selectorClass, String keyGeneratorClass, String fullBootstrapInputProvider,
       String payloadClassName, String enableHiveSync, String propsFilePath, List<String> configs) throws IOException {
 
-    TypedProperties properties = propsFilePath == null ? UtilHelpers.buildProperties(configs, false)
-        : UtilHelpers.readConfig(FSUtils.getFs(propsFilePath, jsc.hadoopConfiguration()), new Path(propsFilePath), configs).getConfig();
+    TypedProperties properties = propsFilePath == null ? UtilHelpers.buildProperties(configs)
+        : UtilHelpers.readConfig(FSUtils.getFs(propsFilePath, jsc.hadoopConfiguration()), new Path(propsFilePath), configs).getConfig(true);
 
     properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_BASE_PATH_PROP, sourcePath);
     properties.setProperty(HoodieBootstrapConfig.BOOTSTRAP_KEYGEN_CLASS, keyGeneratorClass);

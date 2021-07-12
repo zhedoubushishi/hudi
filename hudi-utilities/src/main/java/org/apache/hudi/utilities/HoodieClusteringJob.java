@@ -53,7 +53,7 @@ public class HoodieClusteringJob {
     this.cfg = cfg;
     this.jsc = jsc;
     this.props = cfg.propsFilePath == null
-            ? UtilHelpers.buildProperties(cfg.configs, true)
+            ? UtilHelpers.buildProperties(cfg.configs)
             : readConfigFromFileSystem(jsc, cfg);
   }
 
